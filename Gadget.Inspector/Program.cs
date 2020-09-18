@@ -78,7 +78,7 @@ namespace Gadget.Inspector
             actions.Add(action);
         }
 
-        public void UpdateStatus()
+        public void Refresh()
         {
             ServiceController.Refresh();
             var status = ServiceController.Status;
@@ -102,22 +102,37 @@ namespace Gadget.Inspector
         private static async Task Main()
         {
             var services = new List<Service>();
-            var s = new Service("AppReadiness");
-            s.AddStatusHandler(ServiceControllerStatus.Stopped,
-                controller => Console.WriteLine($"{controller.DisplayName} is stopped"));
-            services.Add(s);
-            while (true)
+            RegisterNewService(services);
+            _ = Task.Run(async () =>
             {
                 foreach (var service in services)
                 {
-                    ServiceLogger.Log($"[SERVICE] : {service.ServiceController.ServiceName} " +
-                                      $"[STATUS] : {service.ServiceController.Status}" +
-                                      $"{Environment.NewLine}", service.ServiceController.Status);
-                    service.UpdateStatus();
+                    service.Refresh();
+                    await Task.Delay(5000);
+                }
+            });
+            while (true)
+            {
+                Console.Write(">");
+                var input = Console.ReadLine();
+                if (string.IsNullOrEmpty(input))
+                {
+                    continue;
                 }
 
-                await Task.Delay(5000);
+                var command = new Command(input);
+                command.Execute(services);
             }
+        }
+
+        private static void RegisterNewService(List<Service> services)
+        {
+            var s = new Service("AppReadiness");
+            s.AddStatusHandler(ServiceControllerStatus.Stopped,
+                controller => Console.WriteLine($"{controller.DisplayName} is stopped"));
+            s.AddStatusHandler(ServiceControllerStatus.Running,
+                controller => Console.WriteLine($"{controller.DisplayName} is well and running ♥"));
+            services.Add(s);
         }
     }
 }
