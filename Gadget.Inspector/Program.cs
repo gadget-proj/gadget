@@ -5,19 +5,6 @@ using System.Threading.Tasks;
 
 namespace Gadget.Inspector
 {
-    public interface IServicesProvider
-    {
-        IAsyncEnumerable<string> GetServices();
-    }
-
-    public class ServicesProvider : IServicesProvider
-    {
-        public async IAsyncEnumerable<string> GetServices()
-        {
-            yield return await Task.FromResult("AppReadiness");
-        }
-    }
-
     public static class ServiceLogger
     {
         private static void SetLogColor(ServiceControllerStatus status)
@@ -99,21 +86,25 @@ namespace Gadget.Inspector
 
     class Program
     {
-        private static async Task Main()
+        private static void Main()
         {
             var services = new List<Service>();
-            RegisterNewService(services);
             _ = Task.Run(async () =>
             {
-                foreach (var service in services)
+                while (true)
                 {
-                    service.Refresh();
+                    foreach (var service in services)
+                    {
+                        service.Refresh();
+                    }
                     await Task.Delay(5000);
                 }
             });
             while (true)
             {
+                Console.ForegroundColor = ConsoleColor.DarkCyan;
                 Console.Write(">");
+                Console.ForegroundColor = ConsoleColor.White;
                 var input = Console.ReadLine();
                 if (string.IsNullOrEmpty(input))
                 {
@@ -123,16 +114,6 @@ namespace Gadget.Inspector
                 var command = new Command(input);
                 command.Execute(services);
             }
-        }
-
-        private static void RegisterNewService(List<Service> services)
-        {
-            var s = new Service("AppReadiness");
-            s.AddStatusHandler(ServiceControllerStatus.Stopped,
-                controller => Console.WriteLine($"{controller.DisplayName} is stopped"));
-            s.AddStatusHandler(ServiceControllerStatus.Running,
-                controller => Console.WriteLine($"{controller.DisplayName} is well and running ♥"));
-            services.Add(s);
         }
     }
 }

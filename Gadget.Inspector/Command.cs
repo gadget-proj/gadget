@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.ServiceProcess;
 using System.Text;
 
 namespace Gadget.Inspector
@@ -42,15 +43,35 @@ namespace Gadget.Inspector
             Target = target;
         }
 
+        private static void RegisterNewService(string name, ICollection<Service> services)
+        {
+            var s = new Service(name);
+            s.AddStatusHandler(ServiceControllerStatus.Stopped,
+                controller => { Console.WriteLine($"{Environment.NewLine}> {controller.DisplayName} is stopped"); });
+            s.AddStatusHandler(ServiceControllerStatus.Running,
+                controller =>
+                    Console.WriteLine($"{Environment.NewLine}> {controller.DisplayName} is well and running ♥"));
+            services.Add(s);
+        }
+
         public void Execute(ICollection<Service> services)
         {
             switch (Action)
             {
                 case CommandAction.Create:
-                    services.Add(new Service(Target));
+                    if (Target.ToLower() == "all")
+                    {
+                        foreach (var serviceController in ServiceController.GetServices())
+                        {
+                            RegisterNewService(serviceController.ServiceName, services);
+                        }
+                        break;
+                    }
+
+                    RegisterNewService(Target, services);
                     break;
                 case CommandAction.Delete:
-                    var s = services.SingleOrDefault(svc => svc.Name.ToLower() == Target);
+                    var s = services.SingleOrDefault(svc => svc.ServiceController.ServiceName.ToLower() == Target);
                     services.Remove(s);
                     break;
                 case CommandAction.Display:
