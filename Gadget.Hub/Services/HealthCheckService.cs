@@ -30,8 +30,8 @@ namespace Gadget.Hub.Services
                 foreach (var (key, value) in _connectedClients)
                 {
                     await _hubContext.Clients.Client(key)
-                        .SendAsync("GetServicesReport", cancellationToken: stoppingToken);
-                    _logger.LogInformation($"Client {key}, Guid : {value}");
+                        .SendAsync("GetServicesReport", stoppingToken);
+                    _logger.LogInformation($"Fetching status for client [{key}/{value}]");
                 }
 
                 await Task.Delay(5000, stoppingToken);

@@ -41,7 +41,7 @@ namespace Gadget.Hub.Hubs
             }
             return Task.CompletedTask;
         }
-
+         
         public Task Register(RegisterNewAgent registerNewAgent)
         {
             var cid = Context.ConnectionId;
@@ -50,6 +50,12 @@ namespace Gadget.Hub.Hubs
             _agents[agentId] = new List<Service>();
             _connectedClients[cid] = agentId;
             return Task.CompletedTask;
+        }
+
+        public async Task RestartService(RestartService restartService)
+        {
+            var sid = restartService.AgentId;
+            var connection = _connectedClients.Where(c => c.Value == sid).Select(c => c.Key).Single() ?? throw new ApplicationException("can't find agent's connection");
         }
     }
 }

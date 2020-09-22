@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Reflection;
 using Gadget.Hub.Hubs;
 using Gadget.Hub.Services;
 using Gadget.Messaging;
+using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,6 +22,7 @@ namespace Gadget.Hub
             services.AddSingleton<IDictionary<Guid, ICollection<Service>>>(_ => new ConcurrentDictionary<Guid, ICollection<Service>>());
             services.AddSingleton<IDictionary<string, Guid>>(_ => new Dictionary<string, Guid>());
             services.AddHostedService<HealthCheckService>();
+            services.AddMediatR(Assembly.GetExecutingAssembly());
         }
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
