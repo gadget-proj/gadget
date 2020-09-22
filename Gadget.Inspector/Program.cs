@@ -1,40 +1,55 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Linq;
+using System.ServiceProcess;
+using System.Text.Json;
 using System.Threading.Tasks;
+using Gadget.Messaging;
+using Microsoft.AspNetCore.SignalR.Client;
 
 namespace Gadget.Inspector
 {
-
     class Program
     {
-        private static void Main()
+        private static async Task Main()
         {
-            var services = new List<Service>();
-            _ = Task.Run(async () =>
+            var id = Guid.NewGuid();
+            var connection = new HubConnectionBuilder()
+                .WithAutomaticReconnect()
+                .WithUrl("http://localhost:5000/gadget")
+                .Build();
+            await connection.StartAsync();
+            var registerNewAgent = new RegisterNewAgent
             {
-                while (true)
+                AgentId = id,
+                Machine = Environment.MachineName
+            };
+            await connection.InvokeAsync("Register", registerNewAgent);
+            connection.On("GetServicesReport", async () =>
+            {
+                Console.WriteLine("On GetServicesReport");
+                try
                 {
-                    foreach (var service in services)
+                    var services = ServiceController.GetServices().Select(s => new Messaging.Service
                     {
-                        service.Refresh();
-                    }
-                    await Task.Delay(5000);
+                        Name = s.ServiceName,
+                        Status = s.Status.ToString()
+                    });
+                    var report = new RegisterNewAgent
+                    {
+                        Machine = Environment.MachineName,
+                        AgentId = id,
+                        Services = services
+                    };
+                    await connection.InvokeAsync<RegisterMachineReport>("RegisterMachineReport", report);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                    throw;
                 }
             });
-            while (true)
-            {
-                Console.ForegroundColor = ConsoleColor.DarkCyan;
-                Console.Write(">");
-                Console.ForegroundColor = ConsoleColor.White;
-                var input = Console.ReadLine();
-                if (string.IsNullOrEmpty(input))
-                {
-                    continue;
-                }
-
-                var command = new Command(input);
-                command.Execute(services);
-            }
+            Console.WriteLine("Registered");
+            Console.ReadKey();
         }
     }
 }

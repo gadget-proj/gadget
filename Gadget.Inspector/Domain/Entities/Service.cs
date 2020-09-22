@@ -1,7 +1,4 @@
-﻿using System;
-using Gadget.Hub.Domain.Enums;
-
-namespace Gadget.Hub.Domain
+﻿namespace Gadget.Inspector.Domain.Entities
 {
     public class Service
     {

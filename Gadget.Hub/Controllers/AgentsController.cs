@@ -1,7 +1,9 @@
-﻿using Gadget.Hub.Domain;
-using Microsoft.AspNetCore.Mvc;
+﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using Gadget.Messaging;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Gadget.Hub.Controllers
 {
@@ -9,22 +11,30 @@ namespace Gadget.Hub.Controllers
     [Route("[controller]")]
     public class AgentsController : ControllerBase
     {
-        private readonly IDictionary<string, ICollection<Service>> _agents;
+        private readonly IDictionary<Guid, ICollection<Service>> _agents;
 
-        public AgentsController(IDictionary<string, ICollection<Service>> agents)
+        public AgentsController(IDictionary<Guid, ICollection<Service>> agents)
         {
             _agents = agents;
         }
 
         [HttpGet]
-        public async Task<IActionResult> Foo()
+        public async Task<IActionResult> GetAllAgents()
         {
-            if (!_agents.TryGetValue("foo", out var foo))
-            {
-                foo = new List<Service>();
-                _agents["foo"] = foo;
-            }
-            return Ok(foo);
+            var keys = _agents.Keys;
+            return Ok(keys.Select(k => new { Agent = k }));
         }
+
+        [HttpGet("{agentId:guid}")]
+        public async Task<IActionResult> GetAgentInfo(Guid agentId)
+        {
+            if (_agents.TryGetValue(agentId, out var services))
+            {
+                return Ok(services);
+            }
+
+            return NotFound();
+        }
+
     }
 }
