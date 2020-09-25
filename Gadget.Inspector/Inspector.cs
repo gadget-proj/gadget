@@ -55,13 +55,19 @@ namespace Gadget.Inspector
         {
             _hubConnection.On<StopService>("StopService", async (command) =>
             {
+                Console.WriteLine($"Trying to stop {command.ServiceName} service");
                 var service = GetService(command.ServiceName);
                 service.Stop();
+                service.Refresh();
+                Console.WriteLine(service.Status);
             });
             _hubConnection.On<StartService>("StartService", async (command) =>
             {
+                Console.WriteLine($"Trying to start {command.ServiceName} service");
                 var service = GetService(command.ServiceName);
                 service.Start();
+                service.Refresh();
+                Console.WriteLine(service.Status);
             });
             _hubConnection.On("GetServicesReport", async () =>
             {

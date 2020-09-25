@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Gadget.Messaging;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 
 namespace Gadget.Server.Controllers
 {
@@ -35,6 +36,5 @@ namespace Gadget.Server.Controllers
 
             return NotFound();
         }
-
     }
 }

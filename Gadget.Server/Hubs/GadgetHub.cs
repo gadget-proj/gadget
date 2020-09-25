@@ -55,9 +55,16 @@ namespace Gadget.Server.Hubs
 
         public async Task StopService(StopService stopService)
         {
-            var group = stopService.AgentId;
-            var connectionId = _connectedClients.FirstOrDefault(e => e.Value == group).Key;
-            await Clients.Client(connectionId).SendAsync("StopService", stopService);
+            try
+            {
+                var group = stopService.AgentId;
+                var connectionId = _connectedClients.FirstOrDefault(e => e.Value == group).Key;
+                await Clients.Client(connectionId).SendAsync("StopService", stopService);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e.Message);
+            }
         }
 
         public async Task StartService(StartService startService)
