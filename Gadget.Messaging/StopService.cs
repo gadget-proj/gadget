@@ -2,7 +2,7 @@
 
 namespace Gadget.Messaging
 {
-    public class RestartService
+    public class StopService
     {
         public Guid AgentId { get; set; }
         public string ServiceName { get; set; }

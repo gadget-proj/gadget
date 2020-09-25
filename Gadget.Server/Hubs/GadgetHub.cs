@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Gadget.Messaging;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.SignalR;
+using Gadget.Server.Commands;
 
 namespace Gadget.Server.Hubs
 {
@@ -38,6 +39,7 @@ namespace Gadget.Server.Hubs
             {
                 _logger.LogInformation($"Service name : {service.Name} status : {service.Status}");
             }
+
             return Task.CompletedTask;
         }
 
@@ -51,11 +53,18 @@ namespace Gadget.Server.Hubs
             return Task.CompletedTask;
         }
 
-        public async Task RestartService(RestartService restartService)
+        public async Task StopService(StopService stopService)
         {
-            
-            var sid = restartService.AgentId;
-            var connection = _connectedClients.Where(c => c.Value == sid).Select(c => c.Key).Single() ?? throw new ApplicationException("can't find agent's connection");
+            var group = stopService.AgentId;
+            var connectionId = _connectedClients.FirstOrDefault(e => e.Value == group).Key;
+            await Clients.Client(connectionId).SendAsync("StopService", stopService);
+        }
+
+        public async Task StartService(StartService startService)
+        {
+            var group = startService.AgentId;
+            var connectionId = _connectedClients.FirstOrDefault(e => e.Value == group).Key;
+            await Clients.Client(connectionId).SendAsync("StartService", startService);
         }
     }
 }

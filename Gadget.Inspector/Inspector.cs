@@ -43,8 +43,26 @@ namespace Gadget.Inspector
             await _hubConnection.InvokeAsync("Register", registerNewAgent);
         }
 
+        private static ServiceController GetService(string serviceName)
+        {
+            if (string.IsNullOrEmpty(serviceName))
+            {
+                throw new ArgumentException("Value cannot be null or empty.", nameof(serviceName));
+            }
+            return ServiceController.GetServices().Single(s => string.Equals(s.ServiceName, serviceName, StringComparison.CurrentCultureIgnoreCase));
+        }
         private void RegisterHandlers()
         {
+            _hubConnection.On<StopService>("StopService", async (command) =>
+            {
+                var service = GetService(command.ServiceName);
+                service.Stop();
+            });
+            _hubConnection.On<StartService>("StartService", async (command) =>
+            {
+                var service = GetService(command.ServiceName);
+                service.Start();
+            });
             _hubConnection.On("GetServicesReport", async () =>
             {
                 _logger?.LogInformation($"Received request for services report");
