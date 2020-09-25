@@ -33,9 +33,13 @@ namespace Gadget.Inspector
             var services = ServiceController.GetServices().Select(s => (s.ServiceName, new WindowsService(s)));
             foreach (var s in services)
             {
-                s.Item2.StatusChanged += (caller, @event) =>
+                s.Item2.StatusChanged += async (caller, @event) =>
                 {
-                    Console.WriteLine($"[{@event.ServiceName}] status has changed");
+                    await _hubConnection.InvokeAsync("ServiceStatusChanged", new ServiceStatusChanged
+                    {
+                        Name = @event.ServiceName,
+                        Status = @event.Status.ToString()
+                    });
                 };
                 _services.Add(s.ServiceName, s.Item2);
             }

@@ -52,6 +52,26 @@ namespace Gadget.Server.Hubs
             return Task.CompletedTask;
         }
 
+        public Task ServiceStatusChanged(ServiceStatusChanged serviceStatusChanged)
+        {
+            var cid = Context.ConnectionId;
+            if (!_connectedClients.TryGetValue(cid, out var agentId))
+            {
+                return Task.CompletedTask;
+            }
+
+            if (!_agents.TryGetValue(agentId, out var services))
+            {
+                return Task.CompletedTask;
+            }
+
+            var serviceName = serviceStatusChanged.Name;
+            var serviceStatus = serviceStatusChanged.Status;
+            var service = services.Single(s => s.Name.ToLower() == serviceName.ToLower());
+            service.Status = serviceStatus;
+            return Task.CompletedTask;
+        }
+
         public async Task StopService(StopService stopService)
         {
             try
