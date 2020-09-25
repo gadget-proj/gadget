@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Gadget.Messaging;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Gadget.Hub.Controllers
+namespace Gadget.Server.Controllers
 {
     [ApiController]
     [Route("[controller]")]

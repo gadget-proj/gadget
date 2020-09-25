@@ -1,4 +1,4 @@
-﻿namespace Gadget.Hub.Domain
+﻿namespace Gadget.Server.Domain
 {
     public class Service
     {

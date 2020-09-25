@@ -1,4 +1,4 @@
-namespace Gadget.Hub.Domain.Enums
+namespace Gadget.Server.Domain.Enums
 {
     public enum ServiceState
     {

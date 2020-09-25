@@ -3,13 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Gadget.Messaging;
-using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
-using Service = Gadget.Messaging.Service;
+using Microsoft.AspNetCore.SignalR;
 
-namespace Gadget.Hub.Hubs
+namespace Gadget.Server.Hubs
 {
-    public class GadgetHub : Hub<GadgetHub>
+    public class GadgetHub : Hub
     {
         private readonly IDictionary<Guid, ICollection<Service>> _agents;
         private readonly IDictionary<string, Guid> _connectedClients;
@@ -41,7 +40,7 @@ namespace Gadget.Hub.Hubs
             }
             return Task.CompletedTask;
         }
-         
+
         public Task Register(RegisterNewAgent registerNewAgent)
         {
             var cid = Context.ConnectionId;
@@ -54,6 +53,7 @@ namespace Gadget.Hub.Hubs
 
         public async Task RestartService(RestartService restartService)
         {
+            
             var sid = restartService.AgentId;
             var connection = _connectedClients.Where(c => c.Value == sid).Select(c => c.Key).Single() ?? throw new ApplicationException("can't find agent's connection");
         }

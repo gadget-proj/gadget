@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Gadget.Hub.Hubs;
+using Gadget.Server.Hubs;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace Gadget.Hub.Services
+namespace Gadget.Server.Services
 {
     public class HealthCheckService : BackgroundService
     {

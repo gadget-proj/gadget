@@ -2,6 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <AssemblyName>Gadget.Server</AssemblyName>
+    <RootNamespace>Gadget.Server</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

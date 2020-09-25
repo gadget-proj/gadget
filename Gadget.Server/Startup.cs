@@ -2,16 +2,16 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Reflection;
-using Gadget.Hub.Hubs;
-using Gadget.Hub.Services;
 using Gadget.Messaging;
+using Gadget.Server.Hubs;
+using Gadget.Server.Services;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace Gadget.Hub
+namespace Gadget.Server
 {
     public class Startup
     {

@@ -1,0 +1,8 @@
+﻿syntax = "proto3";
+
+option cshapr_namespace = "Gadget.Proto"
+
+package = "Gadget"
+
+service Gadget {
+}

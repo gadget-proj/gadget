@@ -1,11 +1,10 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
-using Gadget.Hub.Hubs;
+using Gadget.Server.Hubs;
 using MediatR;
 using Microsoft.AspNetCore.SignalR;
 
-namespace Gadget.Hub.Commands
+namespace Gadget.Server.Commands
 {
     public class RestartService : IRequest
     {
@@ -25,6 +24,7 @@ namespace Gadget.Hub.Commands
         public async Task<Unit> Handle(RestartService request, CancellationToken cancellationToken)
         {
             await _hubContext.Clients.Client(request.ConnectionId).SendAsync("RestartService");
+            return Unit.Value;
         }
     }
 }

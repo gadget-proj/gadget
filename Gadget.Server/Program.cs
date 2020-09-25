@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 
-namespace Gadget.Hub
+namespace Gadget.Server
 {
     public class Program
     {
