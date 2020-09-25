@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.ServiceProcess;
 using System.Threading.Tasks;
@@ -13,6 +14,7 @@ namespace Gadget.Inspector
         private readonly ILogger<Inspector> _logger;
         private readonly HubConnection _hubConnection;
         private readonly Guid _id;
+        private readonly IDictionary<string, WindowsService> _services;
 
         public Inspector(Uri hubAddress, ILogger<Inspector> logger = null)
         {
@@ -22,11 +24,26 @@ namespace Gadget.Inspector
                 .WithAutomaticReconnect()
                 .WithUrl(hubAddress)
                 .Build();
+            _services = new Dictionary<string, WindowsService>();
         }
 
         public async Task Start()
         {
             RegisterHandlers();
+            var services = ServiceController.GetServices().Select(s => (s.ServiceName, new WindowsService(s)));
+            foreach (var s in services)
+            {
+                s.Item2.StatusChanged += async (caller, @event) =>
+                {
+                    await _hubConnection.InvokeAsync("ServiceStatusChanged", new ServiceStatusChanged
+                    {
+                        Name = @event.ServiceName,
+                        Status = @event.Status.ToString()
+                    });
+                };
+                _services.Add(s.ServiceName, s.Item2);
+            }
+
             try
             {
                 await _hubConnection.StartAsync();
@@ -35,65 +52,36 @@ namespace Gadget.Inspector
             {
                 _logger?.LogError($"{e.Message}");
             }
+
             var registerNewAgent = new RegisterNewAgent
             {
                 AgentId = _id,
-                Machine = Environment.MachineName
+                Machine = Environment.MachineName,
+                Services = services.Select(s => new Messaging.Service
+                {
+                    Name = s.ServiceName,
+                    Status = s.Item2.Status.ToString()
+                })
             };
             await _hubConnection.InvokeAsync("Register", registerNewAgent);
         }
 
-        private static ServiceController GetService(string serviceName)
-        {
-            if (string.IsNullOrEmpty(serviceName))
-            {
-                throw new ArgumentException("Value cannot be null or empty.", nameof(serviceName));
-            }
-            return ServiceController.GetServices().Single(s => string.Equals(s.ServiceName, serviceName, StringComparison.CurrentCultureIgnoreCase));
-        }
         private void RegisterHandlers()
         {
             _hubConnection.On<StopService>("StopService", async (command) =>
             {
                 Console.WriteLine($"Trying to stop {command.ServiceName} service");
-                var service = GetService(command.ServiceName);
-                service.Stop();
-                service.Refresh();
-                Console.WriteLine(service.Status);
+                if (_services.TryGetValue(command.ServiceName, out var service))
+                {
+                    service.Stop();
+                }
             });
             _hubConnection.On<StartService>("StartService", async (command) =>
             {
                 Console.WriteLine($"Trying to start {command.ServiceName} service");
-                var service = GetService(command.ServiceName);
-                service.Start();
-                service.Refresh();
-                Console.WriteLine(service.Status);
-            });
-            _hubConnection.On("GetServicesReport", async () =>
-            {
-                _logger?.LogInformation($"Received request for services report");
-                try
+                if (_services.TryGetValue(command.ServiceName, out var service))
                 {
-                    var services = ServiceController.GetServices().Select(s => new Messaging.Service
-                    {
-                        Name = s.ServiceName,
-                        Status = s.Status.ToString()
-                    }).ToList();
-
-                    _logger?.LogInformation($"{services.Count} service found");
-
-                    var report = new RegisterNewAgent
-                    {
-                        Machine = Environment.MachineName,
-                        AgentId = _id,
-                        Services = services
-                    };
-                    _logger?.LogInformation($"Sending service report");
-                    await _hubConnection.InvokeAsync<RegisterMachineReport>("RegisterMachineReport", report);
-                }
-                catch (Exception e)
-                {
-                    _logger?.LogError($"{e.Message}");
+                    service.Start();
                 }
             });
         }
