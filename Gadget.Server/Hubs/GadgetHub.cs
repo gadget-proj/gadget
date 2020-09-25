@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Gadget.Messaging;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.SignalR;
-using Gadget.Server.Commands;
 
 namespace Gadget.Server.Hubs
 {
