@@ -47,7 +47,7 @@ namespace Gadget.Server.Hubs
             var cid = Context.ConnectionId;
             var agentId = registerNewAgent.AgentId;
             if (_agents.ContainsKey(agentId)) return Task.CompletedTask;
-            _agents[agentId] = new List<Service>();
+            _agents[agentId] = registerNewAgent.Services.ToList();
             _connectedClients[cid] = agentId;
             return Task.CompletedTask;
         }

@@ -1,11 +1,9 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Reflection;
 using Gadget.Messaging;
 using Gadget.Server.Hubs;
 using Gadget.Server.Services;
-using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,8 +19,7 @@ namespace Gadget.Server
             services.AddControllers();
             services.AddSingleton<IDictionary<Guid, ICollection<Service>>>(_ => new ConcurrentDictionary<Guid, ICollection<Service>>());
             services.AddSingleton<IDictionary<string, Guid>>(_ => new Dictionary<string, Guid>());
-            services.AddHostedService<HealthCheckService>();
-            services.AddMediatR(Assembly.GetExecutingAssembly());
+            // services.AddHostedService<HealthCheckService>();
         }
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
