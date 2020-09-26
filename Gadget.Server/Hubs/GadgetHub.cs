@@ -42,6 +42,14 @@ namespace Gadget.Server.Hubs
             return Task.CompletedTask;
         }
 
+        //TODO Remove from group on disconnect
+        public Task RegisterDashboard(RegisterNewDashboard registerNewDashboard)
+        {
+            var cid = Context.ConnectionId;
+            Groups.AddToGroupAsync("dashboard", cid);
+            return Task.CompletedTask;
+        }
+
         public Task Register(RegisterNewAgent registerNewAgent)
         {
             var cid = Context.ConnectionId;
@@ -67,8 +75,10 @@ namespace Gadget.Server.Hubs
 
             var serviceName = serviceStatusChanged.Name;
             var serviceStatus = serviceStatusChanged.Status;
-            var service = services.Single(s => s.Name.ToLower() == serviceName.ToLower());
+            var service = services.Single(s =>
+                string.Equals(s.Name, serviceName, StringComparison.CurrentCultureIgnoreCase));
             service.Status = serviceStatus;
+            Clients.Group("dashboard").SendAsync("ServiceStatusChanged", serviceStatusChanged);
             return Task.CompletedTask;
         }
 

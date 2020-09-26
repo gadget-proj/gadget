@@ -10,4 +10,12 @@
     <ProjectReference Include="..\Gadget.Messaging\Gadget.Messaging.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Domain\Enums" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Domain\Enums\ServiceState.cs" />
+  </ItemGroup>
+
 </Project>
