@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.ServiceProcess;
 
-namespace Gadget.Inspector
+namespace Gadget.Inspector.Commands
 {
     class CreateCommand : ICommand
     {

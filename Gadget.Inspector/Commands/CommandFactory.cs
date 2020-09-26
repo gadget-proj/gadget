@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Gadget.Inspector
+namespace Gadget.Inspector.Commands
 {
     public static class CommandFactory
     {

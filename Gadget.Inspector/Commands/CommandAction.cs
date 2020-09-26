@@ -1,4 +1,4 @@
-﻿namespace Gadget.Inspector
+﻿namespace Gadget.Inspector.Commands
 {
     public enum CommandAction
     {

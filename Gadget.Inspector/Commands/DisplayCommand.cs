@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Gadget.Inspector
+namespace Gadget.Inspector.Commands
 {
     class DisplayCommand : ICommand
     {

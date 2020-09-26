@@ -30,10 +30,14 @@ namespace Gadget.Inspector
         public async Task Start()
         {
             RegisterHandlers();
-            var services = ServiceController.GetServices().Select(s => (s.ServiceName, new WindowsService(s)));
-            foreach (var s in services)
+            var services = ServiceController
+                .GetServices()
+                .Select(s => (s.ServiceName, new WindowsService(s)))
+                .ToList();
+            
+            foreach (var (serviceName, windowsService) in services)
             {
-                s.Item2.StatusChanged += async (caller, @event) =>
+                windowsService.StatusChanged += async (caller, @event) =>
                 {
                     await _hubConnection.InvokeAsync("ServiceStatusChanged", new ServiceStatusChanged
                     {
@@ -41,7 +45,7 @@ namespace Gadget.Inspector
                         Status = @event.Status.ToString()
                     });
                 };
-                _services.Add(s.ServiceName, s.Item2);
+                _services.Add(serviceName, windowsService);
             }
 
             try
@@ -60,7 +64,7 @@ namespace Gadget.Inspector
                 Services = services.Select(s => new Messaging.Service
                 {
                     Name = s.ServiceName,
-                    Status = s.Item2.Status.ToString()
+                    Status = s.Item2?.Status.ToString()
                 })
             };
             await _hubConnection.InvokeAsync("Register", registerNewAgent);
