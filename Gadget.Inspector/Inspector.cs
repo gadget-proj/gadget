@@ -29,18 +29,25 @@ namespace Gadget.Inspector
 
         public async Task Start()
         {
+            await _hubConnection.StartAsync();
             RegisterHandlers();
+            while (_hubConnection.State != HubConnectionState.Connected)
+            {
+                Console.WriteLine("trying to connect");
+                await Task.Delay(TimeSpan.FromSeconds(1));
+            }
             var services = ServiceController
                 .GetServices()
                 .Select(s => (s.ServiceName, new WindowsService(s)))
                 .ToList();
-            
+
             foreach (var (serviceName, windowsService) in services)
             {
                 windowsService.StatusChanged += async (caller, @event) =>
                 {
                     await _hubConnection.InvokeAsync("ServiceStatusChanged", new ServiceStatusChanged
                     {
+                        AgentId = _id,
                         Name = @event.ServiceName,
                         Status = @event.Status.ToString()
                     });

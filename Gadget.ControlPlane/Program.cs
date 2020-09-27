@@ -1,11 +1,7 @@
-﻿using Gadget.Messaging;
-using Microsoft.AspNetCore.SignalR.Client;
-using System;
-using System.Linq;
-using System.Runtime.InteropServices.ComTypes;
-using System.ServiceProcess;
+﻿using System;
 using System.Threading.Tasks;
-using static System.String;
+using Gadget.Messaging;
+using Microsoft.AspNetCore.SignalR.Client;
 
 namespace Gadget.ControlPlane
 {
@@ -15,26 +11,34 @@ namespace Gadget.ControlPlane
         {
             var connection = new HubConnectionBuilder()
                 .WithAutomaticReconnect()
-                .WithUrl("https://localhost:5001/gadget")
+                // .WithUrl("https://localhost:5001/gadget")
+                // .WithUrl("https://unfold.azurewebsites.net/gadget")
+                .WithUrl("https://webscoket.noinputsignal.com/gadget/gadget/")
                 .Build();
             await connection.StartAsync();
-            
-            Console.Write("agent >");
-            var agent = Console.ReadLine();
-            Console.Write("svc >");
-            var service = Console.ReadLine();
-            var command = new StopService
+            await connection.InvokeAsync("RegisterDashboard", new RegisterNewDashboard());
+            connection.On<ServiceStatusChanged>("ServiceStatusChanged", msg =>
             {
-                AgentId = Guid.Parse(agent),
-                ServiceName = service
-            };
-            await connection.InvokeAsync("StopService", command);
-            Console.WriteLine("donzo");
-            // var service = ServiceController.GetServices().Single(s =>
-            //     string.Equals(s.ServiceName, "BTAGService", StringComparison.CurrentCultureIgnoreCase));
-            // service.Stop();
-            // service.Refresh();
-            // Console.WriteLine(service.Status);
+                Console.WriteLine($"{msg.Name} {msg.Status}");
+            });
+            Console.WriteLine("ok!");
+            Console.ReadLine();
+            // while (true)
+            // {fxs-draganddrop
+            //     var input = Console.ReadLine();
+            //     ICommand command;
+            //     switch (input)
+            //     {
+            //         case "list":
+            //             command = new GetAllAgents();
+            //             break;
+            //         default:
+            //             continue;
+            //     }
+            //
+            //     await command.Execute();
+            // }
+            // ReSharper disable once FunctionNeverReturns
         }
     }
 }

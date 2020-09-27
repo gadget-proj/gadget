@@ -45,8 +45,9 @@ namespace Gadget.Server.Hubs
         //TODO Remove from group on disconnect
         public Task RegisterDashboard(RegisterNewDashboard registerNewDashboard)
         {
+            _logger.LogCritical($"HEj hej hej roman");
             var cid = Context.ConnectionId;
-            Groups.AddToGroupAsync("dashboard", cid);
+            Groups.AddToGroupAsync(cid, "dashboard");
             return Task.CompletedTask;
         }
 

@@ -15,6 +15,21 @@ namespace Gadget.Server
     {
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAll",
+                    corsBuilder =>
+                    {
+                        corsBuilder
+                            .WithOrigins("localhost:3000")
+                            .WithOrigins("http://localhost:3000")
+                            .AllowAnyMethod()
+                            .AllowAnyHeader()
+                            .AllowCredentials();
+                    });
+                ;
+            });
+
             services.AddSignalR();
             services.AddControllers();
             services.AddSingleton<IDictionary<Guid, ICollection<Service>>>(_ => new ConcurrentDictionary<Guid, ICollection<Service>>());
@@ -27,7 +42,7 @@ namespace Gadget.Server
             {
                 app.UseDeveloperExceptionPage();
             }
-
+            app.UseCors("AllowAll");
             app.UseRouting();
 
             app.UseEndpoints(endpoints =>

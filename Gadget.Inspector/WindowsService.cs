@@ -27,7 +27,6 @@ namespace Gadget.Inspector
                 return currentStatus;
             }
         }
-
         public WindowsService(ServiceController serviceController)
         {
             _serviceController = serviceController;
