@@ -18,4 +18,8 @@
     <Compile Remove="Domain\Enums\ServiceState.cs" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="InfluxDB.Client" Version="1.11.0" />
+  </ItemGroup>
+
 </Project>

@@ -34,6 +34,7 @@ namespace Gadget.Inspector
         }
         private void StartWatcher()
         {
+            //Possibly stealing thread from thread pool and never returning it
             var _ = Task.Run(async () =>
             {
                 while (true)
@@ -43,7 +44,7 @@ namespace Gadget.Inspector
                     if (currentStatus != _lastKnownStatus)
                     {
                         Console.WriteLine("[ws] status has changed");
-                        StatusChanged.Invoke(null, new WindowsServiceStatusChanged
+                        StatusChanged.Invoke(this, new WindowsServiceStatusChanged
                         {
                             ServiceName = _serviceController.ServiceName,
                             Status = currentStatus

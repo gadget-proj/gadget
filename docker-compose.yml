@@ -1,0 +1,28 @@
+version: "3"
+services:
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile.server
+    ports:
+      - 4448:5000
+  influx:
+    image: influxdb:latest
+    volumes:
+      - influxdb_data:/var/lib/influxdb
+    ports:
+      - "8086:8086"
+      - "8083:8083"
+      - "9999:9999"
+    restart: always
+  chronograf:
+    image: chronograf:1.5
+    ports:
+      - 127.0.0.1:8087:8888
+    restart: always
+  grafana:
+    image: "grafana/grafana"
+    ports:
+      - 3000:3000
+volumes:
+  influxdb_data:

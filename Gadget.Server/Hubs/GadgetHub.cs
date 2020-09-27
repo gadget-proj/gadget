@@ -5,6 +5,9 @@ using System.Threading.Tasks;
 using Gadget.Messaging;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.SignalR;
+using InfluxDB.Client;
+using InfluxDB.Client.Writes;
+using InfluxDB.Client.Api.Domain;
 
 namespace Gadget.Server.Hubs
 {
@@ -80,6 +83,23 @@ namespace Gadget.Server.Hubs
                 string.Equals(s.Name, serviceName, StringComparison.CurrentCultureIgnoreCase));
             service.Status = serviceStatus;
             Clients.Group("dashboard").SendAsync("ServiceStatusChanged", serviceStatusChanged);
+            try
+            {
+                var influxDBClient = InfluxDBClientFactory.Create("http://influx:8086", "".ToCharArray());
+                using var writeApi = influxDBClient.GetWriteApi();
+                _logger.LogInformation("writing to influx");
+                var check = PointData.Measurement("serviceHealth")
+                    .Tag("serviceName", serviceName)
+                    .Tag("agentId", agentId.ToString())
+                    .Field("status", serviceStatus)
+                    .Timestamp(DateTime.UtcNow, WritePrecision.Ns);
+                writeApi.WritePoint("gadget.hc", "gadget", check);
+            }
+            catch (Exception exception)
+            {
+                _logger.LogCritical(exception.Message);
+            }
+            _logger.LogInformation("done writing to influx");
             return Task.CompletedTask;
         }
 
