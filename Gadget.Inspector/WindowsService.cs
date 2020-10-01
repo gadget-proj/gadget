@@ -4,11 +4,12 @@ using System.Threading.Tasks;
 
 namespace Gadget.Inspector
 {
-    internal class WindowsService
+    internal class WindowsService : IWindowsService
     {
         private readonly ServiceController _serviceController;
         private ServiceControllerStatus _lastKnownStatus;
         public EventHandler<WindowsServiceStatusChanged> StatusChanged;
+
         public ServiceControllerStatus Status
         {
             get
@@ -24,11 +25,13 @@ namespace Gadget.Inspector
                 return currentStatus;
             }
         }
+
         public WindowsService(ServiceController serviceController)
         {
             _serviceController = serviceController;
             StartWatcher();
         }
+
         private void StartWatcher()
         {
             //Possibly stealing thread from thread pool and never returning it
@@ -47,13 +50,14 @@ namespace Gadget.Inspector
                             Status = currentStatus
                         });
                     }
+
                     _lastKnownStatus = currentStatus;
                     await Task.Delay(1000);
                 }
             });
         }
+
         public void Start() => _serviceController.Start();
         public void Stop() => _serviceController.Stop();
-
     }
 }
