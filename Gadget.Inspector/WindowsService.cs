@@ -4,9 +4,6 @@ using System.Threading.Tasks;
 
 namespace Gadget.Inspector
 {
-    /// <summary>
-    /// TODO Handler on status changed
-    /// </summary>
     internal class WindowsService
     {
         private readonly ServiceController _serviceController;
