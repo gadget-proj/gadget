@@ -79,7 +79,7 @@ namespace Gadget.Inspector
 
         private void RegisterHandlers()
         {
-            _hubConnection.On<StopService>("StopService", async (command) =>
+            _hubConnection.On<StopService>("StopService", (command) =>
             {
                 Console.WriteLine($"Trying to stop {command.ServiceName} service");
                 if (_services.TryGetValue(command.ServiceName, out var service))
@@ -87,7 +87,7 @@ namespace Gadget.Inspector
                     service.Stop();
                 }
             });
-            _hubConnection.On<StartService>("StartService", async (command) =>
+            _hubConnection.On<StartService>("StartService", (command) =>
             {
                 Console.WriteLine($"Trying to start {command.ServiceName} service");
                 if (_services.TryGetValue(command.ServiceName, out var service))

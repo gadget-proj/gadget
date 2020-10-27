@@ -20,21 +20,18 @@ namespace Gadget.Server.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllAgents()
+        public Task<IActionResult> GetAllAgents()
         {
             var keys = _agents.Keys;
-            return Ok(keys.Select(k => new { Agent = k }));
+            return Task.FromResult<IActionResult>(Ok(keys.Select(k => new {Agent = k})));
         }
 
         [HttpGet("{agentId:guid}")]
-        public async Task<IActionResult> GetAgentInfo(Guid agentId)
+        public Task<IActionResult> GetAgentInfo(Guid agentId)
         {
-            if (_agents.TryGetValue(agentId, out var services))
-            {
-                return Ok(services);
-            }
-
-            return NotFound();
+            return _agents.TryGetValue(agentId, out var services)
+                ? Task.FromResult<IActionResult>(Ok(services))
+                : Task.FromResult<IActionResult>(NotFound());
         }
     }
 }
