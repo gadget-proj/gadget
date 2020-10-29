@@ -10,9 +10,7 @@ namespace Gadget.Inspector
         {
             var l = new LoggerFactory();
             var logger = l.CreateLogger<Inspector>();
-            // var inspector = new Inspector(new Uri("https://webscoket.noinputsignal.com/gadget/gadget"), logger);
-            // var inspector = new Inspector(new Uri("https://unfold.azurewebsites.net/gadget"), logger);
-            var inspector = new Inspector(new Uri("http://localhost:4448/gadget"), logger);
+            var inspector = new Inspector(new Uri("https://localhost:44347/gadget"), logger);
             await inspector.Start();
             Console.WriteLine("Inspector started");
             Console.ReadKey();
