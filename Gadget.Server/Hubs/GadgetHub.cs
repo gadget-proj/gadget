@@ -3,11 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Gadget.Messaging;
-using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.SignalR;
-using InfluxDB.Client;
-using InfluxDB.Client.Writes;
-using InfluxDB.Client.Api.Domain;
+using Microsoft.Extensions.Logging;
 
 namespace Gadget.Server.Hubs
 {
@@ -83,6 +80,12 @@ namespace Gadget.Server.Hubs
                 string.Equals(s.Name, serviceName, StringComparison.CurrentCultureIgnoreCase));
             service.Status = serviceStatus;
             Clients.Group("dashboard").SendAsync("ServiceStatusChanged", serviceStatusChanged);
+            return Task.CompletedTask;
+        }
+
+        public Task Lucus(LucusMessage message)
+        {
+            _logger.LogCritical($"{DateTime.UtcNow} > {message.Body}");
             return Task.CompletedTask;
         }
 

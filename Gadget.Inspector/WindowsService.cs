@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ServiceProcess;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace Gadget.Inspector
 {
@@ -43,7 +44,7 @@ namespace Gadget.Inspector
                     var currentStatus = _serviceController.Status;
                     if (currentStatus != _lastKnownStatus)
                     {
-                        Console.WriteLine("[ws] status has changed");
+                        Console.WriteLine($"{_serviceController.DisplayName} has changed, new status {currentStatus}");
                         StatusChanged.Invoke(this, new WindowsServiceStatusChanged
                         {
                             ServiceName = _serviceController.ServiceName,
@@ -54,6 +55,7 @@ namespace Gadget.Inspector
                     _lastKnownStatus = currentStatus;
                     await Task.Delay(1000);
                 }
+                // ReSharper disable once FunctionNeverReturns
             });
         }
 

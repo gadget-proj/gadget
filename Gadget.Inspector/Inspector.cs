@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.ServiceProcess;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Gadget.Inspector
@@ -16,8 +17,9 @@ namespace Gadget.Inspector
         private readonly Guid _id;
         private readonly IDictionary<string, WindowsService> _services;
 
-        public Inspector(Uri hubAddress, ILogger<Inspector> logger = null)
+        public Inspector(Uri hubAddress, ICollection<int> lucek, ILogger<Inspector> logger)
         {
+            Console.WriteLine(lucek is null);
             _logger ??= logger;
             _id = Guid.NewGuid();
             _hubConnection = new HubConnectionBuilder()
@@ -30,12 +32,25 @@ namespace Gadget.Inspector
         public async Task Start()
         {
             await _hubConnection.StartAsync();
+            var _ = Task.Run(async () =>
+            {
+                var token = CancellationToken.None;
+                while (!token.IsCancellationRequested)
+                {
+                    await _hubConnection.InvokeAsync("Lucus", new LucusMessage
+                    {
+                        Body = "Witam szanownego Pana"
+                    }, cancellationToken: token);
+                    await Task.Delay(TimeSpan.FromSeconds(5), token);
+                }
+            });
             RegisterHandlers();
             while (_hubConnection.State != HubConnectionState.Connected)
             {
                 Console.WriteLine("trying to connect");
                 await Task.Delay(TimeSpan.FromSeconds(1));
             }
+
             var services = ServiceController
                 .GetServices()
                 .Select(s => (s.ServiceName, new WindowsService(s)))
