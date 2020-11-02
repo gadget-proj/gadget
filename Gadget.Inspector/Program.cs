@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Autofac;
+using Gadget.Inspector.Services;
 using Microsoft.Extensions.Logging;
 
 namespace Gadget.Inspector
@@ -10,6 +12,12 @@ namespace Gadget.Inspector
         {
             var l = new LoggerFactory();
             var logger = l.CreateLogger<Inspector>();
+            // container and registration
+            //var builder = new ContainerBuilder();
+            //builder.RegisterType<MachineHealthService>().AsImplementedInterfaces();
+            //var container = builder.Build();
+
+
             // var inspector = new Inspector(new Uri("https://webscoket.noinputsignal.com/gadget/gadget"), logger);
             // var inspector = new Inspector(new Uri("https://unfold.azurewebsites.net/gadget"), logger);
             var inspector = new Inspector(new Uri("http://localhost:4448/gadget"), logger);

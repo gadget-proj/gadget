@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Gadget.Inspector.Services.Interfaces;
+using System;
 using System.ServiceProcess;
 using System.Threading.Tasks;
 

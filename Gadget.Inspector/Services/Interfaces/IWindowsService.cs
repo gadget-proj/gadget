@@ -1,6 +1,6 @@
 using System.ServiceProcess;
 
-namespace Gadget.Inspector
+namespace Gadget.Inspector.Services.Interfaces
 {
         internal interface IWindowsService
         {
