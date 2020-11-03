@@ -1,14 +1,11 @@
-﻿using System;
+﻿using Gadget.Inspector.Models;
+using Gadget.Messaging;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Gadget.Messaging;
-using Microsoft.Extensions.Logging;
-using Microsoft.AspNetCore.SignalR;
-using InfluxDB.Client;
-using InfluxDB.Client.Writes;
-using InfluxDB.Client.Api.Domain;
-using Gadget.Inspector.Models;
 
 namespace Gadget.Server.Hubs
 {

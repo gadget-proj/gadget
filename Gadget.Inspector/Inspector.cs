@@ -6,7 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.ServiceProcess;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace Gadget.Inspector
@@ -36,17 +35,8 @@ namespace Gadget.Inspector
 
         public async Task Start()
         {
-            await _hubConnection.StartAsync();
-            RegisterHandlers();
-            while (_hubConnection.State != HubConnectionState.Connected)
-            {
-                Console.WriteLine("trying to connect");
-                await Task.Delay(TimeSpan.FromSeconds(1));
-            }
-             
-            
-
-
+            await Connect();
+            SendHealthCheck(); 
 
             var services = ServiceController
                 .GetServices()
@@ -87,7 +77,23 @@ namespace Gadget.Inspector
                 })
             };
             await _hubConnection.InvokeAsync("Register", registerNewAgent);
-            await SendHealthCheck();
+             
+        }
+
+        private async Task Connect()
+        {
+            await _hubConnection.StartAsync();
+            RegisterHandlers();
+            while (_hubConnection.State != HubConnectionState.Connected)
+            {
+                Console.WriteLine("trying to connect");
+                await Task.Delay(TimeSpan.FromSeconds(1));
+            }
+        }
+
+        private async Task AggregateServices()
+        {
+
         }
 
         private void RegisterHandlers()
@@ -115,9 +121,9 @@ namespace Gadget.Inspector
             while (true)
             {
                 var data = _machineHealth.CheckMachineHealth();
+                data.MachineId = _id;
 
                await _hubConnection.InvokeAsync("MachineHealthCheck", data);
-
                await Task.Delay(10000);
             }
         }

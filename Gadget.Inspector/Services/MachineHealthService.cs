@@ -4,18 +4,19 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
+using System.Management;
 
 namespace Gadget.Inspector.Services
 {
     internal class MachineHealthService : IMachineHealthService
     {
         private readonly PerformanceCounter _cpuCounter;
-        private readonly PerformanceCounter _ramCounter;
 
         public MachineHealthService()
         {
             _cpuCounter = new PerformanceCounter("Processor", "% Processor Time", "_Total");
-            _ramCounter = new PerformanceCounter("Memory", "Available MBytes");
+           // _ramCounter = new PerformanceCounter("Memory", "Available MBytes");
         }
 
         public MachineHealthDataModel CheckMachineHealth()
@@ -24,13 +25,13 @@ namespace Gadget.Inspector.Services
             {
                 MachineName = Environment.MachineName,
                 CpuPercentUsage = (int)_cpuCounter.NextValue(),
-                RamAvailable = (int)_ramCounter.NextValue(),
                 ProcessesQuantity = Process.GetProcesses().Length,
                 Platform = Environment.OSVersion.Platform.ToString(),
                 CpuThreadsQuantity = Environment.ProcessorCount
             };
 
             AddDrivesInfo(output);
+            AddMemoryInfo(output);
             return output;
         }
 
@@ -44,11 +45,30 @@ namespace Gadget.Inspector.Services
                 model.Discs.Add(new DiscUsageInfo
                 {
                     Name = disc.Name,
-                    DiscSize = (int)(disc.TotalSize / 1073741824),
-                    DiscSpaceFree = (int)(disc.AvailableFreeSpace / 1073741824)
+                    DiscSize = disc.TotalSize / 1073741824f,
+                    DiscSpaceFree = disc.AvailableFreeSpace / 1073741824f
                 });
             }
         }
 
+        private void AddMemoryInfo(MachineHealthDataModel model)
+        {
+            ObjectQuery wql = new ObjectQuery("SELECT * FROM Win32_OperatingSystem");
+            ManagementObjectSearcher searcher = new ManagementObjectSearcher(wql);
+            ManagementObjectCollection results = searcher.Get();
+
+            var result = results.OfType<ManagementObject>().FirstOrDefault();
+            if (result == null) return;
+
+            if (int.TryParse(result["TotalVisibleMemorySize"].ToString(), out int total))
+            {
+                model.MemoryTotal = total / 1048576f;
+            }
+
+            if (int.TryParse(result["FreePhysicalMemory"].ToString(), out int free))
+            {
+                model.MemoryFree = free / 1048576f;
+            }
+        }
     }
 }
