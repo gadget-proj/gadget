@@ -4,6 +4,8 @@ namespace Gadget.Inspector.Models
 {
     public class MachineHealthDataModel
     {
+        //public string MachineId { get; set; }
+
         public string MachineName { get; set; } // jest
 
         public int CpuPercentUsage { get; set; }// jest

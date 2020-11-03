@@ -1,10 +1,12 @@
-﻿using Gadget.Messaging;
+﻿using Gadget.Inspector.Services.Interfaces;
+using Gadget.Messaging;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.ServiceProcess;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Gadget.Inspector
@@ -15,9 +17,14 @@ namespace Gadget.Inspector
         private readonly HubConnection _hubConnection;
         private readonly Guid _id;
         private readonly IDictionary<string, WindowsService> _services;
+        private readonly IMachineHealthService _machineHealth;
 
-        public Inspector(Uri hubAddress, ILogger<Inspector> logger = null)
+        public Inspector(
+            Uri hubAddress,
+            IMachineHealthService machineHealt,
+            ILogger<Inspector> logger = null)
         {
+            _machineHealth = machineHealt;
             _logger ??= logger;
             _id = Guid.NewGuid();
             _hubConnection = new HubConnectionBuilder()
@@ -36,6 +43,11 @@ namespace Gadget.Inspector
                 Console.WriteLine("trying to connect");
                 await Task.Delay(TimeSpan.FromSeconds(1));
             }
+             
+            
+
+
+
             var services = ServiceController
                 .GetServices()
                 .Select(s => (s.ServiceName, new WindowsService(s)))
@@ -75,6 +87,7 @@ namespace Gadget.Inspector
                 })
             };
             await _hubConnection.InvokeAsync("Register", registerNewAgent);
+            await SendHealthCheck();
         }
 
         private void RegisterHandlers()
@@ -95,6 +108,18 @@ namespace Gadget.Inspector
                     service.Start();
                 }
             });
+        }
+
+        private async Task SendHealthCheck()
+        {
+            while (true)
+            {
+                var data = _machineHealth.CheckMachineHealth();
+
+               await _hubConnection.InvokeAsync("MachineHealthCheck", data);
+
+               await Task.Delay(10000);
+            }
         }
     }
 }

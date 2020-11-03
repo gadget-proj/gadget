@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.SignalR;
 using InfluxDB.Client;
 using InfluxDB.Client.Writes;
 using InfluxDB.Client.Api.Domain;
+using Gadget.Inspector.Models;
 
 namespace Gadget.Server.Hubs
 {
@@ -16,6 +17,7 @@ namespace Gadget.Server.Hubs
         private readonly IDictionary<Guid, ICollection<Service>> _agents;
         private readonly IDictionary<string, Guid> _connectedClients;
         private readonly ILogger<GadgetHub> _logger;
+        
 
         public GadgetHub(IDictionary<Guid, ICollection<Service>> agents, IDictionary<string, Guid> connectedClients,
             ILogger<GadgetHub> logger)
@@ -42,6 +44,12 @@ namespace Gadget.Server.Hubs
                 _logger.LogInformation($"Service name : {service.Name} status : {service.Status}");
             }
 
+            return Task.CompletedTask;
+        }
+
+        public Task MachineHealthCheck(MachineHealthDataModel model)
+        {
+            _logger.LogInformation(model.MachineName);
             return Task.CompletedTask;
         }
 

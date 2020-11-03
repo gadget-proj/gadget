@@ -2,7 +2,7 @@
 
 namespace Gadget.Inspector.Services.Interfaces
 {
-    internal interface IMachineHealthService
+    public interface IMachineHealthService
     {
         MachineHealthDataModel CheckMachineHealth();
     }
