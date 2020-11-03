@@ -1,5 +1,6 @@
 ﻿using Gadget.Inspector.Models;
-using Gadget.Messaging;
+using Gadget.Messaging.RegistrationMessages;
+using Gadget.Messaging.ServiceMessages;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
 using System;

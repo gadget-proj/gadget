@@ -1,10 +1,9 @@
-﻿using System;
+﻿using Gadget.Messaging.ServiceMessages;
+using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Gadget.Messaging;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.SignalR;
 
 namespace Gadget.Server.Controllers
 {

@@ -1,13 +1,12 @@
-using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using Gadget.Messaging;
+using Gadget.Messaging.ServiceMessages;
 using Gadget.Server.Hubs;
-using Gadget.Server.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
 
 namespace Gadget.Server
 {

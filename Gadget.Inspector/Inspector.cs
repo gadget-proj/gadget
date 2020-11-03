@@ -1,5 +1,6 @@
 ﻿using Gadget.Inspector.Services.Interfaces;
-using Gadget.Messaging;
+using Gadget.Messaging.RegistrationMessages;
+using Gadget.Messaging.ServiceMessages;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Logging;
 using System;
@@ -70,7 +71,7 @@ namespace Gadget.Inspector
             {
                 AgentId = _id,
                 Machine = Environment.MachineName,
-                Services = services.Select(s => new Messaging.Service
+                Services = services.Select(s => new Messaging.ServiceMessages.Service
                 {
                     Name = s.ServiceName,
                     Status = s.Item2?.Status.ToString()

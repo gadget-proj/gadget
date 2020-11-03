@@ -1,4 +1,4 @@
-﻿namespace Gadget.Messaging
+﻿namespace Gadget.Messaging.ServiceMessages
 {
     public class Service
     {

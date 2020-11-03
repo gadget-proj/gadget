@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Gadget.Messaging;
+using Gadget.Messaging.RegistrationMessages;
+using Gadget.Messaging.ServiceMessages;
 using Microsoft.AspNetCore.SignalR.Client;
 
 namespace Gadget.ControlPlane

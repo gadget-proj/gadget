@@ -1,7 +1,8 @@
-﻿using System;
+﻿using Gadget.Messaging.ServiceMessages;
+using System;
 using System.Collections.Generic;
 
-namespace Gadget.Messaging
+namespace Gadget.Messaging.RegistrationMessages
 {
     public class RegisterMachineReport
     {

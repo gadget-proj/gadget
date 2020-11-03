@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Gadget.Messaging
+﻿namespace Gadget.Messaging.RegistrationMessages
 {
     public class RegisterNewDashboard
     {
