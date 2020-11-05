@@ -71,7 +71,7 @@ namespace Gadget.Inspector
             {
                 AgentId = _id,
                 Machine = Environment.MachineName,
-                Services = services.Select(s => new Messaging.ServiceMessages.Service
+                Services = services.Select(s => new Service
                 {
                     Name = s.ServiceName,
                     Status = s.Item2?.Status.ToString()

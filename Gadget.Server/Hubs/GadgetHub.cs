@@ -1,6 +1,6 @@
-﻿using Gadget.Inspector.Models;
-using Gadget.Messaging.RegistrationMessages;
+﻿using Gadget.Messaging.RegistrationMessages;
 using Gadget.Messaging.ServiceMessages;
+using Gadget.Server.Models;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
 using System;
@@ -12,23 +12,20 @@ namespace Gadget.Server.Hubs
 {
     public class GadgetHub : Hub
     {
-        private readonly IDictionary<Guid, ICollection<Service>> _agents;
-        private readonly IDictionary<string, Guid> _connectedClients;
+        private readonly List<Agent> _agents;
         private readonly ILogger<GadgetHub> _logger;
         
 
-        public GadgetHub(IDictionary<Guid, ICollection<Service>> agents, IDictionary<string, Guid> connectedClients,
-            ILogger<GadgetHub> logger)
+        public GadgetHub(List<Agent> agents, ILogger<GadgetHub> logger)
         {
             _agents = agents;
-            _connectedClients = connectedClients;
             _logger = logger;
         }
 
         public override Task OnDisconnectedAsync(Exception exception)
         {
             var cid = Context.ConnectionId;
-            _connectedClients.Remove(cid);
+            _agents.Remove(_agents.Single(x => x.ConectId == cid));
             _logger.LogInformation($"Client {cid} has disconnected");
             return Task.CompletedTask;
         }
@@ -36,7 +33,22 @@ namespace Gadget.Server.Hubs
         public Task RegisterMachineReport(RegisterMachineReport registerMachineReport)
         {
             _logger.LogInformation($"Received new machine report from agent {registerMachineReport.AgentId}");
-            _agents[registerMachineReport.AgentId] = registerMachineReport.Services.ToList();
+            var agent = _agents.FirstOrDefault(x => x.MachineId == registerMachineReport.AgentId);
+            if (agent == null)
+            {
+                _agents.Add(new Agent
+                {
+                    ConectId = Context.ConnectionId,
+                    MachineId = registerMachineReport.AgentId,
+                    Services = registerMachineReport.Services.ToList()
+                });
+            }
+            else // jeżeli taka sytuacja nie może mieć miejsca to skasuję ifa, na wszelki wypadek jest
+            {
+                agent.Services = registerMachineReport.Services.ToList();
+                agent.ConectId = Context.ConnectionId;
+            }
+
             foreach (var service in registerMachineReport.Services)
             {
                 _logger.LogInformation($"Service name : {service.Name} status : {service.Status}");
@@ -47,7 +59,9 @@ namespace Gadget.Server.Hubs
 
         public Task MachineHealthCheck(MachineHealthDataModel model)
         {
-            _logger.LogInformation(model.MachineName);
+            var agent = _agents.FirstOrDefault(x => x.MachineId == model.MachineId);
+            if (agent != null) agent.MachineHealthData = model;
+            
             return Task.CompletedTask;
         }
 
@@ -60,57 +74,62 @@ namespace Gadget.Server.Hubs
             return Task.CompletedTask;
         }
 
-        public Task Register(RegisterNewAgent registerNewAgent)
+        public Task Register(RegisterNewAgent registerNewAgent) // dodać du klasę MachineHealthDataModel ?
         {
             var cid = Context.ConnectionId;
             var agentId = registerNewAgent.AgentId;
-            if (_agents.ContainsKey(agentId)) return Task.CompletedTask;
-            _agents[agentId] = registerNewAgent.Services.ToList();
-            _connectedClients[cid] = agentId;
+            var agent = _agents.FirstOrDefault(x => x.MachineId == agentId);
+            if (agent != null) return Task.CompletedTask;
+
+            _agents.Add(new Agent
+            {
+                ConectId = cid,
+                MachineId = agentId,
+                Services = registerNewAgent.Services.ToList()
+            });
             return Task.CompletedTask;
         }
 
         public Task ServiceStatusChanged(ServiceStatusChanged serviceStatusChanged)
         {
-            var cid = Context.ConnectionId;
-            if (!_connectedClients.TryGetValue(cid, out var agentId))
-            {
-                return Task.CompletedTask;
-            }
+            var service = GetService(serviceStatusChanged.AgentId, serviceStatusChanged.Name);
+            if (service == null) return Task.CompletedTask;
 
-            if (!_agents.TryGetValue(agentId, out var services))
-            {
-                return Task.CompletedTask;
-            }
-
-            var serviceName = serviceStatusChanged.Name;
-            var serviceStatus = serviceStatusChanged.Status;
-            var service = services.Single(s =>
-                string.Equals(s.Name, serviceName, StringComparison.CurrentCultureIgnoreCase));
-            service.Status = serviceStatus;
+            service.Status = serviceStatusChanged.Status;
             Clients.Group("dashboard").SendAsync("ServiceStatusChanged", serviceStatusChanged);
             return Task.CompletedTask;
         }
 
         public async Task StopService(StopService stopService)
         {
-            try
+            var service = GetService(stopService.AgentId, stopService.ServiceName);
+            if (service != null)
             {
-                var group = stopService.AgentId;
-                var connectionId = _connectedClients.FirstOrDefault(e => e.Value == group).Key;
+                var connectionId = _agents.First(x => x.MachineId == stopService.AgentId).ConectId;
                 await Clients.Client(connectionId).SendAsync("StopService", stopService);
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e.Message);
             }
         }
 
         public async Task StartService(StartService startService)
         {
-            var group = startService.AgentId;
-            var connectionId = _connectedClients.FirstOrDefault(e => e.Value == group).Key;
-            await Clients.Client(connectionId).SendAsync("StartService", startService);
+            var service = GetService(startService.AgentId, startService.ServiceName);
+            if (service != null)
+            {
+                var connectionId = _agents.First(x => x.MachineId == startService.AgentId).ConectId;
+                await Clients.Client(connectionId).SendAsync("StartService", startService);
+            }
+        }
+
+        private Service GetService(Guid machineId, string serviceName)
+        {
+            var agent = _agents.FirstOrDefault(x => x.MachineId == machineId);
+            if (agent == null) return null;
+            return agent.Services.FirstOrDefault(x =>
+                    string.Equals(
+                        x.Name, 
+                        serviceName, 
+                        StringComparison.CurrentCultureIgnoreCase));
+
         }
     }
 }

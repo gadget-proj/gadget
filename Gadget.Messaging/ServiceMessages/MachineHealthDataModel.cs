@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Gadget.Inspector.Models
+namespace Gadget.Messaging.ServiceMessages
 {
     public class MachineHealthDataModel
     {
