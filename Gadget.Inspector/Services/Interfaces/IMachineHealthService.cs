@@ -1,4 +1,4 @@
-﻿using Gadget.Inspector.Models;
+﻿using Gadget.Messaging.ServiceMessages;
 
 namespace Gadget.Inspector.Services.Interfaces
 {

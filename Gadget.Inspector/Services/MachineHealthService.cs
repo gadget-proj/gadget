@@ -1,5 +1,5 @@
-﻿using Gadget.Inspector.Models;
-using Gadget.Inspector.Services.Interfaces;
+﻿using Gadget.Inspector.Services.Interfaces;
+using Gadget.Messaging.ServiceMessages;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -38,24 +38,19 @@ namespace Gadget.Inspector.Services
         private void AddDrivesInfo(MachineHealthDataModel model)
         {
             var discs = DriveInfo.GetDrives();
-            model.Discs = new List<DiscUsageInfo>();
-
-            foreach (var disc in discs)
+            model.Discs = discs.Select(x => new DiscUsageInfo
             {
-                model.Discs.Add(new DiscUsageInfo
-                {
-                    Name = disc.Name,
-                    DiscSize = disc.TotalSize / 1073741824f,
-                    DiscSpaceFree = disc.AvailableFreeSpace / 1073741824f
-                });
-            }
+                Name = x.Name,
+                DiscSize = x.TotalSize / 1073741824f,
+                DiscSpaceFree = x.AvailableFreeSpace / 1073741824f
+            }).ToList();
         }
 
         private void AddMemoryInfo(MachineHealthDataModel model)
         {
-            ObjectQuery wql = new ObjectQuery("SELECT * FROM Win32_OperatingSystem");
-            ManagementObjectSearcher searcher = new ManagementObjectSearcher(wql);
-            ManagementObjectCollection results = searcher.Get();
+            var qo = new ObjectQuery("SELECT * FROM Win32_OperatingSystem");
+            var searcher = new ManagementObjectSearcher(qo);
+            var results = searcher.Get();
 
             var result = results.OfType<ManagementObject>().FirstOrDefault();
             if (result == null) return;
