@@ -27,6 +27,7 @@ namespace Gadget.Server.Hubs
 
         public override Task OnDisconnectedAsync(Exception exception)
         {
+            
             var cid = Context.ConnectionId;
             _connectedClients.Remove(cid);
             _logger.LogInformation($"Client {cid} has disconnected");
