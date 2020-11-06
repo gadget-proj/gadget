@@ -1,4 +1,4 @@
-name: Super-Linter
+name: Gadget
 
 # Run this workflow every time a new commit pushed to your repository
 on: push
@@ -13,3 +13,4 @@ jobs:
         with:
           dotnet-version: 3.1.x
       - run: dotnet build Gadget.Inspector
+      - run: dotnet build Gadget.Server
