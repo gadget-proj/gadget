@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.ServiceProcess;
 using System.Threading;
+using System.Threading.Channels;
 using System.Threading.Tasks;
 using Gadget.Messaging;
 using Microsoft.AspNetCore.SignalR.Client;
@@ -17,9 +18,11 @@ namespace Gadget.Inspector
         private readonly Guid _id;
         private readonly ILogger<Inspector> _logger;
         private readonly IDictionary<string, WindowsService> _services;
+        private readonly Channel<ServiceStatusChanged> _channel;
 
-        public Inspector(Uri hubAddress, ILogger<Inspector> logger = null)
+        public Inspector(Uri hubAddress, Channel<ServiceStatusChanged> channel, ILogger<Inspector> logger = null)
         {
+            _channel = channel;
             _logger ??= logger;
             _id = Guid.NewGuid();
             _hubConnection = new HubConnectionBuilder()
@@ -79,12 +82,14 @@ namespace Gadget.Inspector
             {
                 windowsService.StatusChanged += async (caller, @event) =>
                 {
-                    await _hubConnection.InvokeAsync("ServiceStatusChanged", new ServiceStatusChanged
+                    var change = new ServiceStatusChanged
                     {
                         AgentId = _id,
                         Name = @event.ServiceName,
                         Status = @event.Status.ToString()
-                    }, stoppingToken);
+                    };
+                    await _channel.Writer.WriteAsync(change, stoppingToken);
+                    // await _hubConnection.InvokeAsync("ServiceStatusChanged", , stoppingToken);
                 };
                 _services.Add(serviceName, windowsService);
             }

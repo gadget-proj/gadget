@@ -2,7 +2,7 @@
 
 namespace Gadget.Inspector
 {
-    internal class WindowsServiceStatusChanged
+    public class WindowsServiceStatusChanged
     {
         public string ServiceName { get; set; }
         public ServiceControllerStatus Status { get; set; }
