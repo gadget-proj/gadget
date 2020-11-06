@@ -46,14 +46,30 @@ namespace Gadget.Inspector
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            await _hubConnection.StartAsync(stoppingToken);
-            RegisterHandlers();
-            while (_hubConnection.State != HubConnectionState.Connected)
-            {
-                _logger.LogInformation("trying to connect");
-                await Task.Delay(TimeSpan.FromSeconds(1), stoppingToken);
-            }
+            await ConnectToHub(stoppingToken);
+            var services = RegisterServices(stoppingToken);
+            await RegisterInspector(stoppingToken, services);
+            stoppingToken.WaitHandle.WaitOne();
+        }
 
+        private async Task RegisterInspector(CancellationToken stoppingToken,
+            IEnumerable<(string ServiceName, WindowsService)> services)
+        {
+            var registerNewAgent = new RegisterNewAgent
+            {
+                AgentId = _id,
+                Machine = Environment.MachineName,
+                Services = services.Select(s => new Service
+                {
+                    Name = s.ServiceName,
+                    Status = s.Item2?.Status.ToString()
+                })
+            };
+            await _hubConnection.InvokeAsync("Register", registerNewAgent, stoppingToken);
+        }
+
+        private IEnumerable<(string ServiceName, WindowsService)> RegisterServices(CancellationToken stoppingToken)
+        {
             var services = ServiceController
                 .GetServices()
                 .Select(s => (s.ServiceName, new WindowsService(s)))
@@ -73,27 +89,18 @@ namespace Gadget.Inspector
                 _services.Add(serviceName, windowsService);
             }
 
-            try
-            {
-                await _hubConnection.StartAsync(stoppingToken);
-            }
-            catch (Exception e)
-            {
-                _logger?.LogError($"{e.Message}");
-            }
+            return services;
+        }
 
-            var registerNewAgent = new RegisterNewAgent
+        private async Task ConnectToHub(CancellationToken stoppingToken)
+        {
+            await _hubConnection.StartAsync(stoppingToken);
+            RegisterHandlers();
+            while (_hubConnection.State != HubConnectionState.Connected)
             {
-                AgentId = _id,
-                Machine = Environment.MachineName,
-                Services = services.Select(s => new Service
-                {
-                    Name = s.ServiceName,
-                    Status = s.Item2?.Status.ToString()
-                })
-            };
-            await _hubConnection.InvokeAsync("Register", registerNewAgent, stoppingToken);
-            stoppingToken.WaitHandle.WaitOne();
+                _logger.LogInformation("trying to connect");
+                await Task.Delay(TimeSpan.FromSeconds(1), stoppingToken);
+            }
         }
     }
 }
