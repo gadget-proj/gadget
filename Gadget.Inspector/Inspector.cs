@@ -1,15 +1,17 @@
-﻿using Gadget.Messaging;
-using Microsoft.AspNetCore.SignalR.Client;
-using Microsoft.Extensions.Logging;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.ServiceProcess;
+using System.Threading;
 using System.Threading.Tasks;
+using Gadget.Messaging;
+using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace Gadget.Inspector
 {
-    public class Inspector
+    public class Inspector : BackgroundService
     {
         private readonly ILogger<Inspector> _logger;
         private readonly HubConnection _hubConnection;
@@ -27,15 +29,37 @@ namespace Gadget.Inspector
             _services = new Dictionary<string, WindowsService>();
         }
 
-        public async Task Start()
+
+        private void RegisterHandlers()
         {
-            await _hubConnection.StartAsync();
+            _hubConnection.On<StopService>("StopService", (command) =>
+            {
+                _logger.LogInformation($"Trying to stop {command.ServiceName} service");
+                if (_services.TryGetValue(command.ServiceName, out var service))
+                {
+                    service.Stop();
+                }
+            });
+            _hubConnection.On<StartService>("StartService", (command) =>
+            {
+                _logger.LogInformation($"Trying to start {command.ServiceName} service");
+                if (_services.TryGetValue(command.ServiceName, out var service))
+                {
+                    service.Start();
+                }
+            });
+        }
+
+        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+        {
+            await _hubConnection.StartAsync(stoppingToken);
             RegisterHandlers();
             while (_hubConnection.State != HubConnectionState.Connected)
             {
-                Console.WriteLine("trying to connect");
-                await Task.Delay(TimeSpan.FromSeconds(1));
+                _logger.LogInformation("trying to connect");
+                await Task.Delay(TimeSpan.FromSeconds(1), stoppingToken);
             }
+
             var services = ServiceController
                 .GetServices()
                 .Select(s => (s.ServiceName, new WindowsService(s)))
@@ -50,14 +74,14 @@ namespace Gadget.Inspector
                         AgentId = _id,
                         Name = @event.ServiceName,
                         Status = @event.Status.ToString()
-                    });
+                    }, stoppingToken);
                 };
                 _services.Add(serviceName, windowsService);
             }
 
             try
             {
-                await _hubConnection.StartAsync();
+                await _hubConnection.StartAsync(stoppingToken);
             }
             catch (Exception e)
             {
@@ -68,33 +92,14 @@ namespace Gadget.Inspector
             {
                 AgentId = _id,
                 Machine = Environment.MachineName,
-                Services = services.Select(s => new Messaging.Service
+                Services = services.Select(s => new Service
                 {
                     Name = s.ServiceName,
                     Status = s.Item2?.Status.ToString()
                 })
             };
-            await _hubConnection.InvokeAsync("Register", registerNewAgent);
-        }
-
-        private void RegisterHandlers()
-        {
-            _hubConnection.On<StopService>("StopService", (command) =>
-            {
-                Console.WriteLine($"Trying to stop {command.ServiceName} service");
-                if (_services.TryGetValue(command.ServiceName, out var service))
-                {
-                    service.Stop();
-                }
-            });
-            _hubConnection.On<StartService>("StartService", (command) =>
-            {
-                Console.WriteLine($"Trying to start {command.ServiceName} service");
-                if (_services.TryGetValue(command.ServiceName, out var service))
-                {
-                    service.Start();
-                }
-            });
+            await _hubConnection.InvokeAsync("Register", registerNewAgent, stoppingToken);
+            stoppingToken.WaitHandle.WaitOne();
         }
     }
 }
