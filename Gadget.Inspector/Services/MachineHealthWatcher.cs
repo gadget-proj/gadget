@@ -1,21 +1,39 @@
 ﻿using Gadget.Inspector.Services.Interfaces;
 using Gadget.Messaging.ServiceMessages;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Management;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Gadget.Inspector.Services
 {
-    internal class MachineHealthService : IMachineHealthService
+    internal class MachineHealthWatcher : BackgroundService
     {
         private readonly PerformanceCounter _cpuCounter;
+        private readonly ILogger<MachineHealthWatcher> _logger;
 
-        public MachineHealthService()
+        public MachineHealthWatcher(PerformanceCounter cpuCounter, ILogger<MachineHealthWatcher> logger)
         {
-            _cpuCounter = new PerformanceCounter("Processor", "% Processor Time", "_Total");
-           // _ramCounter = new PerformanceCounter("Memory", "Available MBytes");
+            _cpuCounter = cpuCounter;
+            _logger = logger;
+        }
+
+        protected override Task ExecuteAsync(CancellationToken stoppingToken)
+        {
+            while (!stoppingToken.IsCancellationRequested)
+            {
+                var data = CheckMachineHealth();
+               // data.MachineId = _id;
+
+                //await _hubConnection.InvokeAsync("MachineHealthCheck", data);
+                //await Task.Delay(10000);
+            }
+            return Task.CompletedTask;
         }
 
         public MachineHealthDataModel CheckMachineHealth()
@@ -33,6 +51,8 @@ namespace Gadget.Inspector.Services
             AddMemoryInfo(output);
             return output;
         }
+
+        
 
         private void AddDrivesInfo(MachineHealthDataModel model)
         {

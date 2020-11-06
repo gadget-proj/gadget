@@ -17,14 +17,11 @@ namespace Gadget.Inspector
         private readonly HubConnection _hubConnection;
         private readonly Guid _id;
         private readonly IDictionary<string, WindowsService> _services;
-        private readonly IMachineHealthService _machineHealth;
 
         public Inspector(
             Uri hubAddress,
-            IMachineHealthService machineHealt,
             ILogger<Inspector> logger = null)
         {
-            _machineHealth = machineHealt;
             _logger ??= logger;
             _id = Guid.NewGuid();
             _hubConnection = new HubConnectionBuilder()
@@ -37,7 +34,6 @@ namespace Gadget.Inspector
         public async Task Start()
         {
             await Connect();
-            SendHealthCheck(); 
 
             var services = ServiceController
                 .GetServices()
@@ -115,18 +111,6 @@ namespace Gadget.Inspector
                     service.Start();
                 }
             });
-        }
-
-        private async Task SendHealthCheck()
-        {
-            while (true)
-            {
-                var data = _machineHealth.CheckMachineHealth();
-                data.MachineId = _id;
-
-               await _hubConnection.InvokeAsync("MachineHealthCheck", data);
-               await Task.Delay(10000);
-            }
         }
     }
 }

@@ -2,6 +2,7 @@
 using Gadget.Inspector.Services.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 
 namespace Gadget.Inspector
@@ -14,7 +15,8 @@ namespace Gadget.Inspector
             services.AddTransient<Startup>();
             services.AddSingleton<Inspector>();
             services.AddTransient(_ => new Uri("https://localhost:44347/gadget"));
-            services.AddTransient<IMachineHealthService, MachineHealthService>();
+            services.AddSingleton(_ => new PerformanceCounter("Processor", "% Processor Time", "_Total"));
+            services.AddHostedService<MachineHealthWatcher>();
             services.AddTransient<IWindowsService, WindowsService>();
             services.AddLogging();
 
