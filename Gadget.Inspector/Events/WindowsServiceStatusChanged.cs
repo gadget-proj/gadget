@@ -1,6 +1,6 @@
 ﻿using System.ServiceProcess;
 
-namespace Gadget.Inspector
+namespace Gadget.Inspector.Events
 {
     public class WindowsServiceStatusChanged
     {

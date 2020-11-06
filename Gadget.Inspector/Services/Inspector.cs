@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace Gadget.Inspector
+namespace Gadget.Inspector.Services
 {
     public class Inspector : BackgroundService
     {

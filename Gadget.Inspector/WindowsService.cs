@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ServiceProcess;
 using System.Threading.Tasks;
+using Gadget.Inspector.Events;
 
 namespace Gadget.Inspector
 {
@@ -53,7 +54,6 @@ namespace Gadget.Inspector
                     var currentStatus = _serviceController.Status;
                     if (currentStatus != _lastKnownStatus)
                     {
-                        Console.WriteLine("[ws] status has changed");
                         StatusChanged.Invoke(this, new WindowsServiceStatusChanged
                         {
                             ServiceName = _serviceController.ServiceName,
