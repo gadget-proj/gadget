@@ -1,6 +1,7 @@
 ﻿using Gadget.Messaging.RegistrationMessages;
 using Gadget.Messaging.ServiceMessages;
 using Gadget.Server.Models;
+using Microsoft.AspNetCore.Components.Server.Circuits;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
 using System;
@@ -36,17 +37,7 @@ namespace Gadget.Server.Hubs
             var agent = _agents.FirstOrDefault(x => x.MachineId == registerMachineReport.AgentId);
             if (agent == null)
             {
-                _agents.Add(new Agent
-                {
-                    ConnectionId = Context.ConnectionId,
-                    MachineId = registerMachineReport.AgentId,
-                    Services = registerMachineReport.Services
-                });
-            }
-            else // jeżeli taka sytuacja nie może mieć miejsca to skasuję ifa, na wszelki wypadek jest
-            {
-                agent.Services = registerMachineReport.Services.ToList();
-                agent.ConnectionId = Context.ConnectionId;
+                _agents.Add(new Agent(registerMachineReport.AgentId, Context.ConnectionId, registerMachineReport.Services));
             }
 
             foreach (var service in registerMachineReport.Services)
@@ -81,12 +72,7 @@ namespace Gadget.Server.Hubs
             var agent = _agents.FirstOrDefault(x => x.MachineId == agentId);
             if (agent != null) return Task.CompletedTask;
 
-            _agents.Add(new Agent
-            {
-                ConnectionId = cid,
-                MachineId = agentId,
-                Services = registerNewAgent.Services.ToList()
-            });
+            _agents.Add(new Agent(agentId, cid, registerNewAgent.Services));
             return Task.CompletedTask;
         }
 
