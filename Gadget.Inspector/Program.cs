@@ -6,15 +6,16 @@ using Microsoft.Extensions.Hosting;
 
 namespace Gadget.Inspector
 {
-    class Program
+    internal class Program
     {
         public static void Main(string[] args)
         {
             CreateHostBuilder(args).Build().Run();
         }
 
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
+        public static IHostBuilder CreateHostBuilder(string[] args)
+        {
+            return Host.CreateDefaultBuilder(args)
                 .ConfigureServices((hostContext, services) =>
                 {
                     services.AddLogging();
@@ -24,5 +25,6 @@ namespace Gadget.Inspector
                     services.AddHostedService<Inspector>();
                     services.AddHostedService<Producer>();
                 });
+        }
     }
 }

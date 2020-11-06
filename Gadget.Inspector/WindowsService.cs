@@ -10,6 +10,12 @@ namespace Gadget.Inspector
         private ServiceControllerStatus _lastKnownStatus;
         public EventHandler<WindowsServiceStatusChanged> StatusChanged;
 
+        public WindowsService(ServiceController serviceController)
+        {
+            _serviceController = serviceController;
+            StartWatcher();
+        }
+
         public ServiceControllerStatus Status
         {
             get
@@ -26,10 +32,14 @@ namespace Gadget.Inspector
             }
         }
 
-        public WindowsService(ServiceController serviceController)
+        public void Start()
         {
-            _serviceController = serviceController;
-            StartWatcher();
+            _serviceController.Start();
+        }
+
+        public void Stop()
+        {
+            _serviceController.Stop();
         }
 
         private void StartWatcher()
@@ -56,8 +66,5 @@ namespace Gadget.Inspector
                 }
             });
         }
-
-        public void Start() => _serviceController.Start();
-        public void Stop() => _serviceController.Stop();
     }
 }

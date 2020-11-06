@@ -1,4 +1,3 @@
-using System;
 using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
@@ -24,9 +23,7 @@ namespace Gadget.Inspector.Services
             {
                 await _events.Reader.WaitToReadAsync(stoppingToken);
                 await foreach (var s in _events.Reader.ReadAllAsync(stoppingToken))
-                {
                     _logger.LogInformation($"handing {s}");
-                }
             }
         }
     }

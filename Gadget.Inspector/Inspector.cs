@@ -13,9 +13,9 @@ namespace Gadget.Inspector
 {
     public class Inspector : BackgroundService
     {
-        private readonly ILogger<Inspector> _logger;
         private readonly HubConnection _hubConnection;
         private readonly Guid _id;
+        private readonly ILogger<Inspector> _logger;
         private readonly IDictionary<string, WindowsService> _services;
 
         public Inspector(Uri hubAddress, ILogger<Inspector> logger = null)
@@ -32,21 +32,15 @@ namespace Gadget.Inspector
 
         private void RegisterHandlers()
         {
-            _hubConnection.On<StopService>("StopService", (command) =>
+            _hubConnection.On<StopService>("StopService", command =>
             {
                 _logger.LogInformation($"Trying to stop {command.ServiceName} service");
-                if (_services.TryGetValue(command.ServiceName, out var service))
-                {
-                    service.Stop();
-                }
+                if (_services.TryGetValue(command.ServiceName, out var service)) service.Stop();
             });
-            _hubConnection.On<StartService>("StartService", (command) =>
+            _hubConnection.On<StartService>("StartService", command =>
             {
                 _logger.LogInformation($"Trying to start {command.ServiceName} service");
-                if (_services.TryGetValue(command.ServiceName, out var service))
-                {
-                    service.Start();
-                }
+                if (_services.TryGetValue(command.ServiceName, out var service)) service.Start();
             });
         }
 
