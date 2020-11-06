@@ -24,7 +24,12 @@ namespace Gadget.Inspector.Services
             {
                 await _channel.Reader.WaitToReadAsync(stoppingToken);
                 await foreach (var s in _channel.Reader.ReadAllAsync(stoppingToken))
+                {
                     _logger.LogInformation($"handing {s.Status} change for service {s.Name} on agent {s.AgentId}");
+                    
+                    //TODO implement hubconnection
+                    // await _hubConnection.InvokeAsync("ServiceStatusChanged", s, stoppingToken);
+                }
             }
         }
     }
