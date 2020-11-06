@@ -1,7 +1,6 @@
 ﻿using Gadget.Inspector.Services.Interfaces;
 using Gadget.Messaging.ServiceMessages;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;

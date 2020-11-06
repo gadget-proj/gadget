@@ -12,7 +12,7 @@ namespace Gadget.Server.Hubs
 {
     public class GadgetHub : Hub
     {
-        private readonly List<Agent> _agents;
+        private readonly IList<Agent> _agents;
         private readonly ILogger<GadgetHub> _logger;
         
 
@@ -25,7 +25,7 @@ namespace Gadget.Server.Hubs
         public override Task OnDisconnectedAsync(Exception exception)
         {
             var cid = Context.ConnectionId;
-            _agents.Remove(_agents.Single(x => x.ConectId == cid));
+            _agents.Remove(_agents.Single(x => x.ConnectionId == cid));
             _logger.LogInformation($"Client {cid} has disconnected");
             return Task.CompletedTask;
         }
@@ -38,15 +38,15 @@ namespace Gadget.Server.Hubs
             {
                 _agents.Add(new Agent
                 {
-                    ConectId = Context.ConnectionId,
+                    ConnectionId = Context.ConnectionId,
                     MachineId = registerMachineReport.AgentId,
-                    Services = registerMachineReport.Services.ToList()
+                    Services = registerMachineReport.Services
                 });
             }
             else // jeżeli taka sytuacja nie może mieć miejsca to skasuję ifa, na wszelki wypadek jest
             {
                 agent.Services = registerMachineReport.Services.ToList();
-                agent.ConectId = Context.ConnectionId;
+                agent.ConnectionId = Context.ConnectionId;
             }
 
             foreach (var service in registerMachineReport.Services)
@@ -83,7 +83,7 @@ namespace Gadget.Server.Hubs
 
             _agents.Add(new Agent
             {
-                ConectId = cid,
+                ConnectionId = cid,
                 MachineId = agentId,
                 Services = registerNewAgent.Services.ToList()
             });
@@ -105,7 +105,7 @@ namespace Gadget.Server.Hubs
             var service = GetService(stopService.AgentId, stopService.ServiceName);
             if (service != null)
             {
-                var connectionId = _agents.First(x => x.MachineId == stopService.AgentId).ConectId;
+                var connectionId = _agents.First(x => x.MachineId == stopService.AgentId).ConnectionId;
                 await Clients.Client(connectionId).SendAsync("StopService", stopService);
             }
         }
@@ -115,7 +115,7 @@ namespace Gadget.Server.Hubs
             var service = GetService(startService.AgentId, startService.ServiceName);
             if (service != null)
             {
-                var connectionId = _agents.First(x => x.MachineId == startService.AgentId).ConectId;
+                var connectionId = _agents.First(x => x.MachineId == startService.AgentId).ConnectionId;
                 await Clients.Client(connectionId).SendAsync("StartService", startService);
             }
         }
