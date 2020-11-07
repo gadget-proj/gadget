@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Channels;
+using Gadget.Inspector.Extensions;
 using Gadget.Inspector.Services;
 using Gadget.Messaging;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,9 +21,7 @@ namespace Gadget.Inspector
                 .ConfigureServices((hostContext, services) =>
                 {
                     services.AddLogging();
-                    services.AddScoped(_ => Channel.CreateUnbounded<ServiceStatusChanged>());
-                    services.AddTransient(_ => new Uri("https://localhost:5001/gadget"));
-                    services.AddHostedService<Services.Inspector>();
+                    services.AddInspector();
                 });
         }
     }
