@@ -1,15 +1,34 @@
 ﻿using Gadget.Inspector.Services.Interfaces;
 using System;
 using System.ServiceProcess;
+using System.Threading.Channels;
 using System.Threading.Tasks;
+using Gadget.Messaging;
 
 namespace Gadget.Inspector
 {
     internal class WindowsService : IWindowsService
     {
+        private readonly ChannelWriter<ServiceStatusChanged> _channelWriter;
         private readonly ServiceController _serviceController;
         private ServiceControllerStatus _lastKnownStatus;
-        public EventHandler<WindowsServiceStatusChanged> StatusChanged;
+
+        public WindowsService(ServiceController serviceController, ChannelWriter<ServiceStatusChanged> channelWriter)
+        {
+            _serviceController = serviceController;
+            _channelWriter = channelWriter;
+            StartWatcher();
+        }
+
+        public void Start()
+        {
+            _serviceController.Start();
+        }
+
+        public void Stop()
+        {
+            _serviceController.Stop();
+        }
 
         public ServiceControllerStatus Status
         {
@@ -17,22 +36,13 @@ namespace Gadget.Inspector
             {
                 _serviceController.Refresh();
                 var currentStatus = _serviceController.Status;
-                if (_lastKnownStatus != currentStatus)
-                {
-                    //Status has changed, notify the server
-                }
-
                 _lastKnownStatus = currentStatus;
                 return currentStatus;
             }
         }
 
-        public WindowsService(ServiceController serviceController)
-        {
-            _serviceController = serviceController;
-            StartWatcher();
-        }
 
+        //TODO Replace this with global scheduler/watcher that utilizes less resources? 
         private void StartWatcher()
         {
             //Possibly stealing thread from thread pool and never returning it
@@ -44,21 +54,20 @@ namespace Gadget.Inspector
                     var currentStatus = _serviceController.Status;
                     if (currentStatus != _lastKnownStatus)
                     {
-                        Console.WriteLine("[ws] status has changed");
-                        StatusChanged.Invoke(this, new WindowsServiceStatusChanged
+                        var change = new ServiceStatusChanged
                         {
-                            ServiceName = _serviceController.ServiceName,
-                            Status = currentStatus
-                        });
+                            Name = _serviceController.ServiceName,
+                            Status = Status.ToString()
+                        };
+                        await _channelWriter.WriteAsync(change);
                     }
 
                     _lastKnownStatus = currentStatus;
-                    await Task.Delay(1000);
+                    await Task.Delay(TimeSpan.FromSeconds(1));
                 }
+
+                // ReSharper disable once FunctionNeverReturns
             });
         }
-
-        public void Start() => _serviceController.Start();
-        public void Stop() => _serviceController.Stop();
     }
 }

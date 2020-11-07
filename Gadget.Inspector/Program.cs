@@ -1,32 +1,24 @@
-﻿using Gadget.Inspector.Services;
-using Gadget.Inspector.Services.Interfaces;
+﻿using Gadget.Inspector.Extensions;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Diagnostics;
-using System.Threading.Tasks;
+using Microsoft.Extensions.Hosting;
 
 namespace Gadget.Inspector
 {
-    class Program
+    internal class Program
     {
-        private static IServiceCollection ConfigureServices()
+        public static void Main(string[] args)
         {
-            IServiceCollection services = new ServiceCollection();
-            services.AddTransient<Startup>();
-            services.AddSingleton<Inspector>();
-            services.AddTransient(_ => new Uri("https://localhost:44347/gadget"));
-            services.AddSingleton(_ => new PerformanceCounter("Processor", "% Processor Time", "_Total"));
-            services.AddHostedService<MachineHealthWatcher>();
-            services.AddTransient<IWindowsService, WindowsService>();
-            services.AddLogging();
-
-            return services;
+            CreateHostBuilder(args).Build().Run();
         }
-        private static async Task Main()
+
+        public static IHostBuilder CreateHostBuilder(string[] args)
         {
-            var services = ConfigureServices();
-            var serviceProvider = services.BuildServiceProvider();
-            await serviceProvider.GetService<Startup>().Run();
+            return Host.CreateDefaultBuilder(args)
+                .ConfigureServices((hostContext, services) =>
+                {
+                    services.AddLogging();
+                    services.AddInspector();
+                });
         }
     }
 }

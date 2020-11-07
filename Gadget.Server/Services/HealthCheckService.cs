@@ -11,9 +11,9 @@ namespace Gadget.Server.Services
 {
     public class HealthCheckService : BackgroundService
     {
-        private readonly ILogger<HealthCheckService> _logger;
         private readonly IDictionary<string, Guid> _connectedClients;
         private readonly IHubContext<GadgetHub> _hubContext;
+        private readonly ILogger<HealthCheckService> _logger;
 
         public HealthCheckService(ILogger<HealthCheckService> logger, IDictionary<string, Guid> connectedClients,
             IHubContext<GadgetHub> hubContext)
