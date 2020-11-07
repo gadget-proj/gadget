@@ -33,7 +33,6 @@ namespace Gadget.Inspector.Services
                 .WithAutomaticReconnect()
                 .WithUrl(hubAddress)
                 .Build();
-            _services = new Dictionary<string, WindowsService>();
         }
 
 
@@ -55,12 +54,12 @@ namespace Gadget.Inspector.Services
         {
             await ConnectToHub(stoppingToken);
             await WatchServices(stoppingToken);
-            stoppingToken.WaitHandle.WaitOne();
+            // stoppingToken.WaitHandle.WaitOne();
         }
 
-        private Task WatchServices(CancellationToken stoppingToken)
+        private async Task WatchServices(CancellationToken stoppingToken)
         {
-            var _ = Task.Run(async () =>
+            await Task.Run(async () =>
             {
                 var registerNewAgent = new RegisterNewAgent
                 {
@@ -74,16 +73,22 @@ namespace Gadget.Inspector.Services
                 };
                 await _hubConnection.InvokeAsync("Register", registerNewAgent, stoppingToken);
                 _logger.LogInformation("Registering this agent");
-                while (!stoppingToken.IsCancellationRequested)
+                while (true)
                 {
-                    await _channel.Reader.WaitToReadAsync(stoppingToken);
-                    var @event = await _channel.Reader.ReadAsync(stoppingToken);
-                    @event.AgentId = _id;
-                    _logger.LogInformation($"Service {@event.Name} status has changed to {@event.Status}");
-                    await _hubConnection.InvokeAsync("ServiceStatusChanged", @event, stoppingToken);
+                    try
+                    {
+                        await _channel.Reader.WaitToReadAsync(stoppingToken);
+                        var @event = await _channel.Reader.ReadAsync(stoppingToken);
+                        @event.AgentId = _id;
+                        _logger.LogInformation($"Service {@event.Name} status has changed to {@event.Status}");
+                        await _hubConnection.InvokeAsync("ServiceStatusChanged", @event, stoppingToken);
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e);
+                    }
                 }
             }, stoppingToken);
-            return Task.CompletedTask;
         }
 
         private async Task ConnectToHub(CancellationToken stoppingToken)
