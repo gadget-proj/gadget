@@ -1,8 +1,4 @@
-﻿using System;
-using System.Threading.Channels;
-using Gadget.Inspector.Extensions;
-using Gadget.Inspector.Services;
-using Gadget.Messaging;
+﻿using Gadget.Inspector.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 

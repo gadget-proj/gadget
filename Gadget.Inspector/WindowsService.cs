@@ -8,18 +8,25 @@ namespace Gadget.Inspector
 {
     internal class WindowsService : IWindowsService
     {
+        private readonly ChannelWriter<ServiceStatusChanged> _channelWriter;
         private readonly ServiceController _serviceController;
         private ServiceControllerStatus _lastKnownStatus;
-        private readonly ChannelWriter<ServiceStatusChanged> _channelWriter;
-        public void Start() => _serviceController.Start();
-
-        public void Stop() => _serviceController.Stop();
 
         public WindowsService(ServiceController serviceController, ChannelWriter<ServiceStatusChanged> channelWriter)
         {
             _serviceController = serviceController;
             _channelWriter = channelWriter;
             StartWatcher();
+        }
+
+        public void Start()
+        {
+            _serviceController.Start();
+        }
+
+        public void Stop()
+        {
+            _serviceController.Stop();
         }
 
         public ServiceControllerStatus Status

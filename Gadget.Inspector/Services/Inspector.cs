@@ -14,11 +14,11 @@ namespace Gadget.Inspector.Services
 {
     public class Inspector : BackgroundService
     {
+        private readonly Channel<ServiceStatusChanged> _channel;
         private readonly HubConnection _hubConnection;
         private readonly Guid _id;
         private readonly ILogger<Inspector> _logger;
         private readonly IDictionary<string, WindowsService> _services;
-        private readonly Channel<ServiceStatusChanged> _channel;
 
         public Inspector(Uri hubAddress, Channel<ServiceStatusChanged> channel, ILogger<Inspector> logger = null)
         {
@@ -74,7 +74,6 @@ namespace Gadget.Inspector.Services
                 await _hubConnection.InvokeAsync("Register", registerNewAgent, stoppingToken);
                 _logger.LogInformation("Registering this agent");
                 while (!stoppingToken.IsCancellationRequested)
-                {
                     try
                     {
                         await _channel.Reader.WaitToReadAsync(stoppingToken);
@@ -87,7 +86,6 @@ namespace Gadget.Inspector.Services
                     {
                         Console.WriteLine(e);
                     }
-                }
             }, stoppingToken);
         }
 
