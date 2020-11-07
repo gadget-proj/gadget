@@ -3,11 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Gadget.Messaging;
-using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.SignalR;
-using InfluxDB.Client;
-using InfluxDB.Client.Writes;
-using InfluxDB.Client.Api.Domain;
+using Microsoft.Extensions.Logging;
 
 namespace Gadget.Server.Hubs
 {
@@ -38,9 +35,7 @@ namespace Gadget.Server.Hubs
             _logger.LogInformation($"Received new machine report from agent {registerMachineReport.AgentId}");
             _agents[registerMachineReport.AgentId] = registerMachineReport.Services.ToList();
             foreach (var service in registerMachineReport.Services)
-            {
                 _logger.LogInformation($"Service name : {service.Name} status : {service.Status}");
-            }
 
             return Task.CompletedTask;
         }
@@ -48,7 +43,7 @@ namespace Gadget.Server.Hubs
         //TODO Remove from group on disconnect
         public Task RegisterDashboard(RegisterNewDashboard registerNewDashboard)
         {
-            _logger.LogCritical($"HEj hej hej roman");
+            _logger.LogCritical("HEj hej hej roman");
             var cid = Context.ConnectionId;
             Groups.AddToGroupAsync(cid, "dashboard");
             return Task.CompletedTask;
@@ -67,15 +62,9 @@ namespace Gadget.Server.Hubs
         public Task ServiceStatusChanged(ServiceStatusChanged serviceStatusChanged)
         {
             var cid = Context.ConnectionId;
-            if (!_connectedClients.TryGetValue(cid, out var agentId))
-            {
-                return Task.CompletedTask;
-            }
+            if (!_connectedClients.TryGetValue(cid, out var agentId)) return Task.CompletedTask;
 
-            if (!_agents.TryGetValue(agentId, out var services))
-            {
-                return Task.CompletedTask;
-            }
+            if (!_agents.TryGetValue(agentId, out var services)) return Task.CompletedTask;
 
             var serviceName = serviceStatusChanged.Name;
             var serviceStatus = serviceStatusChanged.Status;

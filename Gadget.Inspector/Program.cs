@@ -1,19 +1,24 @@
-﻿using System;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+﻿using Gadget.Inspector.Extensions;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 namespace Gadget.Inspector
 {
-    class Program
+    internal class Program
     {
-        private static async Task Main()
+        public static void Main(string[] args)
         {
-            var l = new LoggerFactory();
-            var logger = l.CreateLogger<Inspector>();
-            var inspector = new Inspector(new Uri("https://localhost:44347/gadget"), logger);
-            await inspector.Start();
-            Console.WriteLine("Inspector started");
-            Console.ReadKey();
+            CreateHostBuilder(args).Build().Run();
+        }
+
+        public static IHostBuilder CreateHostBuilder(string[] args)
+        {
+            return Host.CreateDefaultBuilder(args)
+                .ConfigureServices((hostContext, services) =>
+                {
+                    services.AddLogging();
+                    services.AddInspector();
+                });
         }
     }
 }
