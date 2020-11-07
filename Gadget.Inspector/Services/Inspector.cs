@@ -73,7 +73,7 @@ namespace Gadget.Inspector.Services
                 };
                 await _hubConnection.InvokeAsync("Register", registerNewAgent, stoppingToken);
                 _logger.LogInformation("Registering this agent");
-                while (true)
+                while (!stoppingToken.IsCancellationRequested)
                 {
                     try
                     {
