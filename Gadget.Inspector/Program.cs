@@ -21,7 +21,6 @@ namespace Gadget.Inspector
                 {
                     services.AddLogging();
                     services.AddScoped(_ => Channel.CreateUnbounded<ServiceStatusChanged>());
-                    services.AddHostedService<ServicesWatcher>();
                     services.AddTransient(_ => new Uri("https://localhost:44347/gadget"));
                     services.AddHostedService<Services.Inspector>();
                 });

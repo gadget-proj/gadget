@@ -25,6 +25,10 @@ namespace Gadget.Inspector.Services
             _channel = channel;
             _logger ??= logger;
             _id = Guid.NewGuid();
+            _services = ServiceController
+                .GetServices()
+                .Select(s => (s.ServiceName, new WindowsService(s, _channel.Writer)))
+                .ToDictionary(k => k.ServiceName, v => v.Item2);
             _hubConnection = new HubConnectionBuilder()
                 .WithAutomaticReconnect()
                 .WithUrl(hubAddress)
@@ -50,51 +54,36 @@ namespace Gadget.Inspector.Services
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             await ConnectToHub(stoppingToken);
-            var services = RegisterServices(stoppingToken);
-            await RegisterInspector(stoppingToken, services);
+            await WatchServices(stoppingToken);
             stoppingToken.WaitHandle.WaitOne();
         }
 
-        private async Task RegisterInspector(CancellationToken stoppingToken,
-            IEnumerable<(string ServiceName, WindowsService)> services)
+        private Task WatchServices(CancellationToken stoppingToken)
         {
-            var registerNewAgent = new RegisterNewAgent
+            var _ = Task.Run(async () =>
             {
-                AgentId = _id,
-                Machine = Environment.MachineName,
-                Services = services.Select(s => new Service
+                var registerNewAgent = new RegisterNewAgent
                 {
-                    Name = s.ServiceName,
-                    Status = s.Item2?.Status.ToString()
-                })
-            };
-            await _hubConnection.InvokeAsync("Register", registerNewAgent, stoppingToken);
-        }
-
-        private IEnumerable<(string ServiceName, WindowsService)> RegisterServices(CancellationToken stoppingToken)
-        {
-            var services = ServiceController
-                .GetServices()
-                .Select(s => (s.ServiceName, new WindowsService(s)))
-                .ToList();
-
-            foreach (var (serviceName, windowsService) in services)
-            {
-                windowsService.StatusChanged += async (caller, @event) =>
-                {
-                    var change = new ServiceStatusChanged
+                    AgentId = _id,
+                    Machine = Environment.MachineName,
+                    Services = _services.Select(s => new Service
                     {
-                        AgentId = _id,
-                        Name = @event.ServiceName,
-                        Status = @event.Status.ToString()
-                    };
-                    await _channel.Writer.WriteAsync(change, stoppingToken);
-                    // await _hubConnection.InvokeAsync("ServiceStatusChanged", , stoppingToken);
+                        Name = s.Key,
+                        Status = s.Value?.Status.ToString()
+                    })
                 };
-                _services.Add(serviceName, windowsService);
-            }
-
-            return services;
+                await _hubConnection.InvokeAsync("Register", registerNewAgent, stoppingToken);
+                _logger.LogInformation("Registering this agent");
+                while (!stoppingToken.IsCancellationRequested)
+                {
+                    await _channel.Reader.WaitToReadAsync(stoppingToken);
+                    var @event = await _channel.Reader.ReadAsync(stoppingToken);
+                    @event.AgentId = _id;
+                    _logger.LogInformation($"Service {@event.Name} status has changed to {@event.Status}");
+                    await _hubConnection.InvokeAsync("ServiceStatusChanged", @event, stoppingToken);
+                }
+            }, stoppingToken);
+            return Task.CompletedTask;
         }
 
         private async Task ConnectToHub(CancellationToken stoppingToken)

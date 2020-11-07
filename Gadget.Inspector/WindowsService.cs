@@ -1,7 +1,9 @@
 ﻿using System;
 using System.ServiceProcess;
+using System.Threading.Channels;
 using System.Threading.Tasks;
 using Gadget.Inspector.Events;
+using Gadget.Messaging;
 
 namespace Gadget.Inspector
 {
@@ -9,11 +11,15 @@ namespace Gadget.Inspector
     {
         private readonly ServiceController _serviceController;
         private ServiceControllerStatus _lastKnownStatus;
-        public EventHandler<WindowsServiceStatusChanged> StatusChanged;
+        private readonly ChannelWriter<ServiceStatusChanged> _channelWriter;
+        public void Start() => _serviceController.Start();
 
-        public WindowsService(ServiceController serviceController)
+        public void Stop() => _serviceController.Stop();
+
+        public WindowsService(ServiceController serviceController, ChannelWriter<ServiceStatusChanged> channelWriter)
         {
             _serviceController = serviceController;
+            _channelWriter = channelWriter;
             StartWatcher();
         }
 
@@ -23,25 +29,11 @@ namespace Gadget.Inspector
             {
                 _serviceController.Refresh();
                 var currentStatus = _serviceController.Status;
-                if (_lastKnownStatus != currentStatus)
-                {
-                    //Status has changed, notify the server
-                }
-
                 _lastKnownStatus = currentStatus;
                 return currentStatus;
             }
         }
 
-        public void Start()
-        {
-            _serviceController.Start();
-        }
-
-        public void Stop()
-        {
-            _serviceController.Stop();
-        }
 
         private void StartWatcher()
         {
@@ -54,16 +46,19 @@ namespace Gadget.Inspector
                     var currentStatus = _serviceController.Status;
                     if (currentStatus != _lastKnownStatus)
                     {
-                        StatusChanged.Invoke(this, new WindowsServiceStatusChanged
+                        var change = new ServiceStatusChanged
                         {
-                            ServiceName = _serviceController.ServiceName,
-                            Status = currentStatus
-                        });
+                            Name = _serviceController.ServiceName,
+                            Status = Status.ToString()
+                        };
+                        await _channelWriter.WriteAsync(change);
                     }
 
                     _lastKnownStatus = currentStatus;
-                    await Task.Delay(1000);
+                    await Task.Delay(TimeSpan.FromSeconds(1));
                 }
+
+                // ReSharper disable once FunctionNeverReturns
             });
         }
     }
