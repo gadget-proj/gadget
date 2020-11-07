@@ -2,7 +2,6 @@
 using System.ServiceProcess;
 using System.Threading.Channels;
 using System.Threading.Tasks;
-using Gadget.Inspector.Events;
 using Gadget.Messaging;
 
 namespace Gadget.Inspector
