@@ -1,12 +1,10 @@
-﻿using Gadget.Inspector.Services.Interfaces;
-using Gadget.Messaging.ServiceMessages;
+﻿using Gadget.Messaging.ServiceMessages;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Management;
 using System.Threading;
 using System.Threading.Tasks;
 

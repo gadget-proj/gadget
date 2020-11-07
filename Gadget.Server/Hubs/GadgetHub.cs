@@ -1,7 +1,7 @@
-﻿using Gadget.Messaging.RegistrationMessages;
+﻿using Gadget.Messaging;
+using Gadget.Messaging.RegistrationMessages;
 using Gadget.Messaging.ServiceMessages;
 using Gadget.Server.Models;
-using Microsoft.AspNetCore.Components.Server.Circuits;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
 using System;
