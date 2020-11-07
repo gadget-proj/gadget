@@ -7,10 +7,10 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Gadget.Messaging\Gadget.Messaging.csproj"/>
+        <ProjectReference Include="..\Gadget.Messaging\Gadget.Messaging.csproj" />
     </ItemGroup>
     <ItemGroup>
-        <PackageReference Include="InfluxDB.Client" Version="1.11.0"/>
+        <PackageReference Include="InfluxDB.Client" Version="1.11.0" />
     </ItemGroup>
 
 </Project>

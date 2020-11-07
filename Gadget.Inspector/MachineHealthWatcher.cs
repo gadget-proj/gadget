@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Management;
 using System.Threading;
+using System.Threading.Channels;
 using System.Threading.Tasks;
 
 namespace Gadget.Inspector
@@ -14,12 +15,14 @@ namespace Gadget.Inspector
     public class MachineHealthWatcher : BackgroundService
     {
         private readonly PerformanceCounter _cpuCounter;
-        private readonly ILogger<MachineHealthWatcher> _logger;
+        private readonly ChannelWriter<MachineHealthDataModel> _healthChannelWriter;
 
-        public MachineHealthWatcher(PerformanceCounter cpuCounter, ILogger<MachineHealthWatcher> logger)
+        public MachineHealthWatcher(
+            PerformanceCounter cpuCounter, 
+            ChannelWriter<MachineHealthDataModel> healthChannelWriter)
         {
             _cpuCounter = cpuCounter;
-            _logger = logger;
+            _healthChannelWriter = healthChannelWriter;
         }
 
         protected override Task ExecuteAsync(CancellationToken stoppingToken)
@@ -27,15 +30,13 @@ namespace Gadget.Inspector
             while (!stoppingToken.IsCancellationRequested)
             {
                 var data = CheckMachineHealth();
-                // data.MachineId = _id;
-
-                //await _hubConnection.InvokeAsync("MachineHealthCheck", data);
-                //await Task.Delay(10000);
+                _healthChannelWriter.WriteAsync(data);
+                Task.Delay(10 * 1000);
             }
             return Task.CompletedTask;
         }
 
-        public MachineHealthDataModel CheckMachineHealth()
+        private MachineHealthDataModel CheckMachineHealth()
         {
             var output = new MachineHealthDataModel
             {
