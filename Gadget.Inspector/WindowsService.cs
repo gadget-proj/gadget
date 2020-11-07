@@ -35,6 +35,7 @@ namespace Gadget.Inspector
         }
 
 
+        //TODO Replace this with global scheduler/watcher that utilizes less resources? 
         private void StartWatcher()
         {
             //Possibly stealing thread from thread pool and never returning it
