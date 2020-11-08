@@ -20,6 +20,6 @@ namespace Gadget.Messaging.ServiceMessages
 
         public string Platform { get; set; }
 
-        public List<DiscUsageInfo> Discs { get; set; }
+        public ICollection<DiscUsageInfo> Discs { get; set; } = new List<DiscUsageInfo>();
     }
 }
