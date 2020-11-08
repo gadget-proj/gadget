@@ -1,3 +1,1 @@
-# gadget
-Inspect and manage your windows services
-![](https://i.imgur.com/At0WFV1.png)
+## 🔍 Gadget is a project that provides 🛠 tools to easily manage your Windows Services on many machines from a single control point 🎛
