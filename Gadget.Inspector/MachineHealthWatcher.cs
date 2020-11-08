@@ -18,21 +18,21 @@ namespace Gadget.Inspector
 
         public MachineHealthWatcher(
             PerformanceCounter cpuCounter, 
-            ChannelWriter<MachineHealthData> healthChannelWriter)
+            Channel<MachineHealthData> healthChannel)
         {
             _cpuCounter = cpuCounter;
-            _healthChannelWriter = healthChannelWriter;
+            _healthChannelWriter = healthChannel.Writer;
         }
 
-        protected override Task ExecuteAsync(CancellationToken stoppingToken)
+        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             while (!stoppingToken.IsCancellationRequested)
             {
                 var data = CheckMachineHealth();
-                _healthChannelWriter.WriteAsync(data);
-                Task.Delay(10 * 1000);
+                _healthChannelWriter.WriteAsync(data).GetAwaiter().GetResult();
+               await Task.Delay(10 * 1000);
             }
-            return Task.CompletedTask;
+            //return Task.CompletedTask;
         }
 
         private MachineHealthData CheckMachineHealth()
