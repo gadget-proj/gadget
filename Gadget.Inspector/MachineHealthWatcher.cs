@@ -29,7 +29,7 @@ namespace Gadget.Inspector
             while (!stoppingToken.IsCancellationRequested)
             {
                 var data = CheckMachineHealth();
-                _healthChannelWriter.WriteAsync(data).GetAwaiter().GetResult();
+               await _healthChannelWriter.WriteAsync(data);
                await Task.Delay(10 * 1000);
             }
             //return Task.CompletedTask;
