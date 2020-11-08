@@ -22,7 +22,7 @@ namespace Gadget.Inspector.Services
         private readonly ILogger<Inspector> _logger;
         private readonly IDictionary<string, WindowsService> _services;
 
-        public Inspector(Uri hubAddress, 
+        public Inspector(Uri hubAddress,
             Channel<ServiceStatusChanged> channel,
             Channel<MachineHealthData> healthChannel,
             ILogger<Inspector> logger = null)
@@ -64,9 +64,9 @@ namespace Gadget.Inspector.Services
             // stoppingToken.WaitHandle.WaitOne();
         }
 
-        private async Task WatchServices(CancellationToken stoppingToken)
+        private Task WatchServices(CancellationToken stoppingToken)
         {
-            await Task.Run(async () =>
+            var _ = Task.Run(async () =>
             {
                 var registerNewAgent = new RegisterNewAgent
                 {
@@ -94,6 +94,7 @@ namespace Gadget.Inspector.Services
                         Console.WriteLine(e);
                     }
             }, stoppingToken);
+            return Task.CompletedTask;
         }
 
         private async Task WatchMachineHealth(CancellationToken stoppingToken)
