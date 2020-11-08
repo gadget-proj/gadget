@@ -18,7 +18,7 @@ namespace Gadget.Server.Models
 
         public string ConnectionId { get; private set; }
 
-        public MachineHealthDataModel MachineHealthData { get; set; }
+        public MachineHealthData MachineHealthData { get; set; }
 
         public IEnumerable<Service> Services { get; set; } = new List<Service>();
     }

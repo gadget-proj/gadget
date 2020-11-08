@@ -1,6 +1,5 @@
 ﻿using Gadget.Messaging.ServiceMessages;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -15,11 +14,11 @@ namespace Gadget.Inspector
     public class MachineHealthWatcher : BackgroundService
     {
         private readonly PerformanceCounter _cpuCounter;
-        private readonly ChannelWriter<MachineHealthDataModel> _healthChannelWriter;
+        private readonly ChannelWriter<MachineHealthData> _healthChannelWriter;
 
         public MachineHealthWatcher(
             PerformanceCounter cpuCounter, 
-            ChannelWriter<MachineHealthDataModel> healthChannelWriter)
+            ChannelWriter<MachineHealthData> healthChannelWriter)
         {
             _cpuCounter = cpuCounter;
             _healthChannelWriter = healthChannelWriter;
@@ -36,9 +35,9 @@ namespace Gadget.Inspector
             return Task.CompletedTask;
         }
 
-        private MachineHealthDataModel CheckMachineHealth()
+        private MachineHealthData CheckMachineHealth()
         {
-            var output = new MachineHealthDataModel
+            var output = new MachineHealthData
             {
                 MachineName = Environment.MachineName,
                 CpuPercentUsage = (int)_cpuCounter.NextValue(),
@@ -52,9 +51,7 @@ namespace Gadget.Inspector
             return output;
         }
 
-
-
-        private void AddDrivesInfo(MachineHealthDataModel model)
+        private void AddDrivesInfo(MachineHealthData model)
         {
             var discs = DriveInfo.GetDrives();
             model.Discs = discs.Select(x => new DiscUsageInfo
@@ -65,7 +62,7 @@ namespace Gadget.Inspector
             }).ToList();
         }
 
-        private void AddMemoryInfo(MachineHealthDataModel model)
+        private void AddMemoryInfo(MachineHealthData model)
         {
             var qo = new ObjectQuery("SELECT * FROM Win32_OperatingSystem");
             var searcher = new ManagementObjectSearcher(qo);

@@ -16,7 +16,7 @@ namespace Gadget.Inspector.Services
     public class Inspector : BackgroundService
     {
         private readonly Channel<ServiceStatusChanged> _channel;
-        private readonly Channel<MachineHealthDataModel> _healthChannelWriter;
+        private readonly Channel<MachineHealthData> _healthChannel;
         private readonly HubConnection _hubConnection;
         private readonly Guid _id;
         private readonly ILogger<Inspector> _logger;
@@ -24,11 +24,11 @@ namespace Gadget.Inspector.Services
 
         public Inspector(Uri hubAddress, 
             Channel<ServiceStatusChanged> channel,
-            Channel<MachineHealthDataModel> healthChannelWriter,
+            Channel<MachineHealthData> healthChannel,
             ILogger<Inspector> logger = null)
         {
             _channel = channel;
-            _healthChannelWriter = healthChannelWriter;
+            _healthChannel = healthChannel;
             _logger ??= logger;
             _id = Guid.NewGuid();
             _services = ServiceController
@@ -60,7 +60,7 @@ namespace Gadget.Inspector.Services
         {
             await ConnectToHub(stoppingToken);
             await WatchServices(stoppingToken);
-            await WatchMachineHEalt(stoppingToken);
+            await WatchMachineHealth(stoppingToken);
             // stoppingToken.WaitHandle.WaitOne();
         }
 
@@ -96,15 +96,15 @@ namespace Gadget.Inspector.Services
             }, stoppingToken);
         }
 
-        private async Task WatchMachineHEalt(CancellationToken stoppingToken)
+        private async Task WatchMachineHealth(CancellationToken stoppingToken)
         {
-            await Task.Run(async () =>
+            while (!stoppingToken.IsCancellationRequested)
             {
-                await _healthChannelWriter.Reader.WaitToReadAsync(stoppingToken);
-                var data = await _healthChannelWriter.Reader.ReadAsync(stoppingToken);
-                data.MachineId = _id; // może wrzucimy ten guid do DI, to bym sobie go pobrał wewnątrz klasy
+                await _healthChannel.Reader.WaitToReadAsync(stoppingToken);
+                var data = await _healthChannel.Reader.ReadAsync(stoppingToken);
+                data.MachineId = _id;
                 await _hubConnection.InvokeAsync("MachineHealthCheck", data, stoppingToken);
-            });
+            }
         }
 
         private async Task ConnectToHub(CancellationToken stoppingToken)

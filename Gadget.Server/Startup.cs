@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using Gadget.Messaging;
 using Gadget.Server.Hubs;
+using Gadget.Server.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
@@ -31,12 +32,9 @@ namespace Gadget.Server
 
             services.AddSignalR();
             services.AddControllers();
-            services.AddSingleton<IDictionary<Guid, ICollection<Service>>>(_ =>
-                new ConcurrentDictionary<Guid, ICollection<Service>>());
-            services.AddSingleton<IDictionary<string, Guid>>(_ => new Dictionary<string, Guid>());
+            services.AddSingleton<IList<Agent>>(_ => new List<Agent>());
             // services.AddHostedService<HealthCheckService>();
         }
-
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment()) app.UseDeveloperExceptionPage();

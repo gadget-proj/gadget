@@ -16,7 +16,7 @@ namespace Gadget.Server.Hubs
         private readonly ILogger<GadgetHub> _logger;
 
 
-        public GadgetHub(List<Agent> agents, ILogger<GadgetHub> logger)
+        public GadgetHub(IList<Agent> agents, ILogger<GadgetHub> logger)
         {
             _agents = agents;
             _logger = logger;
@@ -47,7 +47,7 @@ namespace Gadget.Server.Hubs
             return Task.CompletedTask;
         }
 
-        public Task MachineHealthCheck(MachineHealthDataModel model)
+        public Task MachineHealthCheck(MachineHealthData model)
         {
             var agent = _agents.FirstOrDefault(x => x.MachineId == model.MachineId);
             if (agent != null) agent.MachineHealthData = model;

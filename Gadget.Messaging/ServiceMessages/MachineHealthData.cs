@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Gadget.Messaging.ServiceMessages
 {
-    public class MachineHealthDataModel
+    public class MachineHealthData
     {
         public Guid MachineId { get; set; }
 
