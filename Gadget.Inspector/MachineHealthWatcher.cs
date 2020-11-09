@@ -1,6 +1,4 @@
-﻿using Gadget.Messaging.ServiceMessages;
-using Microsoft.Extensions.Hosting;
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -8,6 +6,8 @@ using System.Management;
 using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
+using Gadget.Messaging.ServiceMessages;
+using Microsoft.Extensions.Hosting;
 
 namespace Gadget.Inspector
 {
@@ -16,9 +16,7 @@ namespace Gadget.Inspector
         private readonly PerformanceCounter _cpuCounter;
         private readonly ChannelWriter<MachineHealthData> _healthChannelWriter;
 
-        public MachineHealthWatcher(
-            PerformanceCounter cpuCounter, 
-            Channel<MachineHealthData> healthChannel)
+        public MachineHealthWatcher(PerformanceCounter cpuCounter, Channel<MachineHealthData> healthChannel)
         {
             _cpuCounter = cpuCounter;
             _healthChannelWriter = healthChannel.Writer;
@@ -29,10 +27,9 @@ namespace Gadget.Inspector
             while (!stoppingToken.IsCancellationRequested)
             {
                 var data = CheckMachineHealth();
-               await _healthChannelWriter.WriteAsync(data);
-               await Task.Delay(10 * 1000);
+                await _healthChannelWriter.WriteAsync(data, stoppingToken);
+                await Task.Delay(TimeSpan.FromSeconds(10), stoppingToken);
             }
-            //return Task.CompletedTask;
         }
 
         private MachineHealthData CheckMachineHealth()
@@ -40,7 +37,7 @@ namespace Gadget.Inspector
             var output = new MachineHealthData
             {
                 MachineName = Environment.MachineName,
-                CpuPercentUsage = (int)_cpuCounter.NextValue(),
+                CpuPercentUsage = (int) _cpuCounter.NextValue(),
                 ProcessesQuantity = Process.GetProcesses().Length,
                 Platform = Environment.OSVersion.Platform.ToString(),
                 CpuThreadsQuantity = Environment.ProcessorCount
@@ -51,18 +48,22 @@ namespace Gadget.Inspector
             return output;
         }
 
-        private void AddDrivesInfo(MachineHealthData model)
+        private static void AddDrivesInfo(MachineHealthData model)
         {
-            var discs = DriveInfo.GetDrives();
-            model.Discs = discs.Select(x => new DiscUsageInfo
+            model.Discs = DriveInfo.GetDrives().Select(Disks);
+
+            static DiscUsageInfo Disks(DriveInfo driveInfo)
             {
-                Name = x.Name,
-                DiscSize = x.TotalSize / 1073741824f,
-                DiscSpaceFree = x.AvailableFreeSpace / 1073741824f
-            }).ToList();
+                return new DiscUsageInfo
+                {
+                    Name = driveInfo.Name,
+                    DiscSize = driveInfo.TotalSize / 1073741824f,
+                    DiscSpaceFree = driveInfo.AvailableFreeSpace / 1073741824f
+                };
+            }
         }
 
-        private void AddMemoryInfo(MachineHealthData model)
+        private static void AddMemoryInfo(MachineHealthData model)
         {
             var qo = new ObjectQuery("SELECT * FROM Win32_OperatingSystem");
             var searcher = new ManagementObjectSearcher(qo);
@@ -71,12 +72,12 @@ namespace Gadget.Inspector
             var result = results.OfType<ManagementObject>().FirstOrDefault();
             if (result == null) return;
 
-            if (int.TryParse(result["TotalVisibleMemorySize"].ToString(), out int total))
+            if (int.TryParse(result["TotalVisibleMemorySize"].ToString(), out var total))
             {
                 model.MemoryTotal = total / 1048576f;
             }
 
-            if (int.TryParse(result["FreePhysicalMemory"].ToString(), out int free))
+            if (int.TryParse(result["FreePhysicalMemory"].ToString(), out var free))
             {
                 model.MemoryFree = free / 1048576f;
             }
