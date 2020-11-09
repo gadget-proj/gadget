@@ -11,6 +11,7 @@ namespace Gadget.Inspector
         private readonly ChannelWriter<ServiceStatusChanged> _channelWriter;
         private readonly ServiceController _serviceController;
         private ServiceControllerStatus _lastKnownStatus;
+        public string Name => _serviceController.ServiceName;
 
         public WindowsService(ServiceController serviceController, ChannelWriter<ServiceStatusChanged> channelWriter)
         {
