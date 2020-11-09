@@ -33,7 +33,6 @@ namespace Gadget.Inspector.Services
                 .ToDictionary(k => k.ServiceName, v => v.Item2);
         }
 
-
         private void RegisterHandlers()
         {
             _controlPlane.RegisterHandler<StopService>("StopService", command =>
@@ -86,7 +85,6 @@ namespace Gadget.Inspector.Services
                     })
                 };
                 await _controlPlane.Invoke("Register", registerNewAgent);
-                _logger.LogInformation("Registering this agent");
             }
         }
     }
