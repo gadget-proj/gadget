@@ -20,12 +20,11 @@ namespace Gadget.Inspector.Services
         private readonly ICollection<WindowsService> _services;
         private readonly IControlPlane _controlPlane;
 
-        public Inspector(Channel<ServiceStatusChanged> channel, IControlPlane controlPlane,
-            ILogger<Inspector> logger = null)
+        public Inspector(Channel<ServiceStatusChanged> channel, IControlPlane controlPlane, ILogger<Inspector> logger)
         {
             _channel = channel;
             _controlPlane = controlPlane;
-            _logger ??= logger;
+            _logger = logger;
             _id = Guid.NewGuid();
             _services = ServiceController
                 .GetServices()
@@ -52,6 +51,7 @@ namespace Gadget.Inspector.Services
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
+            RegisterHandlers();
             await Register();
             while (!stoppingToken.IsCancellationRequested)
             {
