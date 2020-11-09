@@ -1,6 +1,9 @@
-﻿using Gadget.Inspector.Extensions;
+﻿using System.Reflection;
+using Gadget.Inspector.Extensions;
+using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace Gadget.Inspector
 {
@@ -16,7 +19,8 @@ namespace Gadget.Inspector
             return Host.CreateDefaultBuilder(args)
                 .ConfigureServices((hostContext, services) =>
                 {
-                    services.AddLogging();
+                    services.AddMediatR(Assembly.GetExecutingAssembly());
+                    services.AddLogging(options=>options.AddConsole());
                     services.AddInspector();
                 });
         }
