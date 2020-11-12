@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Gadget.Messaging
+namespace Gadget.Messaging.Commands
 {
     public class RegisterNewAgent
     {

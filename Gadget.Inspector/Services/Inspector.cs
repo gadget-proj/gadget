@@ -6,6 +6,8 @@ using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
 using Gadget.Messaging;
+using Gadget.Messaging.Commands;
+using Gadget.Messaging.Events;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -74,6 +76,7 @@ namespace Gadget.Inspector.Services
                 await _hubConnection.InvokeAsync("Register", registerNewAgent, stoppingToken);
                 _logger.LogInformation("Registering this agent");
                 while (!stoppingToken.IsCancellationRequested)
+                {
                     try
                     {
                         await _channel.Reader.WaitToReadAsync(stoppingToken);
@@ -86,6 +89,7 @@ namespace Gadget.Inspector.Services
                     {
                         Console.WriteLine(e);
                     }
+                }
             }, stoppingToken);
         }
 

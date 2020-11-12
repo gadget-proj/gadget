@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Channels;
 using Gadget.Messaging;
+using Gadget.Messaging.Events;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Gadget.Inspector.Extensions

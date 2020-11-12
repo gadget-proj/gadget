@@ -1,4 +1,4 @@
-﻿namespace Gadget.Messaging
+﻿namespace Gadget.Messaging.Commands
 {
     public class RegisterNewDashboard
     {
