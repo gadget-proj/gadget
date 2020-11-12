@@ -3,6 +3,7 @@ using System.ServiceProcess;
 using System.Threading.Channels;
 using System.Threading.Tasks;
 using Gadget.Messaging;
+using Gadget.Messaging.Events;
 
 namespace Gadget.Inspector
 {

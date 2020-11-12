@@ -7,6 +7,8 @@ using System.Threading.Channels;
 using System.Threading.Tasks;
 using Gadget.Inspector.Transport;
 using Gadget.Messaging;
+using Gadget.Messaging.Commands;
+using Gadget.Messaging.Events;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 

@@ -3,6 +3,7 @@ using System.Threading.Channels;
 using Gadget.Inspector.Transport;
 using Gadget.Messaging;
 using Microsoft.AspNetCore.SignalR.Client;
+using Gadget.Messaging.Events;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Gadget.Inspector.Extensions

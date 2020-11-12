@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Gadget.Messaging;
+using Gadget.Messaging.Commands;
+using Gadget.Messaging.Events;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
 
@@ -30,7 +32,7 @@ namespace Gadget.Server.Hubs
             return Task.CompletedTask;
         }
 
-        public Task RegisterMachineReport(RegisterMachineReport registerMachineReport)
+        public Task RegisterMachineReport(RegisterNewAgent registerMachineReport)
         {
             _logger.LogInformation($"Received new machine report from agent {registerMachineReport.AgentId}");
             _agents[registerMachineReport.AgentId] = registerMachineReport.Services.ToList();
