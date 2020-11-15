@@ -16,12 +16,14 @@ namespace Gadget.Inspector.Metrics
         public IEnumerable<DiscUsageInfo> Discs { get; set; } = new List<DiscUsageInfo>();
 
         public override string ToString()
-            => $"AGN : {Agent}" +
-               $"{Environment.NewLine}" +
-               $"CPU : {CpuPercentUsage}" +
-               $"{Environment.NewLine}" +
-               $"MEF : {MemoryFree}" +
-               $"{Environment.NewLine}" +
-               $"MET : {MemoryTotal}";
+        {
+            return $"AGN : {Agent}" +
+                   $"{Environment.NewLine}" +
+                   $"CPU : {CpuPercentUsage}" +
+                   $"{Environment.NewLine}" +
+                   $"MEF : {MemoryFree}" +
+                   $"{Environment.NewLine}" +
+                   $"MET : {MemoryTotal}";
+        }
     }
 }
