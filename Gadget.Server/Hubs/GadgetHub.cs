@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Gadget.Messaging.Commands;
 using Gadget.Messaging.Events;
 using Gadget.Server.Domain.Entities;
+using Gadget.Server.Extensions;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
 
@@ -21,15 +22,11 @@ namespace Gadget.Server.Hubs
             _logger = logger;
         }
 
-        private Agent GetAgent(string connectionId)
-        {
-            return _agents.FirstOrDefault(a => a.ConnectionId == connectionId);
-        }
 
         public override Task OnDisconnectedAsync(Exception exception)
         {
             var connectionId = Context.ConnectionId;
-            var agent = GetAgent(connectionId);
+            var agent = _agents.WithConnectionId(connectionId);
             _agents.Remove(agent);
             _logger.LogInformation($"Client {connectionId} has disconnected");
             return Task.CompletedTask;
@@ -78,7 +75,7 @@ namespace Gadget.Server.Hubs
         public Task ServiceStatusChanged(ServiceStatusChanged serviceStatusChanged)
         {
             var connectionId = Context.ConnectionId;
-            var agent = GetAgent(connectionId);
+            var agent = _agents.WithConnectionId(connectionId);
             if (agent is null)
             {
                 _logger.LogError($"Cannot find agent for {connectionId}");

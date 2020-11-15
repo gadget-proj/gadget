@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using Gadget.Server.Domain.Entities;
 using Gadget.Server.Hubs;
+using Gadget.Server.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
@@ -36,7 +37,7 @@ namespace Gadget.Server
                 new ConcurrentDictionary<Guid, ICollection<Service>>());
             services.AddSingleton<ICollection<Agent>, HashSet<Agent>>();
             services.AddSingleton<IDictionary<string, Guid>>(_ => new Dictionary<string, Guid>());
-            // services.AddHostedService<HealthCheckService>();
+            services.AddHostedService<HealthCheckService>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
