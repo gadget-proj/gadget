@@ -59,7 +59,7 @@ namespace Gadget.Inspector
                         {
                             Name = _serviceController.ServiceName,
                             Status = Status.ToString(),
-                            AgentId = Environment.MachineName
+                            AgentId = Environment.MachineName.Replace("-","")
                         };
                         await _channelWriter.WriteAsync(change);
                     }

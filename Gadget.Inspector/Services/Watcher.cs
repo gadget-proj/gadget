@@ -59,7 +59,7 @@ namespace Gadget.Inspector.Services
             {
                 Name = serviceController.ServiceName,
                 Status = serviceController.Status.ToString(),
-                AgentId = Environment.MachineName
+                AgentId = Environment.MachineName.Replace("-","")
             }, stoppingToken);
         }
     }

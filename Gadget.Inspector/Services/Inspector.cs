@@ -66,7 +66,7 @@ namespace Gadget.Inspector.Services
 
                 var registerNewAgent = new RegisterNewAgent
                 {
-                    Agent = Environment.MachineName,
+                    Agent = Environment.MachineName.Replace("-",""),
                     Services = ServiceController.GetServices().Select(s => new Service
                     {
                         Name = s.ServiceName,
