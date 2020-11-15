@@ -6,6 +6,8 @@ using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
 using Gadget.Messaging;
+using Gadget.Messaging.RegistrationMessages;
+using Gadget.Messaging.ServiceMessages;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;

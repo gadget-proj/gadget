@@ -17,7 +17,7 @@ namespace Gadget.Inspector.Services
 
         public MachineHealthWatcher(PerformanceCounter cpuCounter, ILogger<MachineHealthWatcher> logger)
         {
-            _cpuCounter = cpuCounter;
+            _cpuCounter = cpuCounter ?? throw new ArgumentNullException(nameof(cpuCounter));
             _logger = logger;
         }
 
