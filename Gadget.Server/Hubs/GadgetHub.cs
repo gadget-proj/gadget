@@ -7,7 +7,6 @@ using Gadget.Messaging.Events;
 using Gadget.Server.Domain.Entities;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
-using Service = Gadget.Messaging.Service;
 
 namespace Gadget.Server.Hubs
 {
@@ -22,7 +21,10 @@ namespace Gadget.Server.Hubs
             _logger = logger;
         }
 
-        private Agent GetAgent(string connectionId) => _agents.FirstOrDefault(a => a.ConnectionId == connectionId);
+        private Agent GetAgent(string connectionId)
+        {
+            return _agents.FirstOrDefault(a => a.ConnectionId == connectionId);
+        }
 
         public override Task OnDisconnectedAsync(Exception exception)
         {
@@ -68,7 +70,7 @@ namespace Gadget.Server.Hubs
             _logger.LogInformation($"Registering new agent {registerNewAgent.Agent} with CID : {connectionId}");
             var agentId = registerNewAgent.Agent;
             var agent = new Agent(agentId, connectionId);
-            agent.AddServices(registerNewAgent.Services.Select(s => new Domain.Entities.Service(s.Name, s.Status)));
+            agent.AddServices(registerNewAgent.Services.Select(s => new Service(s.Name, s.Status)));
             _agents.Add(agent);
             return Task.CompletedTask;
         }

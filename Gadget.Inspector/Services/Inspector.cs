@@ -15,8 +15,8 @@ namespace Gadget.Inspector.Services
 {
     public class Inspector : BackgroundService
     {
-        private readonly ILogger<Inspector> _logger;
         private readonly IControlPlane _controlPlane;
+        private readonly ILogger<Inspector> _logger;
         private readonly IDictionary<string, ServiceControllerStatus> _statuses;
 
         public Inspector(IControlPlane controlPlane, ILogger<Inspector> logger)
@@ -58,10 +58,7 @@ namespace Gadget.Inspector.Services
 
                     var previousStatus = _statuses[serviceController.ServiceName];
                     var currentStatus = serviceController.Status;
-                    if (currentStatus == previousStatus)
-                    {
-                        continue;
-                    }
+                    if (currentStatus == previousStatus) continue;
 
                     await UpdateStatus(serviceController, stoppingToken);
                     _statuses[serviceController.ServiceName] = currentStatus;

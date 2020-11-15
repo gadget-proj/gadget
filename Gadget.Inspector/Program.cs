@@ -20,7 +20,7 @@ namespace Gadget.Inspector
                 .ConfigureServices((hostContext, services) =>
                 {
                     services.AddMediatR(Assembly.GetExecutingAssembly());
-                    services.AddLogging(options=>options.AddConsole());
+                    services.AddLogging(options => options.AddConsole());
                     services.AddInspector();
                 });
         }

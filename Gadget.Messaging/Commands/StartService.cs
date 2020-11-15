@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Gadget.Messaging.Commands
+﻿namespace Gadget.Messaging.Commands
 {
     public class StartService
     {

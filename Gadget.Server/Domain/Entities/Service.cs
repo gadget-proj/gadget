@@ -1,18 +1,19 @@
 using System.Collections.Generic;
-using Gadget.Server.Domain.Enums;
 
 namespace Gadget.Server.Domain.Entities
 {
     public class Service
     {
-        public string Name { get; }
-        public string Status { get; set; }
-
         public Service(string name, string status)
         {
             Name = name;
             Status = status;
         }
+
+        public string Name { get; }
+        public string Status { get; set; }
+
+        public static IEqualityComparer<Service> NameComparer { get; } = new NameEqualityComparer();
 
         private sealed class NameEqualityComparer : IEqualityComparer<Service>
         {
@@ -27,10 +28,8 @@ namespace Gadget.Server.Domain.Entities
 
             public int GetHashCode(Service obj)
             {
-                return (obj.Name != null ? obj.Name.GetHashCode() : 0);
+                return obj.Name != null ? obj.Name.GetHashCode() : 0;
             }
         }
-
-        public static IEqualityComparer<Service> NameComparer { get; } = new NameEqualityComparer();
     }
 }

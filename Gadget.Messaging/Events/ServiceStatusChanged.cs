@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Gadget.Messaging.Events
+﻿namespace Gadget.Messaging.Events
 {
     public class ServiceStatusChanged
     {

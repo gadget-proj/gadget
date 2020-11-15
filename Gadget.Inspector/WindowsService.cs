@@ -2,7 +2,6 @@
 using System.ServiceProcess;
 using System.Threading.Channels;
 using System.Threading.Tasks;
-using Gadget.Messaging;
 using Gadget.Messaging.Events;
 
 namespace Gadget.Inspector
@@ -12,7 +11,6 @@ namespace Gadget.Inspector
         private readonly ChannelWriter<ServiceStatusChanged> _channelWriter;
         private readonly ServiceController _serviceController;
         private ServiceControllerStatus _lastKnownStatus;
-        public string Name => _serviceController.ServiceName;
 
         public WindowsService(ServiceController serviceController, ChannelWriter<ServiceStatusChanged> channelWriter)
         {
@@ -20,6 +18,8 @@ namespace Gadget.Inspector
             _channelWriter = channelWriter;
             StartWatcher();
         }
+
+        public string Name => _serviceController.ServiceName;
 
         public void Start()
         {
@@ -59,7 +59,7 @@ namespace Gadget.Inspector
                         {
                             Name = _serviceController.ServiceName,
                             Status = Status.ToString(),
-                            AgentId = Environment.MachineName.Replace("-","")
+                            AgentId = Environment.MachineName.Replace("-", "")
                         };
                         await _channelWriter.WriteAsync(change);
                     }
