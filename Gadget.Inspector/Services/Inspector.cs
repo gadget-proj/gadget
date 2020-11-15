@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.ServiceProcess;
 using System.Threading;
-using System.Threading.Channels;
 using System.Threading.Tasks;
 using Gadget.Inspector.Transport;
 using Gadget.Messaging;
@@ -16,15 +15,13 @@ namespace Gadget.Inspector.Services
 {
     public class Inspector : BackgroundService
     {
-        private readonly Channel<ServiceStatusChanged> _channel;
         private readonly ILogger<Inspector> _logger;
         private readonly IControlPlane _controlPlane;
         private readonly IDictionary<string, ServiceControllerStatus> _statuses;
 
-        public Inspector(Channel<ServiceStatusChanged> channel, IControlPlane controlPlane, ILogger<Inspector> logger)
+        public Inspector(IControlPlane controlPlane, ILogger<Inspector> logger)
         {
             _statuses = new Dictionary<string, ServiceControllerStatus>();
-            _channel = channel;
             _controlPlane = controlPlane;
             _logger = logger;
         }
