@@ -58,7 +58,8 @@ namespace Gadget.Inspector
                         var change = new ServiceStatusChanged
                         {
                             Name = _serviceController.ServiceName,
-                            Status = Status.ToString()
+                            Status = Status.ToString(),
+                            AgentId = Environment.MachineName
                         };
                         await _channelWriter.WriteAsync(change);
                     }

@@ -5,8 +5,7 @@ namespace Gadget.Messaging.Commands
 {
     public class RegisterNewAgent
     {
-        public string Machine { get; set; }
-        public Guid AgentId { get; set; }
+        public string Agent { get; set; }
         public IEnumerable<Service> Services { get; set; }
     }
 }

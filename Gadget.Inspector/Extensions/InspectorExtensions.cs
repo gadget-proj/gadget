@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Channels;
+using Gadget.Inspector.Services;
 using Gadget.Inspector.Transport;
 using Gadget.Messaging;
 using Microsoft.AspNetCore.SignalR.Client;
@@ -25,6 +26,7 @@ namespace Gadget.Inspector.Extensions
             services.AddScoped(_ => Channel.CreateUnbounded<ServiceStatusChanged>());
             services.AddTransient(_ => new Uri("https://localhost:5001/gadget"));
             services.AddHostedService<Services.Inspector>();
+            services.AddHostedService<Watcher>();
             return services;
         }
     }

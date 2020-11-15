@@ -2,42 +2,52 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Gadget.Messaging;
 using Gadget.Messaging.Commands;
 using Gadget.Messaging.Events;
+using Gadget.Server.Domain.Entities;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
+using Service = Gadget.Messaging.Service;
 
 namespace Gadget.Server.Hubs
 {
     public class GadgetHub : Hub
     {
-        private readonly IDictionary<Guid, ICollection<Service>> _agents;
-        private readonly IDictionary<string, Guid> _connectedClients;
+        private readonly ICollection<Agent> _agents;
         private readonly ILogger<GadgetHub> _logger;
 
-        public GadgetHub(IDictionary<Guid, ICollection<Service>> agents, IDictionary<string, Guid> connectedClients,
-            ILogger<GadgetHub> logger)
+        public GadgetHub(ICollection<Agent> agents, ILogger<GadgetHub> logger)
         {
             _agents = agents;
-            _connectedClients = connectedClients;
             _logger = logger;
         }
+
+        private Agent GetAgent(string connectionId) => _agents.FirstOrDefault(a => a.ConnectionId == connectionId);
 
         public override Task OnDisconnectedAsync(Exception exception)
         {
             var connectionId = Context.ConnectionId;
-            _connectedClients.Remove(connectionId);
+            var agent = GetAgent(connectionId);
+            _agents.Remove(agent);
             _logger.LogInformation($"Client {connectionId} has disconnected");
             return Task.CompletedTask;
         }
 
         public Task RegisterMachineReport(RegisterNewAgent registerMachineReport)
         {
-            _logger.LogInformation($"Received new machine report from agent {registerMachineReport.AgentId}");
-            _agents[registerMachineReport.AgentId] = registerMachineReport.Services.ToList();
+            _logger.LogInformation($"Received new machine report from agent {registerMachineReport.Agent}");
+            var agent = _agents.FirstOrDefault(a => a.Name == registerMachineReport.Agent);
+            if (agent is null)
+            {
+                _logger.LogError($"Could not find agent {registerMachineReport.Agent} for {nameof(RegisterNewAgent)}");
+                return Task.CompletedTask;
+            }
+
+            //TODO THIS IS BAD
             foreach (var service in registerMachineReport.Services)
             {
+                var serviceUpdate = agent.Services.FirstOrDefault(s => s.Name == service.Name);
+                serviceUpdate!.Status = service.Status;
                 _logger.LogInformation($"Service name : {service.Name} status : {service.Status}");
             }
 
@@ -55,32 +65,38 @@ namespace Gadget.Server.Hubs
         public Task Register(RegisterNewAgent registerNewAgent)
         {
             var connectionId = Context.ConnectionId;
-            var agentId = registerNewAgent.AgentId;
-            if (_agents.ContainsKey(agentId)) return Task.CompletedTask;
-            _agents[agentId] = registerNewAgent.Services.ToList();
-            _connectedClients[connectionId] = agentId;
+            _logger.LogInformation($"Registering new agent {registerNewAgent.Agent} with CID : {connectionId}");
+            var agentId = registerNewAgent.Agent;
+            var agent = new Agent(agentId, connectionId);
+            agent.AddServices(registerNewAgent.Services.Select(s => new Domain.Entities.Service(s.Name, s.Status)));
+            _agents.Add(agent);
             return Task.CompletedTask;
         }
 
         public Task ServiceStatusChanged(ServiceStatusChanged serviceStatusChanged)
         {
             var connectionId = Context.ConnectionId;
-            if (!_connectedClients.TryGetValue(connectionId, out var agentId))
+            var agent = GetAgent(connectionId);
+            if (agent is null)
             {
-                return Task.CompletedTask;
-            }
-
-            if (!_agents.TryGetValue(agentId, out var services))
-            {
+                _logger.LogError($"Cannot find agent for {connectionId}");
                 return Task.CompletedTask;
             }
 
             var serviceName = serviceStatusChanged.Name;
             var serviceStatus = serviceStatusChanged.Status;
-            var service = services.Single(s =>
+            var service = agent.Services.Single(s =>
                 string.Equals(s.Name, serviceName, StringComparison.CurrentCultureIgnoreCase));
             service.Status = serviceStatus;
-            Clients.Group("dashboard").SendAsync("ServiceStatusChanged", serviceStatusChanged);
+            try
+            {
+                Clients.Group("dashboard").SendAsync("ServiceStatusChanged", serviceStatusChanged);
+            }
+            catch (Exception exception)
+            {
+                _logger.LogError(exception.Message);
+            }
+
             return Task.CompletedTask;
         }
 
@@ -88,9 +104,14 @@ namespace Gadget.Server.Hubs
         {
             try
             {
-                var group = stopService.AgentId;
-                var connectionId = _connectedClients.FirstOrDefault(e => e.Value == group).Key;
-                await Clients.Client(connectionId).SendAsync("StopService", stopService);
+                var agent = _agents.FirstOrDefault(a => a.Name == stopService.Agent);
+                if (agent is null)
+                {
+                    _logger.LogError($"Could not find agent for {nameof(StopService)} command");
+                    return;
+                }
+
+                await Clients.Client(agent.ConnectionId).SendAsync("StopService", stopService);
             }
             catch (Exception e)
             {
@@ -100,9 +121,21 @@ namespace Gadget.Server.Hubs
 
         public async Task StartService(StartService startService)
         {
-            var group = startService.AgentId;
-            var connectionId = _connectedClients.FirstOrDefault(e => e.Value == group).Key;
-            await Clients.Client(connectionId).SendAsync("StartService", startService);
+            try
+            {
+                var agent = _agents.FirstOrDefault(a => a.Name == startService.Agent);
+                if (agent is null)
+                {
+                    _logger.LogError($"Could not find agent for {nameof(StartService)} command");
+                    return;
+                }
+
+                await Clients.Client(agent.ConnectionId).SendAsync("StopService", startService);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e.Message);
+            }
         }
     }
 }

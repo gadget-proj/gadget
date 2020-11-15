@@ -1,12 +1,14 @@
 using System;
+using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using Gadget.Messaging;
+using Gadget.Server.Domain.Entities;
 using Gadget.Server.Hubs;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Service = Gadget.Messaging.Service;
 
 namespace Gadget.Server
 {
@@ -33,6 +35,7 @@ namespace Gadget.Server
             services.AddControllers();
             services.AddSingleton<IDictionary<Guid, ICollection<Service>>>(_ =>
                 new ConcurrentDictionary<Guid, ICollection<Service>>());
+            services.AddSingleton<ICollection<Agent>, HashSet<Agent>>();
             services.AddSingleton<IDictionary<string, Guid>>(_ => new Dictionary<string, Guid>());
             // services.AddHostedService<HealthCheckService>();
         }
