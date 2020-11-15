@@ -130,7 +130,7 @@ namespace Gadget.Server.Hubs
                     return;
                 }
 
-                await Clients.Client(agent.ConnectionId).SendAsync("StopService", startService);
+                await Clients.Client(agent.ConnectionId).SendAsync("StartService", startService);
             }
             catch (Exception e)
             {
