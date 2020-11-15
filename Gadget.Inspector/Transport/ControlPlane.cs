@@ -25,14 +25,27 @@ namespace Gadget.Inspector.Transport
         public async Task Invoke(string method, object payload)
         {
             _logger.LogInformation($"Trying to invoke {method} with payload {payload}");
-            await _hubConnection.InvokeAsync(method, payload);
-            _logger.LogInformation($"Invoked {method} with payload {payload}");
+            try
+            {
+                await _hubConnection.InvokeAsync(method, payload);
+            }
+            catch (Exception exception)
+            {
+                _logger.LogError(exception.Message);
+            }
         }
 
         public void RegisterHandler<T>(string method, Action<T> handler) where T : class
         {
             _logger.LogInformation($"Registering handler for method {method}, T : {typeof(T)}");
-            _hubConnection.On(method, handler);
+            try
+            {
+                _hubConnection.On(method, handler);
+            }
+            catch (Exception exception)
+            {
+                _logger.LogError(exception.Message);
+            }
         }
     }
 }
