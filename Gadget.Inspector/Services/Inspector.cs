@@ -1,32 +1,36 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.ServiceProcess;
-using System.Threading;
-using System.Threading.Tasks;
-using Gadget.Inspector.Metrics;
+﻿using Gadget.Inspector.Metrics;
+using Gadget.Inspector.Metrics.Services;
 using Gadget.Inspector.Transport;
-using Gadget.Messaging;
 using Gadget.Messaging.Commands;
 using Gadget.Messaging.Events;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using System;
+using System.Linq;
+using System.ServiceProcess;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Gadget.Inspector.Services
 {
     public class Inspector : BackgroundService
     {
-        private readonly IControlPlane _controlPlane;
         private readonly ILogger<Inspector> _logger;
-        private readonly IDictionary<string, ServiceControllerStatus> _statuses;
+        private readonly IControlPlane _controlPlane;
         private readonly InspectorResources _resources;
+        private readonly WindowsServiceCheck _serviceScheck;
 
-        public Inspector(IControlPlane controlPlane, ILogger<Inspector> logger, InspectorResources resources)
+
+        public Inspector(
+            ILogger<Inspector> logger, 
+            InspectorResources resources,
+            IControlPlane controlPlane,
+            WindowsServiceCheck serviceScheck) 
         {
-            _statuses = new Dictionary<string, ServiceControllerStatus>();
-            _controlPlane = controlPlane;
             _logger = logger;
             _resources = resources;
+            _controlPlane = controlPlane;
+            _serviceScheck = serviceScheck;
         }
 
         // TODO Possibly replace this method with some kind of reflection trick to register different handler (split each handler into different class) for each signalR method?
@@ -59,22 +63,10 @@ namespace Gadget.Inspector.Services
             _logger.LogInformation($"Starting Watcher ${DateTime.UtcNow}");
             while (!stoppingToken.IsCancellationRequested)
             {
-                foreach (var serviceController in ServiceController.GetServices())
+                foreach (var statusChanged in _serviceScheck.CheckServices())
                 {
-                    if (!_statuses.ContainsKey(serviceController.ServiceName))
-                    {
-                        _statuses[serviceController.ServiceName] = serviceController.Status;
-                        await UpdateStatus(serviceController, stoppingToken);
-                    }
-
-                    var previousStatus = _statuses[serviceController.ServiceName];
-                    var currentStatus = serviceController.Status;
-                    if (currentStatus == previousStatus) continue;
-
-                    await UpdateStatus(serviceController, stoppingToken);
-                    _statuses[serviceController.ServiceName] = currentStatus;
+                    await UpdateStatus(statusChanged, stoppingToken);
                 }
-
                 await Task.Delay(TimeSpan.FromSeconds(1), stoppingToken);
             }
         }
@@ -82,27 +74,12 @@ namespace Gadget.Inspector.Services
         private async Task RegisterAgent()
         {
             RegisterHandlers();
-
-            var registerNewAgent = new RegisterNewAgent
-            {
-                Agent = Environment.MachineName.Replace("-", ""),
-                Services = ServiceController.GetServices().Select(s => new Service
-                {
-                    Name = s.ServiceName,
-                    Status = s.Status.ToString()
-                })
-            };
+            var registerNewAgent = _serviceScheck.RegisterServices();
             await _controlPlane.Invoke("Register", registerNewAgent);
         }
 
-        private async Task UpdateStatus(ServiceController serviceController, CancellationToken stoppingToken)
+        private async Task UpdateStatus(ServiceStatusChanged @event, CancellationToken stoppingToken)
         {
-            var @event = new ServiceStatusChanged
-            {
-                Name = serviceController.ServiceName,
-                Status = serviceController.Status.ToString(),
-                AgentId = Environment.MachineName.Replace("-", "")
-            };
             await _controlPlane.Invoke("ServiceStatusChanged", @event);
         }
     }

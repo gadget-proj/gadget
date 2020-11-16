@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics;
 using System.Threading.Channels;
 using Gadget.Inspector.Metrics;
+using Gadget.Inspector.Metrics.Services;
 using Gadget.Inspector.Transport;
 using Gadget.Messaging.Events;
 using Microsoft.AspNetCore.SignalR.Client;
@@ -23,6 +24,7 @@ namespace Gadget.Inspector.Extensions
                 return hubConnection;
             });
             services.AddScoped(_ => new PerformanceCounter("Processor", "% Processor Time", "_Total"));
+            services.AddScoped<WindowsServiceCheck>();
             services.AddScoped<InspectorResources>();
             services.AddScoped<IControlPlane, ControlPlane>();
             services.AddScoped(_ => Channel.CreateUnbounded<ServiceStatusChanged>());
