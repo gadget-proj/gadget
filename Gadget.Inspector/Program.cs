@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using Gadget.Inspector.Extensions;
+using Gadget.Inspector.HandlerRegistration;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -11,7 +12,9 @@ namespace Gadget.Inspector
     {
         public static void Main(string[] args)
         {
-            CreateHostBuilder(args).Build().Run();
+           CreateHostBuilder(args).Build().Run();
+            //var tmp = new RegisterHandlers(null);
+            //tmp.Register();
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args)

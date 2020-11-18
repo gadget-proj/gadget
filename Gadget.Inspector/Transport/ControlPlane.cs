@@ -1,5 +1,7 @@
 using System;
 using System.Threading.Tasks;
+using Gadget.Inspector.HandlerRegistration;
+using Gadget.Messaging.Commands;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Logging;
 
@@ -8,7 +10,7 @@ namespace Gadget.Inspector.Transport
     public interface IControlPlane
     {
         Task Invoke(string method, object payload);
-        void RegisterHandler<T>(string method, Action<T> handler) where T : class;
+        void RegisterHandler<T>(string method, Action<T> handler) where T : IGadgetMessage;
     }
 
     public class ControlPlane : IControlPlane
@@ -35,7 +37,7 @@ namespace Gadget.Inspector.Transport
             }
         }
 
-        public void RegisterHandler<T>(string method, Action<T> handler) where T : class
+        public void RegisterHandler<T>(string method, Action<T> handler) where T : IGadgetMessage
         {
             _logger.LogInformation($"Registering handler for method {method}, T : {typeof(T)}");
             try

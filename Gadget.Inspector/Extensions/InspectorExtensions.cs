@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.Threading.Channels;
+using Gadget.Inspector.HandlerRegistration;
 using Gadget.Inspector.Metrics;
 using Gadget.Inspector.Metrics.Services;
 using Gadget.Inspector.Transport;
@@ -27,6 +28,7 @@ namespace Gadget.Inspector.Extensions
             services.AddScoped<WindowsServiceCheck>();
             services.AddScoped<InspectorResources>();
             services.AddScoped<IControlPlane, ControlPlane>();
+            services.AddScoped<RegisterHandlers>();
             services.AddScoped(_ => Channel.CreateUnbounded<ServiceStatusChanged>());
             services.AddScoped(_ => new Uri("https://localhost:5001/gadget"));
             services.AddHostedService<Services.Inspector>();

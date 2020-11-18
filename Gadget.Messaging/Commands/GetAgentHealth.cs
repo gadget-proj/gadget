@@ -1,6 +1,6 @@
 namespace Gadget.Messaging.Commands
 {
-    public class GetAgentHealth
+    public class GetAgentHealth : IGadgetMessage
     {
         
     }
