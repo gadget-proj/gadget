@@ -30,7 +30,7 @@ namespace Gadget.Inspector.HandlerRegistration
 
                 _controlPlane.RegisterHandler<IGadgetMessage>(methodName, _ =>
                 {
-                    MethodInfo methodInfo = t.GetMethod("Execute");
+                    MethodInfo methodInfo = t.GetMethod(methodName);
                     var inst = Activator.CreateInstance(t);
                     methodInfo.Invoke(inst, null);
                 });
