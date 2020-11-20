@@ -4,6 +4,7 @@ using System.Linq;
 using System.ServiceProcess;
 using System.Threading;
 using System.Threading.Tasks;
+using Gadget.Inspector.HandlerRegistration;
 using Gadget.Inspector.Metrics;
 using Gadget.Inspector.Transport;
 using Gadget.Messaging;
@@ -20,38 +21,40 @@ namespace Gadget.Inspector.Services
         private readonly ILogger<Inspector> _logger;
         private readonly IDictionary<string, ServiceControllerStatus> _statuses;
         private readonly InspectorResources _resources;
+        private readonly RegisterHandlers _handlerRegister;
 
-        public Inspector(IControlPlane controlPlane, ILogger<Inspector> logger, InspectorResources resources)
+        public Inspector(IControlPlane controlPlane, ILogger<Inspector> logger, InspectorResources resources, RegisterHandlers handlerRegister)
         {
             _statuses = new Dictionary<string, ServiceControllerStatus>();
             _controlPlane = controlPlane;
             _logger = logger;
             _resources = resources;
+            _handlerRegister = handlerRegister;
         }
 
         // TODO Possibly replace this method with some kind of reflection trick to register different handler (split each handler into different class) for each signalR method?
         // This could possibly grow really big in the future and become really hard to maintain
-        private void RegisterHandlers()
-        {
-            _controlPlane.RegisterHandler<StopService>("StopService", command =>
-            {
-                _logger.LogInformation($"Trying to stop {command.ServiceName} service");
-                var service = ServiceController.GetServices().FirstOrDefault(s => s.ServiceName == command.ServiceName);
-                service?.Stop();
-            });
-            _controlPlane.RegisterHandler<StartService>("StartService", command =>
-            {
-                _logger.LogInformation($"Trying to start {command.ServiceName} service");
-                var service = ServiceController.GetServices().FirstOrDefault(s => s.ServiceName == command.ServiceName);
-                service?.Start();
-            });
-            _controlPlane.RegisterHandler<GetAgentHealth>("GetServicesReport", _ =>
-            {
-                _logger.LogInformation("GetServicesReport");
-                var report = _resources.CheckMachineHealth();
-                _logger.LogInformation($"Healthcheck for agent {Environment.MachineName} => {report}");
-            });
-        }
+        //private void RegisterHandlers()
+        //{
+        //    _controlPlane.RegisterHandler<StopService>("StopService", command =>
+        //    {
+        //        _logger.LogInformation($"Trying to stop {command.ServiceName} service");
+        //        var service = ServiceController.GetServices().FirstOrDefault(s => s.ServiceName == command.ServiceName);
+        //        service?.Stop();
+        //    });
+        //    _controlPlane.RegisterHandler<StartService>("StartService", command =>
+        //    {
+        //        _logger.LogInformation($"Trying to start {command.ServiceName} service");
+        //        var service = ServiceController.GetServices().FirstOrDefault(s => s.ServiceName == command.ServiceName);
+        //        service?.Start();
+        //    });
+        //    _controlPlane.RegisterHandler<GetAgentHealth>("GetServicesReport", _ =>
+        //    {
+        //        _logger.LogInformation("GetServicesReport");
+        //        var report = _resources.CheckMachineHealth();
+        //        _logger.LogInformation($"Healthcheck for agent {Environment.MachineName} => {report}");
+        //    });
+        //}
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
@@ -81,7 +84,8 @@ namespace Gadget.Inspector.Services
 
         private async Task RegisterAgent()
         {
-            RegisterHandlers();
+            //RegisterHandlers();
+            _handlerRegister.Register();
 
             var registerNewAgent = new RegisterNewAgent
             {

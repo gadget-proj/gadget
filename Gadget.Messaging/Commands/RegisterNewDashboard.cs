@@ -1,6 +1,6 @@
 ﻿namespace Gadget.Messaging.Commands
 {
-    public class RegisterNewDashboard
+    public class RegisterNewDashboard : IGadgetMessage
     {
     }
 }

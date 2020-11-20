@@ -2,7 +2,7 @@
 
 namespace Gadget.Messaging.Commands
 {
-    public class RegisterNewAgent
+    public class RegisterNewAgent :IGadgetMessage
     {
         public string Agent { get; set; }
         public IEnumerable<Service> Services { get; set; }
