@@ -14,6 +14,7 @@ namespace Gadget.Inspector.Metrics
         {
             _cpuCounter = cpuCounter;
         }
+
         public MachineHealthData CheckMachineHealth()
         {
             var output = new MachineHealthData
@@ -36,7 +37,7 @@ namespace Gadget.Inspector.Metrics
 
             static DiscUsageInfo Disks(DriveInfo driveInfo)
             {
-                return new DiscUsageInfo
+                return new DiscUsageInfo()
                 {
                     Name = driveInfo.Name,
                     DiscSize = driveInfo.TotalSize / 1073741824f,
@@ -53,14 +54,9 @@ namespace Gadget.Inspector.Metrics
             var result = results.OfType<ManagementObject>().FirstOrDefault();
             if (result is null) return;
             if (int.TryParse(result["TotalVisibleMemorySize"].ToString(), out var total))
-            {
                 model.MemoryTotal = total / 1048576f;
-            }
 
-            if (int.TryParse(result["FreePhysicalMemory"].ToString(), out var free))
-            {
-                model.MemoryFree = free / 1048576f;
-            }
+            if (int.TryParse(result["FreePhysicalMemory"].ToString(), out var free)) model.MemoryFree = free / 1048576f;
         }
     }
 }

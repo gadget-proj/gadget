@@ -1,24 +1,33 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <OutputType>Exe</OutputType>
-    <TargetFramework>net5</TargetFramework>
-  </PropertyGroup>
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net5</TargetFramework>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="MediatR" Version="9.0.0" />
-    <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="9.0.0" />
-    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="5.0.0" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.0" />
-    <PackageReference Include="System.ServiceProcess.ServiceController" Version="5.0.0" />
-    <PackageReference Include="System.Threading.Channels" Version="5.0.0" />
-    <PackageReference Include="System.Diagnostics.PerformanceCounter" Version="5.0.0" />
-    <PackageReference Include="System.Management" Version="5.0.0" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="MediatR" Version="9.0.0"/>
+        <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="9.0.0"/>
+        <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="5.0.0"/>
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.0"/>
+        <PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.0"/>
+        <PackageReference Include="System.ServiceProcess.ServiceController" Version="5.0.0"/>
+        <PackageReference Include="System.Threading.Channels" Version="5.0.0"/>
+        <PackageReference Include="System.Diagnostics.PerformanceCounter" Version="5.0.0"/>
+        <PackageReference Include="System.Management" Version="5.0.0"/>
+    </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Gadget.Messaging\Gadget.Messaging.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\Gadget.Messaging\Gadget.Messaging.csproj"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Update="appsettings.json">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="appsettings.development.json">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+    </ItemGroup>
 
 </Project>

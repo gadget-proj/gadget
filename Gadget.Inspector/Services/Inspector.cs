@@ -18,8 +18,8 @@ namespace Gadget.Inspector.Services
     {
         private readonly IControlPlane _controlPlane;
         private readonly ILogger<Inspector> _logger;
-        private readonly IDictionary<string, ServiceControllerStatus> _statuses;
         private readonly InspectorResources _resources;
+        private readonly IDictionary<string, ServiceControllerStatus> _statuses;
 
         public Inspector(IControlPlane controlPlane, ILogger<Inspector> logger, InspectorResources resources)
         {

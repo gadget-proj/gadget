@@ -5,19 +5,23 @@ using Gadget.Inspector.Metrics;
 using Gadget.Inspector.Transport;
 using Gadget.Messaging.Events;
 using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Gadget.Inspector.Extensions
 {
     public static class InspectorExtensions
     {
-        public static IServiceCollection AddInspector(this IServiceCollection services)
+        public static IServiceCollection AddInspector(this IServiceCollection services, IConfiguration configuration)
         {
+            var controlPlaneBaseAddress =
+                configuration.GetConnectionString("ControlPlane") ?? "https://localhost:5001/";
+            var controlPlaneAddress = $"{controlPlaneBaseAddress}/gadget";
             services.AddScoped(_ =>
             {
                 var hubConnection = new HubConnectionBuilder()
                     .WithAutomaticReconnect()
-                    .WithUrl("https://localhost:5001/gadget")
+                    .WithUrl(controlPlaneAddress)
                     .Build();
                 hubConnection.StartAsync().GetAwaiter().GetResult();
                 return hubConnection;
@@ -26,7 +30,7 @@ namespace Gadget.Inspector.Extensions
             services.AddScoped<InspectorResources>();
             services.AddScoped<IControlPlane, ControlPlane>();
             services.AddScoped(_ => Channel.CreateUnbounded<ServiceStatusChanged>());
-            services.AddScoped(_ => new Uri("https://localhost:5001/gadget"));
+            services.AddScoped(_ => new Uri(controlPlaneAddress));
             services.AddHostedService<Services.Inspector>();
             return services;
         }

@@ -13,8 +13,8 @@ namespace Gadget.Server.Services
 {
     public class HealthCheckService : BackgroundService
     {
-        private readonly IDictionary<string, Guid> _connectedClients;
         private readonly ICollection<Agent> _agents;
+        private readonly IDictionary<string, Guid> _connectedClients;
         private readonly IHubContext<GadgetHub> _hubContext;
         private readonly ILogger<HealthCheckService> _logger;
 
