@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Gadget.Server.Domain.Entities;
@@ -32,6 +33,14 @@ namespace Gadget.Server.Controllers
             return services is null
                 ? Task.FromResult<IActionResult>(NotFound())
                 : Task.FromResult<IActionResult>(Ok(services));
+        }
+
+        [HttpGet("{agent}/{serviceName}")]
+        public async Task<IActionResult> GetServiceInfo(string agent, string serviceName)
+        {
+            var service = _agents.FirstOrDefault(a => a.Name.Replace("-", "") == agent)?.Services
+                .FirstOrDefault(s => string.Equals(s.Name, serviceName, StringComparison.CurrentCultureIgnoreCase));
+            return Ok(service);
         }
     }
 }

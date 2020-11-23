@@ -16,7 +16,7 @@ namespace Gadget.Inspector.Extensions
         {
             var controlPlaneBaseAddress =
                 configuration.GetConnectionString("ControlPlane") ?? "https://localhost:5001/";
-            var controlPlaneAddress = $"{controlPlaneBaseAddress}/gadget";
+            var controlPlaneAddress = $"{controlPlaneBaseAddress}gadget";
             services.AddScoped(_ =>
             {
                 var hubConnection = new HubConnectionBuilder()
