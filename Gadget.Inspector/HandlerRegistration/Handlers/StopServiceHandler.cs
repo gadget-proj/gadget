@@ -4,9 +4,14 @@ namespace Gadget.Inspector.HandlerRegistration.Handlers
 {
     public class StopServiceHandler : IHandler<StopService>
     {
-        public void StopService()
+        public void Handle(StopService message)
         {
-            System.Console.WriteLine("StopServiceHandler works");
+            throw new System.NotImplementedException();
         }
+
+        //public void StopService()
+        //{
+        //    System.Console.WriteLine("StopServiceHandler works");
+        //}
     }
 }

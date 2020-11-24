@@ -6,6 +6,6 @@ namespace Gadget.Inspector.HandlerRegistration
     {
         //void Execute();
 
-        //void Send(T message);
+        void Handle (T message);
     }
 }
