@@ -6,7 +6,7 @@ namespace Gadget.Inspector.HandlerRegistration.Handlers
     {
         public void Handle(StopService message)
         {
-            throw new System.NotImplementedException();
+            System.Console.WriteLine(message.ServiceName);
         }
 
         //public void StopService()

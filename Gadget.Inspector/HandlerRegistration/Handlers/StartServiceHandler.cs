@@ -13,5 +13,10 @@ namespace Gadget.Inspector.HandlerRegistration.Handlers
         //{
         //    throw new System.NotImplementedException();
         //}
+        public void Handle(StartService message)
+        {
+            System.Console.WriteLine(message.ServiceName);
+
+        }
     }
 }
