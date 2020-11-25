@@ -24,15 +24,11 @@ namespace Gadget.Inspector.HandlerRegistration
             {
                 var methodName = t.Name.Replace("Handler", "");
 
-                //MethodInfo methodInfo = t.GetMethod(methodName);
-                //var inst = Activator.CreateInstance(t);
-                //methodInfo.Invoke(inst, null);
-
-                _controlPlane.RegisterHandler<IGadgetMessage>(methodName, _ =>
+                _controlPlane.RegisterHandler<IGadgetMessage>(methodName, message =>
                 {
                     MethodInfo methodInfo = t.GetMethod(methodName);
                     var inst = Activator.CreateInstance(t);
-                    methodInfo.Invoke(inst, null);
+                    methodInfo.Invoke(inst, new object[] { message});
                 });
             }
         }
