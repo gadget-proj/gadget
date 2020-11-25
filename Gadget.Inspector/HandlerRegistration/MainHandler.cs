@@ -5,7 +5,7 @@ using System.Reflection;
 
 namespace Gadget.Inspector.HandlerRegistration
 {
-    public class MainHandler
+    public class MainHandler  // i know that class name is stupid
     {
         public void ProcessEvent(IGadgetMessage message)
         {
@@ -20,7 +20,7 @@ namespace Gadget.Inspector.HandlerRegistration
                 var inst = Activator.CreateInstance(type);
                 methodInfo.Invoke(inst, new object[] {message});
             }
-            catch (System.Exception e)
+            catch (Exception e)
             {
                 Console.WriteLine("lipton");
                 Console.WriteLine(e.Message);
