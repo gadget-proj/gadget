@@ -36,31 +36,7 @@ namespace Gadget.Inspector.Services
             _registerHandlers = registerHandlers;
             _serviceScheck = serviceScheck;
         }
-
-        // TODO Possibly replace this method with some kind of reflection trick to register different handler (split each handler into different class) for each signalR method?
-        // This could possibly grow really big in the future and become really hard to maintain
-        //private void RegisterHandlers()
-        //{
-        //    _controlPlane.RegisterHandler<StopService>("StopService", command =>
-        //    {
-        //        _logger.LogInformation($"Trying to stop {command.ServiceName} service");
-        //        var service = ServiceController.GetServices().FirstOrDefault(s => s.ServiceName == command.ServiceName);
-        //        service?.Stop();
-        //    });
-        //    _controlPlane.RegisterHandler<StartService>("StartService", command =>
-        //    {
-        //        _logger.LogInformation($"Trying to start {command.ServiceName} service");
-        //        var service = ServiceController.GetServices().FirstOrDefault(s => s.ServiceName == command.ServiceName);
-        //        service?.Start();
-        //    });
-        //    _controlPlane.RegisterHandler<GetAgentHealth>("GetServicesReport", _ =>
-        //    {
-        //        _logger.LogInformation("GetServicesReport");
-        //        var report = _resources.CheckMachineHealth();
-        //        _logger.LogInformation($"Healthcheck for agent {Environment.MachineName} => {report}");
-        //    });
-        //}
-
+        
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             await RegisterAgent();
@@ -77,7 +53,6 @@ namespace Gadget.Inspector.Services
 
         private async Task RegisterAgent()
         {
-            //RegisterHandlers();
             _registerHandlers.Register();
             var registerNewAgent = _serviceScheck.RegisterServices();
             await _controlPlane.Invoke("Register", registerNewAgent);

@@ -8,10 +8,5 @@ namespace Gadget.Inspector.HandlerRegistration.Handlers
         {
             System.Console.WriteLine("StartServiceHandler works");
         }
-
-        //public void Send(StartService message)
-        //{
-        //    throw new System.NotImplementedException();
-        //}
     }
 }
