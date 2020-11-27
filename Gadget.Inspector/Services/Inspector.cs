@@ -2,13 +2,10 @@
 using Gadget.Inspector.Metrics;
 using Gadget.Inspector.Metrics.Services;
 using Gadget.Inspector.Transport;
-using Gadget.Messaging.Commands;
 using Gadget.Messaging.Events;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Linq;
-using System.ServiceProcess;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -47,7 +44,7 @@ namespace Gadget.Inspector.Services
                 {
                     await UpdateStatus(statusChanged, stoppingToken);
                 }
-                await Task.Delay(TimeSpan.FromSeconds(1), stoppingToken);
+                await Task.Delay(TimeSpan.FromSeconds(2), stoppingToken);
             }
         }
 

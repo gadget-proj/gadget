@@ -1,9 +1,8 @@
-using System;
-using System.Threading.Tasks;
-using Gadget.Inspector.HandlerRegistration;
 using Gadget.Messaging.Commands;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Logging;
+using System;
+using System.Threading.Tasks;
 
 namespace Gadget.Inspector.Transport
 {

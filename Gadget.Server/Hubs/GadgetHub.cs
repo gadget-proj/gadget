@@ -74,6 +74,7 @@ namespace Gadget.Server.Hubs
 
         public Task ServiceStatusChanged(ServiceStatusChanged serviceStatusChanged)
         {
+            Console.WriteLine("Weszło !!!!!!");
             var connectionId = Context.ConnectionId;
             var agent = _agents.WithConnectionId(connectionId);
             if (agent is null)

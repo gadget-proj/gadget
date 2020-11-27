@@ -1,6 +1,8 @@
-﻿namespace Gadget.Messaging.Events
+﻿using Gadget.Messaging.Commands;
+
+namespace Gadget.Messaging.Events
 {
-    public class ServiceStatusChanged
+    public class ServiceStatusChanged : IGadgetMessage
     {
         public string AgentId { get; set; }
         public string Name { get; set; }

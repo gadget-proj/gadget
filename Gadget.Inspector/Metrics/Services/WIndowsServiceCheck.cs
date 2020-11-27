@@ -10,13 +10,11 @@ namespace Gadget.Inspector.Metrics.Services
 {
     public class WindowsServiceCheck
     {
-        private readonly IEnumerable<ServiceController> _services;
         private readonly IDictionary<string, ServiceControllerStatus> _statuses;
         private readonly string _machineName;
         public WindowsServiceCheck()
         {
-            _services = ServiceController.GetServices().ToList(); // will inject it later
-            _statuses = new Dictionary<string, ServiceControllerStatus>(); // as above
+            _statuses = ServiceController.GetServices().Select(x => new { x.ServiceName, x.Status }).ToDictionary(x => x.ServiceName, x => x.Status);
             _machineName = Environment.MachineName;
         }
 
@@ -25,7 +23,7 @@ namespace Gadget.Inspector.Metrics.Services
             var report = new RegisterNewAgent
             {
                 Agent = _machineName,
-                Services = _services.Select(x => new Service
+                Services = ServiceController.GetServices().Select(x => new Service
                 {
                     Name = x.ServiceName,
                     Status = x.Status.ToString()
@@ -37,10 +35,9 @@ namespace Gadget.Inspector.Metrics.Services
         public IEnumerable<ServiceStatusChanged> CheckServices()
         {
             var output = new List<ServiceStatusChanged>();
-            foreach (var service in _services)
+            foreach (var service in ServiceController.GetServices())
             {
-                var lastStatus = _statuses.First(x => x.Key == service.ServiceName).Value;
-                if (service.Status != lastStatus)
+                if (service.Status != _statuses[service.ServiceName])
                 {
                     output.Add(new ServiceStatusChanged 
                     { 
@@ -48,7 +45,6 @@ namespace Gadget.Inspector.Metrics.Services
                         Name = service.ServiceName, 
                         Status = service.Status.ToString() 
                     });
-
                     _statuses[service.ServiceName] = service.Status;
                 }
             }
