@@ -2,7 +2,6 @@
 using Gadget.Inspector.Metrics;
 using Gadget.Inspector.Metrics.Services;
 using Gadget.Inspector.Transport;
-using Gadget.Messaging.Commands;
 using Gadget.Messaging.Events;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
