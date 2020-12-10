@@ -19,13 +19,15 @@ namespace Gadget.Server.Controllers
 
 
         [HttpGet]
+        [Route("dashboard")]
         public Task<IActionResult> GetAllAgents()
         {
             var keys = _agents.Select(a => a.Name.Replace("-", ""));
             return Task.FromResult<IActionResult>(Ok(keys.Select(k => new {Agent = k})));
         }
 
-        [HttpGet("{agent}")]
+        [HttpGet]
+        [Route("machine/{agent}")]
         public Task<IActionResult> GetAgentInfo(string agent)
         {
             var services = _agents.FirstOrDefault(a => a.Name.Replace("-", "") == agent)?.Services;

@@ -1,3 +1,4 @@
+using Gadget.Messaging.Commands;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -14,7 +15,23 @@ namespace Gadget.Inspector.Metrics
         {
             _cpuCounter = cpuCounter;
         }
-        public MachineHealthData CheckMachineHealth()
+
+        public GetAgentHealth GetMachineHealthData()
+        {
+            var check = CheckMachineHealth();
+
+            return new GetAgentHealth
+            {
+                CpuPercentUsage = check.CpuPercentUsage,
+                MemoryFree = check.MemoryFree,
+                MemoryTotal = check.MemoryTotal,
+                DiscFree = check.Discs.Sum(x => x.DiscSpaceFree),
+                DiscTotal = check.Discs.Sum(x=>x.DiscSize),
+                MachineName = "Lucek"
+            };
+        }
+
+        private MachineHealthData CheckMachineHealth()
         {
             var output = new MachineHealthData
             {

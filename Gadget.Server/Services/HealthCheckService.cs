@@ -34,8 +34,8 @@ namespace Gadget.Server.Services
                 foreach (var agent in _agents)
                 {
                     await _hubContext.Clients.Client(agent.ConnectionId)
-                        .SendAsync("GetServicesReport", new GetAgentHealth(), stoppingToken);
-                    _logger.LogInformation($"Fetching status for client [{agent.Name}]");
+                          .SendAsync("GetAgentHealth", new GetAgentHealth(), stoppingToken);
+                    _logger.LogInformation($"Fetching status for client [{agent.Name}] ");
                 }
 
                 await Task.Delay(TimeSpan.FromSeconds(5), stoppingToken);

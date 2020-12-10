@@ -72,6 +72,13 @@ namespace Gadget.Server.Hubs
             return Task.CompletedTask;
         }
 
+        public Task GetAgentHealth(GetAgentHealth getAgentHealth)
+        {
+            Console.WriteLine($"Agent: {getAgentHealth.Agent}, cpu:{getAgentHealth.CpuPercentUsage}");
+
+            return Task.CompletedTask;
+        }
+
         public Task ServiceStatusChanged(ServiceStatusChanged serviceStatusChanged)
         {
             Console.WriteLine("Weszło !!!!!!");

@@ -2,6 +2,7 @@
 using Gadget.Inspector.Metrics;
 using Gadget.Inspector.Metrics.Services;
 using Gadget.Inspector.Transport;
+using Gadget.Messaging.Commands;
 using Gadget.Messaging.Events;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -42,8 +43,12 @@ namespace Gadget.Inspector.Services
             {
                 foreach (var statusChanged in _serviceScheck.CheckServices())
                 {
-                    await UpdateStatus(statusChanged, stoppingToken);
+                    await UpdateStatus(statusChanged);
                 }
+
+                var data =  _resources.GetMachineHealthData();
+                //data.Agent = "tmp";
+                //await UpdateMachineHealth(data);
                 await Task.Delay(TimeSpan.FromSeconds(2), stoppingToken);
             }
         }
@@ -55,9 +60,14 @@ namespace Gadget.Inspector.Services
             await _controlPlane.Invoke("Register", registerNewAgent);
         }
 
-        private async Task UpdateStatus(ServiceStatusChanged @event, CancellationToken stoppingToken)
+        private async Task UpdateStatus(ServiceStatusChanged @event)
         {
             await _controlPlane.Invoke("ServiceStatusChanged", @event);
         }
+
+        //private async Task UpdateMachineHealth(GetAgentHealth @event)
+        //{
+        //    await _controlPlane.Invoke("GetAgentHealth", @event);
+        //}
     }
 }
