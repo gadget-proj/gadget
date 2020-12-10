@@ -45,8 +45,7 @@ namespace Gadget.Inspector.Services
                 {
                     await UpdateStatus(statusChanged);
                 }
-
-                var data =  _resources.GetMachineHealthData();
+                //var data =  _resources.GetMachineHealthData();
                 //data.Agent = "tmp";
                 //await UpdateMachineHealth(data);
                 await Task.Delay(TimeSpan.FromSeconds(2), stoppingToken);

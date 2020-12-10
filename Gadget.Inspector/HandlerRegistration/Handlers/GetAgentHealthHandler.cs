@@ -1,6 +1,4 @@
-﻿using Gadget.Inspector.Metrics;
-using Gadget.Messaging.Commands;
-using System.Diagnostics;
+﻿using Gadget.Messaging.Commands;
 
 namespace Gadget.Inspector.HandlerRegistration.Handlers
 {
@@ -13,7 +11,7 @@ namespace Gadget.Inspector.HandlerRegistration.Handlers
         //    return logic.GetMachineHealthData();
         //}
 
-        public void GetAgentHealth()
+        public void GetAgentHealth(GetAgentHealth health )
         {
             System.Console.WriteLine("Get health weszło inspector");
         }
