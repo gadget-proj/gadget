@@ -13,6 +13,7 @@ namespace Gadget.Inspector.Consumers
         {
             _logger = logger;
         }
+        
 
         public async Task Consume(ConsumeContext<IStopService> context)
         {

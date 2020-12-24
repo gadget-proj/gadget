@@ -35,7 +35,15 @@ namespace Gadget.Inspector
                         x.AddConsumer<GetAgentHealthConsumer>();
                         x.AddConsumer<StopServiceConsumer>();
                         x.AddConsumer<StartServiceConsumer>();
-                        x.UsingRabbitMq((context, cfg) => { cfg.ConfigureEndpoints(context); });
+                        x.UsingRabbitMq((context, cfg) =>
+                        {
+                            cfg.ReceiveEndpoint(Guid.NewGuid().ToString(), e =>
+                            {
+                                e.ConfigureConsumer<StopServiceConsumer>(context);
+                                e.ConfigureConsumer<StartServiceConsumer>(context);
+                                e.ConfigureConsumer<GetAgentHealthConsumer>(context);
+                            });
+                        });
                     });
                     services.AddMassTransitHostedService();
                     services.AddLogging(options => options.AddConsole());
