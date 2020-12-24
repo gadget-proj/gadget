@@ -17,7 +17,7 @@ namespace Gadget.Inspector.Consumers
             _logger = logger;
         }
 
-        public async Task Consume(ConsumeContext<IStartService> context)
+        public Task Consume(ConsumeContext<IStartService> context)
         {
             _logger.LogInformation($"Trying to start {context.Message.ServiceName}");
             var service = ServiceController.GetServices()
@@ -28,6 +28,7 @@ namespace Gadget.Inspector.Consumers
             }
 
             service.Start();
+            return Task.CompletedTask;
         }
     }
 }

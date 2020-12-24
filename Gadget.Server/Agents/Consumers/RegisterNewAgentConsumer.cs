@@ -18,10 +18,11 @@ namespace Gadget.Server.Agents.Consumers
             _agents = agents;
         }
 
-        public async Task Consume(ConsumeContext<IRegisterNewAgent> context)
+        public Task Consume(ConsumeContext<IRegisterNewAgent> context)
         {
             _logger.LogInformation($"{context.Message.GetType()}");
             _agents.Add(new Agent(context.Message.Agent));
+            return Task.CompletedTask;
         }
     }
 }

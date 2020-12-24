@@ -27,10 +27,10 @@ namespace Gadget.Server.Agents
         public async Task<IActionResult> GetAllAgents()
         {
             var keys = _agents.Select(a => a.Name.Replace("-", ""));
-            return await Task.FromResult<IActionResult>(Ok(_agents.Select(a=>new AgentDto
+            return await Task.FromResult<IActionResult>(Ok(_agents.Select(a => new AgentDto
             {
                 Name = a.Name,
-                Services = a.Services.Select(s=>new ServiceDto
+                Services = a.Services.Select(s => new ServiceDto
                 {
                     Name = s.Name,
                     Status = s.Status
@@ -50,16 +50,16 @@ namespace Gadget.Server.Agents
         [HttpGet("{agent}/start")]
         public async Task<IActionResult> StartService(string agent)
         {
-            var _bus = await _busControl.GetSendEndpoint(new Uri($"exchange:{agent}"));
-            await _bus.Send<IStartService>(new { }, context => { context.SetRoutingKey(agent); });
+            var sendEndpoint = await _busControl.GetSendEndpoint(new Uri($"exchange:{agent}"));
+            await sendEndpoint.Send<IStartService>(new { }, context => { context.SetRoutingKey(agent); });
             return Accepted();
         }
 
         [HttpGet("{agent}/stop")]
         public async Task<IActionResult> StopService(string agent)
         {
-            var _bus = await _busControl.GetSendEndpoint(new Uri($"exchange:{agent}"));
-            await _bus.Send<IStartService>(new { }, context => { context.SetRoutingKey(agent); });
+            var sendEndpoint = await _busControl.GetSendEndpoint(new Uri($"exchange:{agent}"));
+            await sendEndpoint.Send<IStartService>(new { }, context => { context.SetRoutingKey(agent); });
             return Accepted();
         }
 
@@ -68,7 +68,7 @@ namespace Gadget.Server.Agents
         {
             var service = _agents.FirstOrDefault(a => a.Name.Replace("-", "") == agent)?.Services
                 .FirstOrDefault(s => string.Equals(s.Name, serviceName, StringComparison.CurrentCultureIgnoreCase));
-            return Ok(service);
+            return await Task.FromResult(Ok(service));
         }
     }
 }

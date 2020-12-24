@@ -16,9 +16,9 @@ namespace Gadget.Inspector.Consumers
         {
             _logger = logger;
         }
-        
 
-        public async Task Consume(ConsumeContext<IStopService> context)
+
+        public Task Consume(ConsumeContext<IStopService> context)
         {
             _logger.LogInformation($"Trying to stop {context.Message.ServiceName}");
             var service = ServiceController.GetServices()
@@ -29,6 +29,7 @@ namespace Gadget.Inspector.Consumers
             }
 
             service.Stop();
+            return Task.CompletedTask;
         }
     }
 }
