@@ -2,6 +2,8 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Reflection;
+using Gadget.Messaging.Events;
+using Gadget.Server.Agents.Consumers;
 using Gadget.Server.Domain.Entities;
 using MassTransit;
 using Microsoft.AspNetCore.Builder;
@@ -18,9 +20,14 @@ namespace Gadget.Server
         {
             services.AddMassTransit(x =>
             {
-                x.AddConsumers(Assembly.GetExecutingAssembly());
-                x.UsingRabbitMq((context, cfg) => { cfg.ConfigureEndpoints(context); });
+                x.AddConsumer<ServiceStatusChangedConsumer>();
+                x.AddConsumer<RegisterNewAgentConsumer>();
+                x.UsingRabbitMq((context, cfg) =>
+                {
+                    cfg.ConfigureEndpoints(context);
+                });
             });
+            services.AddMassTransitHostedService();
             services.AddCors(options =>
             {
                 options.AddPolicy("AllowAll",
@@ -33,7 +40,6 @@ namespace Gadget.Server
                             .AllowAnyHeader()
                             .AllowCredentials();
                     });
-                ;
             });
 
             services.AddSignalR();

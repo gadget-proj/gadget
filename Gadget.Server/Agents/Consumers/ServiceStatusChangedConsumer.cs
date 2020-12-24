@@ -5,11 +5,11 @@ using Microsoft.Extensions.Logging;
 
 namespace Gadget.Server.Agents.Consumers
 {
-    public class ServiceStatusChanged : IConsumer<IServiceStatusChanged>
+    public class ServiceStatusChangedConsumer : IConsumer<IServiceStatusChanged>
     {
-        private readonly ILogger<ServiceStatusChanged> _logger;
+        private readonly ILogger<ServiceStatusChangedConsumer> _logger;
 
-        public ServiceStatusChanged(ILogger<ServiceStatusChanged> logger)
+        public ServiceStatusChangedConsumer(ILogger<ServiceStatusChangedConsumer> logger)
         {
             _logger = logger;
         }
