@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using System.Threading.Tasks;
 using Gadget.Inspector.Consumers;
 using Gadget.Messaging.Commands;
@@ -34,18 +35,12 @@ namespace Gadget.Inspector
                 {
                     services.AddMassTransit(x =>
                     {
-                        x.AddConsumer<GetAgentHealthConsumer>();
-                        x.AddConsumer<StopServiceConsumer>();
-                        x.AddConsumer<StartServiceConsumer>();
+                        x.AddConsumers(Assembly.GetExecutingAssembly());
                         x.UsingRabbitMq((context, cfg) =>
                         {
-                            var id = Guid.NewGuid().ToString();
-                            Console.WriteLine(id);
+                            var id = Environment.MachineName;
                             cfg.ReceiveEndpoint(id, e =>
                             {
-                                // e.ConfigureConsumer<StopServiceConsumer>(context);
-                                // e.ConfigureConsumer<StartServiceConsumer>(context);
-                                // e.ConfigureConsumer<GetAgentHealthConsumer>(context);
                                 e.Bind<IStopService>(c =>
                                 {
                                     c.RoutingKey = id;
