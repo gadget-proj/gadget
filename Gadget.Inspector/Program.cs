@@ -1,11 +1,7 @@
 ﻿using System;
 using System.Reflection;
-using System.Threading.Tasks;
-using Gadget.Inspector.Consumers;
 using Gadget.Messaging.Commands;
-using Gadget.Messaging.Events;
 using MassTransit;
-using MassTransit.Testing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
