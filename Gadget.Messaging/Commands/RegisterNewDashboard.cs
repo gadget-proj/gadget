@@ -1,6 +1,6 @@
 ﻿namespace Gadget.Messaging.Commands
 {
-    public interface IRegisterNewDashboard
+    public class RegisterNewDashboard
     {
     }
 }
