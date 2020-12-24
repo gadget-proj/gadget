@@ -51,6 +51,7 @@ namespace Gadget.Inspector
                         });
                     });
                     services.AddMassTransitHostedService();
+                    services.AddHostedService<Inspector>();
                     services.AddLogging(options => options.AddConsole());
                 })
                 .ConfigureAppConfiguration((context, builder) =>

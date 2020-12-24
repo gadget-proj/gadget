@@ -1,3 +1,6 @@
+using System;
+using System.Linq;
+using System.ServiceProcess;
 using System.Threading.Tasks;
 using Gadget.Messaging.Commands;
 using MassTransit;
@@ -17,7 +20,15 @@ namespace Gadget.Inspector.Consumers
 
         public async Task Consume(ConsumeContext<IStopService> context)
         {
-            _logger.LogInformation($"Received {context.Message.GetType()}");
+            _logger.LogInformation($"Trying to stop {context.Message.ServiceName}");
+            var service = ServiceController.GetServices()
+                .FirstOrDefault(s => s.ServiceName == context.Message.ServiceName);
+            if (service == null)
+            {
+                throw new ApplicationException($"Service {context.Message.ServiceName} could not be found");
+            }
+
+            service.Stop();
         }
     }
 }

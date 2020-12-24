@@ -1,28 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using Gadget.Messaging.Commands;
 using Gadget.Server.Domain.Entities;
 using MassTransit;
-using MassTransit.Configuration;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Gadget.Server.Controllers
+namespace Gadget.Server.Agents
 {
     [ApiController]
     [Route("[controller]")]
     public class AgentsController : ControllerBase
     {
         private readonly ICollection<Agent> _agents;
-        private readonly ISendEndpointProvider _provider;
+        private readonly IBusControl _busControl;
 
-
-        public AgentsController(ICollection<Agent> agents, ISendEndpointProvider provider)
+        public AgentsController(ICollection<Agent> agents, IBusControl busControl)
         {
             _agents = agents;
-            _provider = provider;
+            _busControl = busControl;
         }
 
         [HttpGet]
@@ -44,8 +41,7 @@ namespace Gadget.Server.Controllers
         [HttpGet("{agent}/start")]
         public async Task<IActionResult> StartService(string agent)
         {
-            Console.WriteLine($"setting key {agent}");
-            var _bus = await _provider.GetSendEndpoint(new Uri($"exchange:{agent}"));
+            var _bus = await _busControl.GetSendEndpoint(new Uri($"exchange:{agent}"));
             await _bus.Send<IStartService>(new { }, context => { context.SetRoutingKey(agent); });
             return Accepted();
         }
@@ -53,8 +49,7 @@ namespace Gadget.Server.Controllers
         [HttpGet("{agent}/stop")]
         public async Task<IActionResult> StopService(string agent)
         {
-            Console.WriteLine($"setting key {agent}");
-            var _bus = await _provider.GetSendEndpoint(new Uri($"exchange:{agent}"));
+            var _bus = await _busControl.GetSendEndpoint(new Uri($"exchange:{agent}"));
             await _bus.Send<IStartService>(new { }, context => { context.SetRoutingKey(agent); });
             return Accepted();
         }

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Reflection;
 using Gadget.Server.Domain.Entities;
 using MassTransit;
 using Microsoft.AspNetCore.Builder;
@@ -17,10 +18,8 @@ namespace Gadget.Server
         {
             services.AddMassTransit(x =>
             {
-                x.UsingRabbitMq((context, cfg) =>
-                {
-                    cfg.ConfigureEndpoints(context);
-                });
+                x.AddConsumers(Assembly.GetExecutingAssembly());
+                x.UsingRabbitMq((context, cfg) => { cfg.ConfigureEndpoints(context); });
             });
             services.AddCors(options =>
             {
@@ -39,10 +38,7 @@ namespace Gadget.Server
 
             services.AddSignalR();
             services.AddControllers();
-            services.AddSingleton<IDictionary<Guid, ICollection<Service>>>(_ =>
-                new ConcurrentDictionary<Guid, ICollection<Service>>());
-            services.AddSingleton<ICollection<Agent>, HashSet<Agent>>();
-            services.AddSingleton<IDictionary<string, Guid>>(_ => new Dictionary<string, Guid>());
+            services.AddSingleton<ICollection<Agent>>(new List<Agent>());
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

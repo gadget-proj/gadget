@@ -4,8 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Gadget.Messaging.Commands;
 using Gadget.Messaging.Events;
+using Gadget.Server.Agents.Extensions;
 using Gadget.Server.Domain.Entities;
-using Gadget.Server.Extensions;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
 

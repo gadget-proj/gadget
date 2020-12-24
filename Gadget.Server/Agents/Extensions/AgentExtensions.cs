@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Gadget.Server.Domain.Entities;
 
-namespace Gadget.Server.Extensions
+namespace Gadget.Server.Agents.Extensions
 {
     public static class AgentExtensions
     {
