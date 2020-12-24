@@ -15,7 +15,13 @@ namespace Gadget.Server
     {
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMassTransit(x => { x.UsingRabbitMq((context, cfg) => cfg.ConfigureEndpoints(context)); });
+            services.AddMassTransit(x =>
+            {
+                x.UsingRabbitMq((context, cfg) =>
+                {
+                    cfg.ConfigureEndpoints(context);
+                });
+            });
             services.AddCors(options =>
             {
                 options.AddPolicy("AllowAll",

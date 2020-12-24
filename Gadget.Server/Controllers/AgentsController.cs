@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Gadget.Messaging.Commands;
 using Gadget.Server.Domain.Entities;
@@ -15,19 +16,20 @@ namespace Gadget.Server.Controllers
     public class AgentsController : ControllerBase
     {
         private readonly ICollection<Agent> _agents;
-        private readonly IBusControl _bus;
+        private readonly ISendEndpointProvider _provider;
 
-        public AgentsController(ICollection<Agent> agents, IBusControl bus)
+
+        public AgentsController(ICollection<Agent> agents, ISendEndpointProvider provider)
         {
             _agents = agents;
-            _bus = bus;
+            _provider = provider;
         }
 
         [HttpGet]
-        public Task<IActionResult> GetAllAgents()
+        public async Task<IActionResult> GetAllAgents()
         {
             var keys = _agents.Select(a => a.Name.Replace("-", ""));
-            return Task.FromResult<IActionResult>(Ok(keys.Select(k => new {Agent = k})));
+            return await Task.FromResult<IActionResult>(Ok(keys.Select(k => new {Agent = k})));
         }
 
         [HttpGet("{agent}")]
@@ -40,16 +42,20 @@ namespace Gadget.Server.Controllers
         }
 
         [HttpGet("{agent}/start")]
-        public async Task<IActionResult> StartService()
+        public async Task<IActionResult> StartService(string agent)
         {
-            await _bus.Publish<IStartService>(new { });
+            Console.WriteLine($"setting key {agent}");
+            var _bus = await _provider.GetSendEndpoint(new Uri($"exchange:{agent}"));
+            await _bus.Send<IStartService>(new { }, context => { context.SetRoutingKey(agent); });
             return Accepted();
         }
 
         [HttpGet("{agent}/stop")]
-        public async Task<IActionResult> StopService()
+        public async Task<IActionResult> StopService(string agent)
         {
-            await _bus.Publish<IStopService>(new { });
+            Console.WriteLine($"setting key {agent}");
+            var _bus = await _provider.GetSendEndpoint(new Uri($"exchange:{agent}"));
+            await _bus.Send<IStartService>(new { }, context => { context.SetRoutingKey(agent); });
             return Accepted();
         }
 
