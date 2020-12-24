@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Gadget.Messaging.Commands;
+using Gadget.Server.Agents.Dto;
 using Gadget.Server.Domain.Entities;
 using MassTransit;
 using Microsoft.AspNetCore.Mvc;
@@ -26,7 +27,15 @@ namespace Gadget.Server.Agents
         public async Task<IActionResult> GetAllAgents()
         {
             var keys = _agents.Select(a => a.Name.Replace("-", ""));
-            return await Task.FromResult<IActionResult>(Ok(keys.Select(k => new {Agent = k})));
+            return await Task.FromResult<IActionResult>(Ok(_agents.Select(a=>new AgentDto
+            {
+                Name = a.Name,
+                Services = a.Services.Select(s=>new ServiceDto
+                {
+                    Name = s.Name,
+                    Status = s.Status
+                })
+            })));
         }
 
         [HttpGet("{agent}")]

@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Gadget.Messaging.Commands;
 using Gadget.Messaging.Events;
-using Gadget.Server.Agents.Extensions;
 using Gadget.Server.Domain.Entities;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
@@ -25,10 +24,10 @@ namespace Gadget.Server.Hubs
 
         public override Task OnDisconnectedAsync(Exception exception)
         {
-            var connectionId = Context.ConnectionId;
-            var agent = _agents.WithConnectionId(connectionId);
-            _agents.Remove(agent);
-            _logger.LogInformation($"Client {connectionId} has disconnected");
+            // var connectionId = Context.ConnectionId;
+            // var agent = _agents.WithConnectionId(connectionId);
+            // _agents.Remove(agent);
+            // _logger.LogInformation($"Client {connectionId} has disconnected");
             return Task.CompletedTask;
         }
 
@@ -63,39 +62,39 @@ namespace Gadget.Server.Hubs
 
         public Task Register(IRegisterNewAgent registerNewAgent)
         {
-            var connectionId = Context.ConnectionId;
-            _logger.LogInformation($"Registering new agent {registerNewAgent.Agent} with CID : {connectionId}");
-            var agentId = registerNewAgent.Agent;
-            var agent = new Agent(agentId, connectionId);
-            agent.AddServices(registerNewAgent.Services.Select(s => new Service(s.Name, s.Status)));
-            _agents.Add(agent);
+            // var connectionId = Context.ConnectionId;
+            // _logger.LogInformation($"Registering new agent {registerNewAgent.Agent} with CID : {connectionId}");
+            // var agentId = registerNewAgent.Agent;
+            // var agent = new Agent(agentId, connectionId);
+            // agent.AddServices(registerNewAgent.Services.Select(s => new Service(s.Name, s.Status)));
+            // _agents.Add(agent);
             return Task.CompletedTask;
         }
 
         public Task ServiceStatusChanged(ServiceStatusChanged serviceStatusChanged)
         {
-            var connectionId = Context.ConnectionId;
-            var agent = _agents.WithConnectionId(connectionId);
-            if (agent is null)
-            {
-                _logger.LogError($"Cannot find agent for {connectionId}");
-                return Task.CompletedTask;
-            }
-
-            var serviceName = serviceStatusChanged.Name;
-            var serviceStatus = serviceStatusChanged.Status;
-            var service = agent.Services.Single(s =>
-                string.Equals(s.Name, serviceName, StringComparison.CurrentCultureIgnoreCase));
-            service.Status = serviceStatus;
-            try
-            {
-                Clients.Group("dashboard").SendAsync("ServiceStatusChanged", serviceStatusChanged);
-            }
-            catch (Exception exception)
-            {
-                _logger.LogError(exception.Message);
-            }
-
+            // var connectionId = Context.ConnectionId;
+            // var agent = _agents.WithConnectionId(connectionId);
+            // if (agent is null)
+            // {
+            //     _logger.LogError($"Cannot find agent for {connectionId}");
+            //     return Task.CompletedTask;
+            // }
+            //
+            // var serviceName = serviceStatusChanged.Name;
+            // var serviceStatus = serviceStatusChanged.Status;
+            // var service = agent.Services.Single(s =>
+            //     string.Equals(s.Name, serviceName, StringComparison.CurrentCultureIgnoreCase));
+            // service.Status = serviceStatus;
+            // try
+            // {
+            //     Clients.Group("dashboard").SendAsync("ServiceStatusChanged", serviceStatusChanged);
+            // }
+            // catch (Exception exception)
+            // {
+            //     _logger.LogError(exception.Message);
+            // }
+            //
             return Task.CompletedTask;
         }
     }

@@ -7,15 +7,13 @@ namespace Gadget.Server.Domain.Entities
     {
         private readonly ICollection<Service> _services;
 
-        public Agent(string name, string connectionId)
+        public Agent(string name)
         {
             Name = name;
-            ConnectionId = connectionId;
             _services = new HashSet<Service>();
         }
 
         public string Name { get; }
-        public string ConnectionId { get; }
         public IEnumerable<Service> Services => _services.ToImmutableList();
 
         public void AddService(Service service)
