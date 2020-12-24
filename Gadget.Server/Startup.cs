@@ -2,8 +2,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using Gadget.Server.Domain.Entities;
-using Gadget.Server.Hubs;
-using Gadget.Server.Services;
+using MassTransit;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,6 +15,7 @@ namespace Gadget.Server
     {
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddMassTransit(x => { x.UsingRabbitMq((context, cfg) => cfg.ConfigureEndpoints(context)); });
             services.AddCors(options =>
             {
                 options.AddPolicy("AllowAll",
@@ -37,7 +37,6 @@ namespace Gadget.Server
                 new ConcurrentDictionary<Guid, ICollection<Service>>());
             services.AddSingleton<ICollection<Agent>, HashSet<Agent>>();
             services.AddSingleton<IDictionary<string, Guid>>(_ => new Dictionary<string, Guid>());
-            services.AddHostedService<HealthCheckService>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -48,7 +47,7 @@ namespace Gadget.Server
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapHub<GadgetHub>("/gadget");
+                // endpoints.MapHub<GadgetHub>("/gadget");
                 endpoints.MapControllers();
             });
         }

@@ -32,13 +32,13 @@ namespace Gadget.Server.Hubs
             return Task.CompletedTask;
         }
 
-        public Task RegisterMachineReport(RegisterNewAgent registerMachineReport)
+        public Task RegisterMachineReport(IRegisterNewAgent registerMachineReport)
         {
             _logger.LogInformation($"Received new machine report from agent {registerMachineReport.Agent}");
             var agent = _agents.FirstOrDefault(a => a.Name == registerMachineReport.Agent);
             if (agent is null)
             {
-                _logger.LogError($"Could not find agent {registerMachineReport.Agent} for {nameof(RegisterNewAgent)}");
+                _logger.LogError($"Could not find agent {registerMachineReport.Agent} for {nameof(IRegisterNewAgent)}");
                 return Task.CompletedTask;
             }
 
@@ -54,14 +54,14 @@ namespace Gadget.Server.Hubs
         }
 
         //TODO Remove from group on disconnect
-        public Task RegisterDashboard(RegisterNewDashboard registerNewDashboard)
+        public Task RegisterDashboard(IRegisterNewDashboard registerNewDashboard)
         {
             var connectionId = Context.ConnectionId;
             Groups.AddToGroupAsync(connectionId, "dashboard");
             return Task.CompletedTask;
         }
 
-        public Task Register(RegisterNewAgent registerNewAgent)
+        public Task Register(IRegisterNewAgent registerNewAgent)
         {
             var connectionId = Context.ConnectionId;
             _logger.LogInformation($"Registering new agent {registerNewAgent.Agent} with CID : {connectionId}");
@@ -97,44 +97,6 @@ namespace Gadget.Server.Hubs
             }
 
             return Task.CompletedTask;
-        }
-
-        public async Task StopService(StopService stopService)
-        {
-            try
-            {
-                var agent = _agents.FirstOrDefault(a => a.Name == stopService.Agent);
-                if (agent is null)
-                {
-                    _logger.LogError($"Could not find agent for {nameof(StopService)} command");
-                    return;
-                }
-
-                await Clients.Client(agent.ConnectionId).SendAsync("StopService", stopService);
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e.Message);
-            }
-        }
-
-        public async Task StartService(StartService startService)
-        {
-            try
-            {
-                var agent = _agents.FirstOrDefault(a => a.Name == startService.Agent);
-                if (agent is null)
-                {
-                    _logger.LogError($"Could not find agent for {nameof(StartService)} command");
-                    return;
-                }
-
-                await Clients.Client(agent.ConnectionId).SendAsync("StartService", startService);
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e.Message);
-            }
         }
     }
 }

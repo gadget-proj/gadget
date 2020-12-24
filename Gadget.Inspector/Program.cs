@@ -1,7 +1,9 @@
 ﻿using System;
-using System.Reflection;
-using Gadget.Inspector.Extensions;
-using MediatR;
+using System.Threading.Tasks;
+using Gadget.Inspector.Consumers;
+using Gadget.Messaging.Events;
+using MassTransit;
+using MassTransit.Testing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -28,9 +30,15 @@ namespace Gadget.Inspector
                 })
                 .ConfigureServices((host, services) =>
                 {
-                    services.AddMediatR(Assembly.GetExecutingAssembly());
+                    services.AddMassTransit(x =>
+                    {
+                        x.AddConsumer<GetAgentHealthConsumer>();
+                        x.AddConsumer<StopServiceConsumer>();
+                        x.AddConsumer<StartServiceConsumer>();
+                        x.UsingRabbitMq((context, cfg) => { cfg.ConfigureEndpoints(context); });
+                    });
+                    services.AddMassTransitHostedService();
                     services.AddLogging(options => options.AddConsole());
-                    services.AddInspector(host.Configuration);
                 })
                 .ConfigureAppConfiguration((context, builder) =>
                 {

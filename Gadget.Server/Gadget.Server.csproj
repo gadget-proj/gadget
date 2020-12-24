@@ -10,4 +10,11 @@
         <ProjectReference Include="..\Gadget.Messaging\Gadget.Messaging.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="MassTransit" Version="7.0.7" />
+      <PackageReference Include="MassTransit.AspNetCore" Version="7.0.7" />
+      <PackageReference Include="MassTransit.Extensions.DependencyInjection" Version="7.0.7" />
+      <PackageReference Include="MassTransit.RabbitMQ" Version="7.0.7" />
+    </ItemGroup>
+
 </Project>

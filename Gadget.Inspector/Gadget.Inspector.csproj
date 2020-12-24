@@ -6,19 +6,23 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="MediatR" Version="9.0.0"/>
-        <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="9.0.0"/>
-        <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="5.0.0"/>
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.0"/>
-        <PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.0"/>
-        <PackageReference Include="System.ServiceProcess.ServiceController" Version="5.0.0"/>
-        <PackageReference Include="System.Threading.Channels" Version="5.0.0"/>
-        <PackageReference Include="System.Diagnostics.PerformanceCounter" Version="5.0.0"/>
-        <PackageReference Include="System.Management" Version="5.0.0"/>
+        <PackageReference Include="MassTransit" Version="7.0.7" />
+        <PackageReference Include="MassTransit.AspNetCore" Version="7.0.7" />
+        <PackageReference Include="MassTransit.Extensions.DependencyInjection" Version="7.0.7" />
+        <PackageReference Include="MassTransit.RabbitMQ" Version="7.0.7" />
+        <PackageReference Include="MediatR" Version="9.0.0" />
+        <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="9.0.0" />
+        <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="5.0.0" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.0" />
+        <PackageReference Include="System.ServiceProcess.ServiceController" Version="5.0.0" />
+        <PackageReference Include="System.Threading.Channels" Version="5.0.0" />
+        <PackageReference Include="System.Diagnostics.PerformanceCounter" Version="5.0.0" />
+        <PackageReference Include="System.Management" Version="5.0.0" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Gadget.Messaging\Gadget.Messaging.csproj"/>
+        <ProjectReference Include="..\Gadget.Messaging\Gadget.Messaging.csproj" />
     </ItemGroup>
 
     <ItemGroup>

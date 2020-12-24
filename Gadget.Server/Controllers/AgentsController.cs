@@ -2,7 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Gadget.Messaging.Commands;
 using Gadget.Server.Domain.Entities;
+using MassTransit;
+using MassTransit.Configuration;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Gadget.Server.Controllers
@@ -12,12 +15,13 @@ namespace Gadget.Server.Controllers
     public class AgentsController : ControllerBase
     {
         private readonly ICollection<Agent> _agents;
+        private readonly IBusControl _bus;
 
-        public AgentsController(ICollection<Agent> agents)
+        public AgentsController(ICollection<Agent> agents, IBusControl bus)
         {
             _agents = agents;
+            _bus = bus;
         }
-
 
         [HttpGet]
         public Task<IActionResult> GetAllAgents()
@@ -33,6 +37,20 @@ namespace Gadget.Server.Controllers
             return services is null
                 ? Task.FromResult<IActionResult>(NotFound())
                 : Task.FromResult<IActionResult>(Ok(services));
+        }
+
+        [HttpGet("{agent}/start")]
+        public async Task<IActionResult> StartService()
+        {
+            await _bus.Publish<IStartService>(new { });
+            return Accepted();
+        }
+
+        [HttpGet("{agent}/stop")]
+        public async Task<IActionResult> StopService()
+        {
+            await _bus.Publish<IStopService>(new { });
+            return Accepted();
         }
 
         [HttpGet("{agent}/{serviceName}")]
