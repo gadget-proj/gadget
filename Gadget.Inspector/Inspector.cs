@@ -58,7 +58,7 @@ namespace Gadget.Inspector
                     await _publishEndpoint.Publish<IServiceStatusChanged>(new
                     {
                         Agent = Environment.MachineName,
-                        ServicName = serviceController.ServiceName,
+                        Name = serviceController.ServiceName,
                         Status = current.ToString()
                     }, stoppingToken);
 
