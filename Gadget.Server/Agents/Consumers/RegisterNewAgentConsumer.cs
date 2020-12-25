@@ -20,6 +20,7 @@ namespace Gadget.Server.Agents.Consumers
 
         public Task Consume(ConsumeContext<IRegisterNewAgent> context)
         {
+            _logger.LogInformation("Regisgering new agent");
             _logger.LogInformation($"{context.Message.GetType()}");
             _agents.Add(new Agent(context.Message.Agent));
             return Task.CompletedTask;

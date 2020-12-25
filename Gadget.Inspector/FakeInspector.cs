@@ -1,6 +1,8 @@
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Gadget.Messaging.Commands;
 using Gadget.Messaging.Events;
 using MassTransit;
 using Microsoft.Extensions.Hosting;
@@ -12,6 +14,7 @@ namespace Gadget.Inspector
     {
         private readonly ILogger<FakeInspector> _logger;
         private readonly IPublishEndpoint _publishEndpoint;
+
         public FakeInspector(ILogger<FakeInspector> logger, IPublishEndpoint publishEndpoint)
         {
             _logger = logger;
@@ -20,6 +23,11 @@ namespace Gadget.Inspector
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
+            await _publishEndpoint.Publish<IRegisterNewAgent>(new
+            {
+                Agent = Environment.MachineName,
+                Services = Enumerable.Range(1, 5).Select(x => x.ToString())
+            }, stoppingToken);
             _logger.LogInformation("Exec started");
             while (!stoppingToken.IsCancellationRequested)
             {
