@@ -28,6 +28,8 @@ namespace Gadget.Inspector
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
+            _logger.LogInformation("Starting Inspector service");
+            _logger.LogInformation($"Registering new agent {Environment.MachineName}");
             await _publishEndpoint.Publish<IRegisterNewAgent>(new
             {
                 Agent = Environment.MachineName,
@@ -40,6 +42,7 @@ namespace Gadget.Inspector
             }, stoppingToken);
             while (!stoppingToken.IsCancellationRequested)
             {
+                _logger.LogInformation($"Starting watcher {DateTime.UtcNow}");
                 foreach (var serviceController in ServiceController.GetServices())
                 {
                     serviceController.Refresh();
@@ -54,6 +57,7 @@ namespace Gadget.Inspector
                     {
                         continue;
                     }
+
                     _services[serviceController.ServiceName] = current;
                     await _publishEndpoint.Publish<IServiceStatusChanged>(new
                     {
@@ -61,7 +65,6 @@ namespace Gadget.Inspector
                         Name = serviceController.ServiceName,
                         Status = current.ToString()
                     }, stoppingToken);
-
                 }
 
                 await Task.Delay(TimeSpan.FromSeconds(1), stoppingToken);
