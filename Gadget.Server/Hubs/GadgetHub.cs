@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using Gadget.Messaging.Commands;
-using Gadget.Server.Domain.Entities;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
 
@@ -23,9 +19,9 @@ namespace Gadget.Server.Hubs
             return Task.CompletedTask;
         }
 
-        public Task RegisterDashboard(RegisterNewDashboard registerNewDashboard)
+        public override Task OnConnectedAsync()
         {
-            _logger.LogInformation($"{Context.ConnectionId} joining dashboard group");
+            _logger.LogInformation($"{Context.ConnectionId} connected");
             var connectionId = Context.ConnectionId;
             Groups.AddToGroupAsync(connectionId, "dashboard");
             _logger.LogInformation($"{Context.ConnectionId} successfully joined dashboard group");
