@@ -22,6 +22,8 @@ namespace Gadget.Server.Agents.Consumers
         {
             await _hub.Clients.Group("dashboard").SendAsync("ServiceStatusChanged", context.Message);
             _logger.LogInformation($"{context.Message.GetType()} received");
+            _logger.LogInformation(
+                $"Agent {context.Message.Agent} Svc {context.Message.Name} Status {context.Message.Status}");
         }
     }
 }
