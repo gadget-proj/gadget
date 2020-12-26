@@ -27,6 +27,7 @@ namespace Gadget.Server.Agents.Consumers
             _logger.LogInformation("Regisgering new agent");
 
             var agent = new Agent(context.Message.Agent);
+            //TODO Services are always empty why?
             // agent.AddServices(context.Message.Services?.Select(s => new Service(s.Name, s.Status)));
             _agents.Add(agent);
 
