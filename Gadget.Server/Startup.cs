@@ -1,8 +1,4 @@
-using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Reflection;
-using Gadget.Messaging.Events;
 using Gadget.Server.Agents.Consumers;
 using Gadget.Server.Domain.Entities;
 using MassTransit;
@@ -10,7 +6,6 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Service = Gadget.Messaging.Service;
 
 namespace Gadget.Server
 {
