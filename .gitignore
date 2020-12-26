@@ -341,3 +341,5 @@ healthchecksdb
 /Gadget.Hub/Properties
 
 .docker
+Gadget.Server/Migrations
+Gadget.Server/gadget.db**
