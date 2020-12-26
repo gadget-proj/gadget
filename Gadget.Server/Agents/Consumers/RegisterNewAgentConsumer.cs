@@ -5,6 +5,7 @@ using Gadget.Messaging.Commands;
 using Gadget.Server.Domain.Entities;
 using MassTransit;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 
 namespace Gadget.Server.Agents.Consumers
 {
@@ -30,12 +31,12 @@ namespace Gadget.Server.Agents.Consumers
             //TODO Services are always empty why?
             agent.AddServices(context.Message.Services?.Select(s =>
             {
-                var service = s as Messaging.Service;
-                return new Service(service?.Name, service?.Status);
+                var service = JsonConvert.DeserializeObject<Messaging.Service>(s.ToString());
+                return new Service(service?.Name, service?.Status, agent);
             }));
             _agents.Add(agent);
 
-            await _context.AddAsync(new Agent(context.Message.Agent));
+            await _context.Agents.AddAsync(agent);
             await _context.SaveChangesAsync();
         }
     }

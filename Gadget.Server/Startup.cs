@@ -5,6 +5,7 @@ using MassTransit;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -12,6 +13,12 @@ namespace Gadget.Server
 {
     public class Startup
     {
+        public Startup(IConfiguration configuration)
+        {
+            Configuration = configuration;
+        }
+
+        public IConfiguration Configuration { get; private set; }
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<GadgetContext>(builder => builder.UseSqlite("Data Source=gadget.db"));

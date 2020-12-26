@@ -26,7 +26,8 @@ namespace Gadget.Inspector
             var foo = new
             {
                 Agent = Environment.MachineName,
-                Services = Enumerable.Range(1, 5).Select(x => x.ToString())
+                Services = Enumerable.Range(1, 5).Select(x => new
+                    {Name = x.ToString(), Status = x % 2 == 0 ? "Running" : "Stopped"})
             };
             _logger.LogCritical(foo.Services.Count().ToString());
             await _publishEndpoint.Publish<IRegisterNewAgent>(foo, stoppingToken);

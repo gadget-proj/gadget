@@ -6,14 +6,13 @@ namespace Gadget.Server.Domain.Entities
 {
     public class Agent
     {
-        private readonly ICollection<Service> _services;
+        private readonly ICollection<Service> _services = new List<Service>();
         public Guid Id { get; private set; }
 
         public Agent(string name)
         {
             Name = name;
             Id = Guid.NewGuid();
-            _services = new HashSet<Service>();
         }
 
         private Agent()
