@@ -20,6 +20,8 @@ namespace Gadget.Server.Domain.Entities
         public string Name { get; }
         public string Status { get; set; }
 
+        public Agent Agent { get; }
+
         public static IEqualityComparer<Service> NameComparer { get; } = new NameEqualityComparer();
 
         private sealed class NameEqualityComparer : IEqualityComparer<Service>

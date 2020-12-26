@@ -5,6 +5,6 @@ namespace Gadget.Messaging.Commands
     public interface IRegisterNewAgent
     {
         string Agent { get; }
-        IEnumerable<Service> Services { get; }
+        IEnumerable<object> Services { get; }
     }
 }

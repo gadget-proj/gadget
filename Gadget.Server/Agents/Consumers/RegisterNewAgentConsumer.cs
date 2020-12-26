@@ -28,7 +28,11 @@ namespace Gadget.Server.Agents.Consumers
 
             var agent = new Agent(context.Message.Agent);
             //TODO Services are always empty why?
-            // agent.AddServices(context.Message.Services?.Select(s => new Service(s.Name, s.Status)));
+            agent.AddServices(context.Message.Services?.Select(s =>
+            {
+                var service = s as Messaging.Service;
+                return new Service(service?.Name, service?.Status);
+            }));
             _agents.Add(agent);
 
             await _context.AddAsync(new Agent(context.Message.Agent));
