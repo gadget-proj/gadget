@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 
@@ -6,11 +7,17 @@ namespace Gadget.Server.Domain.Entities
     public class Agent
     {
         private readonly ICollection<Service> _services;
+        public Guid Id { get; private set; }
 
         public Agent(string name)
         {
             Name = name;
+            Id = Guid.NewGuid();
             _services = new HashSet<Service>();
+        }
+
+        private Agent()
+        {
         }
 
         public string Name { get; }

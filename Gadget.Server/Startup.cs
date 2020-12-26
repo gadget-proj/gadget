@@ -4,6 +4,7 @@ using Gadget.Server.Domain.Entities;
 using MassTransit;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -13,14 +14,12 @@ namespace Gadget.Server
     {
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddDbContext<GadgetContext>(builder => builder.UseSqlite("Data Source=gadget.db"));
             services.AddMassTransit(x =>
             {
                 x.AddConsumer<ServiceStatusChangedConsumer>();
                 x.AddConsumer<RegisterNewAgentConsumer>();
-                x.UsingRabbitMq((context, cfg) =>
-                {
-                    cfg.ConfigureEndpoints(context);
-                });
+                x.UsingRabbitMq((context, cfg) => { cfg.ConfigureEndpoints(context); });
             });
             services.AddMassTransitHostedService();
             services.AddCors(options =>

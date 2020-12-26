@@ -23,11 +23,13 @@ namespace Gadget.Inspector
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            await _publishEndpoint.Publish<IRegisterNewAgent>(new
+            var foo = new
             {
                 Agent = Environment.MachineName,
                 Services = Enumerable.Range(1, 5).Select(x => x.ToString())
-            }, stoppingToken);
+            };
+            _logger.LogCritical(foo.Services.Count().ToString());
+            await _publishEndpoint.Publish<IRegisterNewAgent>(foo, stoppingToken);
             _logger.LogInformation("Exec started");
             while (!stoppingToken.IsCancellationRequested)
             {

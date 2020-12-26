@@ -7,6 +7,7 @@ using Gadget.Server.Agents.Dto;
 using Gadget.Server.Domain.Entities;
 using MassTransit;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Gadget.Server.Agents
 {
@@ -16,18 +17,23 @@ namespace Gadget.Server.Agents
     {
         private readonly ICollection<Agent> _agents;
         private readonly IBusControl _busControl;
+        private readonly GadgetContext _context;
 
-        public AgentsController(ICollection<Agent> agents, IBusControl busControl)
+        public AgentsController(ICollection<Agent> agents, IBusControl busControl, GadgetContext context)
         {
             _agents = agents;
             _busControl = busControl;
+            _context = context;
         }
 
         [HttpGet]
         public async Task<IActionResult> GetAllAgents()
         {
+            var agents = await _context.Agents
+                .Include(a=>a.Services)
+                .ToListAsync();
             var keys = _agents.Select(a => a.Name.Replace("-", ""));
-            return await Task.FromResult<IActionResult>(Ok(_agents.Select(a => new AgentDto
+            return await Task.FromResult<IActionResult>(Ok(agents.Select(a => new AgentDto
             {
                 Name = a.Name,
                 Services = a.Services.Select(s => new ServiceDto

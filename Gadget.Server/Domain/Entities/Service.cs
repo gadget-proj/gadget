@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace Gadget.Server.Domain.Entities
@@ -8,8 +9,14 @@ namespace Gadget.Server.Domain.Entities
         {
             Name = name;
             Status = status;
+            Id = Guid.NewGuid();
         }
 
+        private Service()
+        {
+        }
+
+        public Guid Id { get; }
         public string Name { get; }
         public string Status { get; set; }
 
