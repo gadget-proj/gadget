@@ -1,13 +1,15 @@
 version: "3"
 services:
-  foo:
+  rabbitmq:
     image: "rabbitmq:3-management"
-
-    volumes:
-      - ./.docker/rabbitmq/etc/:/etc/rabbitmq/
-      - ./.docker/rabbitmq/data/:/var/lib/rabbitmq/
-      - ./.docker/rabbitmq/logs/:/var/log/rabbitmq/
-    container_name: rabbitmq
     ports:
       - 5672:5672
+      - 5673:5673
       - 15672:15672
+  seq:
+    image: "datalust/seq:latest"
+    environment:
+      - ACCEPT_EULA=Y
+    ports:
+      - 5341:5341
+      - 4444:80
