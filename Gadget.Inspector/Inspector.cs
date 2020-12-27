@@ -5,8 +5,8 @@ using System.ServiceProcess;
 using System.Threading;
 using System.Threading.Tasks;
 using Gadget.Messaging;
-using Gadget.Messaging.Commands;
-using Gadget.Messaging.Events;
+using Gadget.Messaging.Contracts.Commands;
+using Gadget.Messaging.Contracts.Events;
 using Gadget.Messaging.SignalR;
 using MassTransit;
 using Microsoft.Extensions.Hosting;
@@ -18,7 +18,6 @@ namespace Gadget.Inspector
     {
         private readonly IPublishEndpoint _publishEndpoint;
         private readonly ILogger<Inspector> _logger;
-
         private readonly IDictionary<string, ServiceControllerStatus> _services =
             new Dictionary<string, ServiceControllerStatus>();
 
@@ -31,16 +30,8 @@ namespace Gadget.Inspector
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             _logger.LogInformation("Starting Inspector service");
-            _logger.LogInformation($"Registering new agent {Environment.MachineName}");
-            await _publishEndpoint.Publish<IRegisterNewAgent>(new
-            {
-                Agent = Environment.MachineName,
-                Services = ServiceController.GetServices().Select(s => new ServiceDescriptor
-                {
-                    Name = s.ServiceName,
-                    Status = s.Status.ToString()
-                })
-            }, stoppingToken);
+            await RegisterAgent(stoppingToken);
+            
             _logger.LogInformation($"Starting watcher {DateTime.UtcNow}");
             while (!stoppingToken.IsCancellationRequested)
             {
@@ -70,6 +61,20 @@ namespace Gadget.Inspector
 
                 await Task.Delay(TimeSpan.FromSeconds(1), stoppingToken);
             }
+        }
+
+        private async Task RegisterAgent(CancellationToken stoppingToken)
+        {
+            _logger.LogInformation($"Registering new agent {Environment.MachineName}");
+            await _publishEndpoint.Publish<IRegisterNewAgent>(new
+            {
+                Agent = Environment.MachineName,
+                Services = ServiceController.GetServices().Select(s => new ServiceDescriptor
+                {
+                    Name = s.ServiceName,
+                    Status = s.Status.ToString()
+                })
+            }, stoppingToken);
         }
     }
 }

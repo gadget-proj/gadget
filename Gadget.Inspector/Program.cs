@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Reflection;
-using Gadget.Messaging.Commands;
+using Gadget.Messaging.Contracts.Commands;
 using MassTransit;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

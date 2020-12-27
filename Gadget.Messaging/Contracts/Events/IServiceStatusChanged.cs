@@ -1,4 +1,4 @@
-namespace Gadget.Messaging.Events
+namespace Gadget.Messaging.Contracts.Events
 {
     public interface IServiceStatusChanged
     {

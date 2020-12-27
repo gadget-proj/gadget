@@ -1,7 +1,12 @@
 ﻿namespace Gadget.Messaging.SignalR
 {
-    public class ServiceDescriptor
+    /// <summary>
+    /// ServiceDescriptor describes a windows service, its name and current status
+    /// It is only meant to be used as a message
+    /// </summary>
+    public sealed class ServiceDescriptor
     {
+        public string Agent { get; set; }
         public string Name { get; set; }
         public string Status { get; set; }
     }

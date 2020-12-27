@@ -1,6 +1,6 @@
 using System;
 using System.Threading.Tasks;
-using Gadget.Messaging.Events;
+using Gadget.Messaging.Contracts.Events;
 using Gadget.Messaging.SignalR;
 using Gadget.Server.Hubs;
 using MassTransit;
@@ -40,9 +40,9 @@ namespace Gadget.Server.Agents.Consumers
 
             agent.ChangeServiceStatus(service, newStatus);
             await _context.SaveChangesAsync();
-            await _hub.Clients.Group("dashboard").SendAsync("ServiceStatusChanged", new ServiceStatusChanged
+            await _hub.Clients.Group("dashboard").SendAsync("ServiceStatusChanged", new ServiceDescriptor
             {
-                AgentId = context.Message.Agent,
+                Agent = context.Message.Agent,
                 Name = context.Message.Name,
                 Status = context.Message.Status
             });
