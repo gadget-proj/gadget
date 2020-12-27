@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Gadget.Messaging;
 using Gadget.Messaging.Commands;
 using Gadget.Messaging.Events;
+using Gadget.Messaging.SignalR;
 using MassTransit;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -40,9 +41,9 @@ namespace Gadget.Inspector
                     Status = s.Status.ToString()
                 })
             }, stoppingToken);
+            _logger.LogInformation($"Starting watcher {DateTime.UtcNow}");
             while (!stoppingToken.IsCancellationRequested)
             {
-                _logger.LogInformation($"Starting watcher {DateTime.UtcNow}");
                 foreach (var serviceController in ServiceController.GetServices())
                 {
                     serviceController.Refresh();

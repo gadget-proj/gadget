@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Gadget.Messaging.Commands;
+using Gadget.Messaging.SignalR;
 using Gadget.Server.Domain.Entities;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
@@ -37,7 +38,7 @@ namespace Gadget.Server.Agents.Consumers
             var agent = new Agent(context.Message.Agent);
             agent.AddServices(context.Message.Services?.Select(s =>
             {
-                var service = JsonConvert.DeserializeObject<Messaging.ServiceDescriptor>(s.ToString());
+                var service = JsonConvert.DeserializeObject<ServiceDescriptor>(s.ToString());
                 return new Service(service?.Name, service?.Status, agent);
             }));
             _agents.Add(agent);

@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Gadget.Server.Agents.Consumers;
 using Gadget.Server.Domain.Entities;
+using Gadget.Server.Hubs;
 using MassTransit;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -56,7 +57,7 @@ namespace Gadget.Server
 
             app.UseEndpoints(endpoints =>
             {
-                // endpoints.MapHub<GadgetHub>("/gadget");
+                endpoints.MapHub<GadgetHub>("/gadget");
                 endpoints.MapControllers();
             });
         }
