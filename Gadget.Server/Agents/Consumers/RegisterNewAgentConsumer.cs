@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Gadget.Messaging.Commands;
 using Gadget.Server.Domain.Entities;
 using MassTransit;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
@@ -26,9 +27,14 @@ namespace Gadget.Server.Agents.Consumers
         public async Task Consume(ConsumeContext<IRegisterNewAgent> context)
         {
             _logger.LogInformation("Regisgering new agent");
+            var exists = _context.Agents
+                .Any(a => a.Name == context.Message.Agent);
+            if (exists)
+            {
+                return;
+            }
 
             var agent = new Agent(context.Message.Agent);
-            //TODO Services are always empty why?
             agent.AddServices(context.Message.Services?.Select(s =>
             {
                 var service = JsonConvert.DeserializeObject<Messaging.ServiceDescriptor>(s.ToString());

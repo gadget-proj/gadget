@@ -4,6 +4,7 @@ using System.Linq;
 using System.ServiceProcess;
 using System.Threading;
 using System.Threading.Tasks;
+using Gadget.Messaging;
 using Gadget.Messaging.Commands;
 using Gadget.Messaging.Events;
 using MassTransit;
@@ -33,12 +34,11 @@ namespace Gadget.Inspector
             await _publishEndpoint.Publish<IRegisterNewAgent>(new
             {
                 Agent = Environment.MachineName,
-                // Services = ServiceController.GetServices().Select(s => new Service
-                // {
-                //     Name = s.ServiceName,
-                //     Status = s.Status.ToString()
-                // })
-                Services = Enumerable.Empty<object>()
+                Services = ServiceController.GetServices().Select(s => new ServiceDescriptor
+                {
+                    Name = s.ServiceName,
+                    Status = s.Status.ToString()
+                })
             }, stoppingToken);
             while (!stoppingToken.IsCancellationRequested)
             {

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
 
 namespace Gadget.Server.Domain.Entities
 {
@@ -30,6 +31,17 @@ namespace Gadget.Server.Domain.Entities
         public void AddServices(IEnumerable<Service> services)
         {
             foreach (var service in services) AddService(service);
+        }
+
+        public void ChangeServiceStatus(string serviceName, string newStatus)
+        {
+            var service = _services.FirstOrDefault(s => s.Name == serviceName);
+            if (service == null)
+            {
+                throw new ApplicationException($"Service {serviceName} could not be found on agent {Name}");
+            }
+
+            service.Status = newStatus;
         }
     }
 }
