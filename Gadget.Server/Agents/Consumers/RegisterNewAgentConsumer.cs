@@ -31,7 +31,7 @@ namespace Gadget.Server.Agents.Consumers
             //TODO Services are always empty why?
             agent.AddServices(context.Message.Services?.Select(s =>
             {
-                var service = JsonConvert.DeserializeObject<Messaging.Service>(s.ToString());
+                var service = JsonConvert.DeserializeObject<Messaging.ServiceDescriptor>(s.ToString());
                 return new Service(service?.Name, service?.Status, agent);
             }));
             _agents.Add(agent);
