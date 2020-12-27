@@ -1,21 +1,35 @@
-using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
+using Gadget.Server.Agents.Consumers;
 using Gadget.Server.Domain.Entities;
 using Gadget.Server.Hubs;
-using Gadget.Server.Services;
+using MassTransit;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Service = Gadget.Messaging.Service;
 
 namespace Gadget.Server
 {
     public class Startup
     {
+        public Startup(IConfiguration configuration)
+        {
+            Configuration = configuration;
+        }
+
+        public IConfiguration Configuration { get; private set; }
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddDbContext<GadgetContext>(builder => builder.UseSqlite("Data Source=gadget.db"));
+            services.AddMassTransit(x =>
+            {
+                x.AddConsumer<ServiceStatusChangedConsumer>();
+                x.AddConsumer<RegisterNewAgentConsumer>();
+                x.UsingRabbitMq((context, cfg) => { cfg.ConfigureEndpoints(context); });
+            });
+            services.AddMassTransitHostedService();
             services.AddCors(options =>
             {
                 options.AddPolicy("AllowAll",
@@ -28,16 +42,11 @@ namespace Gadget.Server
                             .AllowAnyHeader()
                             .AllowCredentials();
                     });
-                ;
             });
 
             services.AddSignalR();
             services.AddControllers();
-            services.AddSingleton<IDictionary<Guid, ICollection<Service>>>(_ =>
-                new ConcurrentDictionary<Guid, ICollection<Service>>());
-            services.AddSingleton<ICollection<Agent>, HashSet<Agent>>();
-            services.AddSingleton<IDictionary<string, Guid>>(_ => new Dictionary<string, Guid>());
-            services.AddHostedService<HealthCheckService>();
+            services.AddSingleton<ICollection<Agent>>(new List<Agent>());
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

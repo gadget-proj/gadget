@@ -1,17 +1,27 @@
+using System;
 using System.Collections.Generic;
 
 namespace Gadget.Server.Domain.Entities
 {
     public class Service
     {
-        public Service(string name, string status)
+        public Service(string name, string status, Agent agent)
         {
             Name = name;
             Status = status;
+            Agent = agent;
+            Id = Guid.NewGuid();
         }
 
+        private Service()
+        {
+        }
+
+        public Guid Id { get; }
         public string Name { get; }
         public string Status { get; set; }
+
+        public Agent Agent { get; }
 
         public static IEqualityComparer<Service> NameComparer { get; } = new NameEqualityComparer();
 

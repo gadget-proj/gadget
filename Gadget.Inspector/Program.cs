@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Reflection;
-using Gadget.Inspector.Extensions;
-using MediatR;
+using Gadget.Messaging.Commands;
+using MassTransit;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using RabbitMQ.Client;
 
 namespace Gadget.Inspector
 {
@@ -28,9 +29,31 @@ namespace Gadget.Inspector
                 })
                 .ConfigureServices((host, services) =>
                 {
-                    services.AddMediatR(Assembly.GetExecutingAssembly());
+                    services.AddMassTransit(x =>
+                    {
+                        x.AddConsumers(Assembly.GetExecutingAssembly());
+                        x.UsingRabbitMq((context, cfg) =>
+                        {
+                            var id = Environment.MachineName;
+                            cfg.ReceiveEndpoint(id, e =>
+                            {
+                                e.Bind<IStopService>(c =>
+                                {
+                                    c.RoutingKey = id;
+                                    c.ExchangeType = ExchangeType.Direct;
+                                });
+                                e.Bind<IStartService>(c =>
+                                {
+                                    c.RoutingKey = id;
+                                    c.ExchangeType = ExchangeType.Direct;
+                                });
+                            });
+                        });
+                    });
+                    services.AddMassTransitHostedService();
+                    // services.AddHostedService<Inspector>();
+                    services.AddHostedService<Inspector>();
                     services.AddLogging(options => options.AddConsole());
-                    services.AddInspector(host.Configuration);
                 })
                 .ConfigureAppConfiguration((context, builder) =>
                 {

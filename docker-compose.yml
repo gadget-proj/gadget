@@ -1,28 +1,13 @@
 version: "3"
 services:
-  server:
-    build:
-      context: .
-      dockerfile: Dockerfile.server
-    ports:
-      - 4448:5000
-  influx:
-    image: influxdb:latest
+  foo:
+    image: "rabbitmq:3-management"
+
     volumes:
-      - influxdb_data:/var/lib/influxdb
+      - ./.docker/rabbitmq/etc/:/etc/rabbitmq/
+      - ./.docker/rabbitmq/data/:/var/lib/rabbitmq/
+      - ./.docker/rabbitmq/logs/:/var/log/rabbitmq/
+    container_name: rabbitmq
     ports:
-      - "8086:8086"
-      - "8083:8083"
-      - "9999:9999"
-    restart: always
-  chronograf:
-    image: chronograf:1.5
-    ports:
-      - 127.0.0.1:8087:8888
-    restart: always
-  grafana:
-    image: "grafana/grafana"
-    ports:
-      - 3000:3000
-volumes:
-  influxdb_data:
+      - 5672:5672
+      - 15672:15672
