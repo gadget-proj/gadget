@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Gadget.Messaging.Commands;
+using Gadget.Messaging.Contracts.Commands;
 using Gadget.Server.Agents.Dto;
 using Gadget.Server.Domain.Entities;
 using MassTransit;

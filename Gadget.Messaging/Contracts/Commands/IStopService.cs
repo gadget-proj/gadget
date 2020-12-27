@@ -1,4 +1,4 @@
-﻿namespace Gadget.Messaging.Commands
+﻿namespace Gadget.Messaging.Contracts.Commands
 {
     public interface IStopService
     {
