@@ -28,7 +28,15 @@ namespace Gadget.Inspector.HandlerRegistration
                 {
                     MethodInfo methodInfo = t.GetMethod(methodName);
                     var inst = Activator.CreateInstance(t);
-                    methodInfo.Invoke(inst, new object[] { message});
+                    try
+                    {
+                        methodInfo.Invoke(inst, new object[] { message });
+                    }
+                    catch (Exception e)
+                    {
+
+                        Console.WriteLine(e.Message);
+                    }
                 });
             }
         }

@@ -20,6 +20,7 @@ namespace Gadget.Inspector.Transport
         public ControlPlane(HubConnection hubConnection, ILogger<ControlPlane> logger)
         {
             _hubConnection = hubConnection;
+            //_hubConnection.On<GetAgentHealth>("GetAgentHealth", @event => Console.WriteLine($"wesz³o 1111111112222{@event.CpuPercentUsage}"));
             _logger = logger;
         }
 
@@ -36,9 +37,11 @@ namespace Gadget.Inspector.Transport
             }
         }
 
+
         public void RegisterHandler<T>(string method, Action<T> handler) where T : IGadgetMessage
         {
             _logger.LogInformation($"Registering handler for method {method}, T : {typeof(T)}");
+            Console.WriteLine($"Registering handler for method {method}, T : {typeof(T)}");
             try
             {
                 _hubConnection.On(method, handler);

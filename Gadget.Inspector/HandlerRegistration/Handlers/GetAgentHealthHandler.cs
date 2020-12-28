@@ -11,7 +11,7 @@ namespace Gadget.Inspector.HandlerRegistration.Handlers
         //    return logic.GetMachineHealthData();
         //}
 
-        public void GetAgentHealth()
+        public void GetAgentHealth(GetAgentHealth getAgentHealth)
         {
             System.Console.WriteLine("Get health weszło inspector");
         }
