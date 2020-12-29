@@ -11,8 +11,4 @@
       <PackageReference Include="MassTransit.RabbitMQ" Version="7.0.7" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Contracts" />
-    </ItemGroup>
-
 </Project>

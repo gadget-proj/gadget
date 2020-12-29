@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Reflection;
 using Gadget.Messaging.Contracts.Commands;
 using MassTransit;
@@ -54,6 +55,7 @@ namespace Gadget.Inspector
                     // services.AddHostedService<Inspector>();
                     services.AddHostedService<Inspector>();
                     services.AddLogging(options => options.AddConsole());
+                    services.AddScoped(_ => new PerformanceCounter("Processor", "% Processor Time", "_Total"));
                 })
                 .ConfigureAppConfiguration((context, builder) =>
                 {
