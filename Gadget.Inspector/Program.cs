@@ -56,6 +56,7 @@ namespace Gadget.Inspector
                     services.AddHostedService<Inspector>();
                     services.AddLogging(options => options.AddConsole());
                     services.AddScoped(_ => new PerformanceCounter("Processor", "% Processor Time", "_Total"));
+                    services.AddScoped<InspectorResources>();
                 })
                 .ConfigureAppConfiguration((context, builder) =>
                 {

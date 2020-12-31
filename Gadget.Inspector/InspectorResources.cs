@@ -19,7 +19,7 @@ namespace Gadget.Inspector
         {
             var output = new MachineHealthData
             {
-                MachineName = Environment.MachineName,
+                Agent = Environment.MachineName,
                 CpuPercentUsage = (int)_cpuCounter.NextValue(),
             };
 
