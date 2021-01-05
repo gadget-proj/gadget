@@ -1,13 +1,12 @@
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Gadget.Messaging.Contracts.Commands;
 using Gadget.Messaging.SignalR;
 using Gadget.Server.Domain.Entities;
 using MassTransit;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Gadget.Server.Agents.Consumers
 {

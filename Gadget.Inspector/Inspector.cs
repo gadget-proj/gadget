@@ -1,16 +1,15 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.ServiceProcess;
-using System.Threading;
-using System.Threading.Tasks;
-using Gadget.Messaging;
 using Gadget.Messaging.Contracts.Commands;
 using Gadget.Messaging.Contracts.Events;
 using Gadget.Messaging.SignalR;
 using MassTransit;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.ServiceProcess;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Gadget.Inspector
 {
@@ -20,11 +19,15 @@ namespace Gadget.Inspector
         private readonly ILogger<Inspector> _logger;
         private readonly IDictionary<string, ServiceControllerStatus> _services =
             new Dictionary<string, ServiceControllerStatus>();
+        private readonly InspectorResources _inspectorResources;
 
-        public Inspector(IPublishEndpoint publishEndpoint, ILogger<Inspector> logger)
+        public Inspector(IPublishEndpoint publishEndpoint, 
+            ILogger<Inspector> logger,
+            InspectorResources inspectorResources)
         {
             _publishEndpoint = publishEndpoint;
             _logger = logger;
+            _inspectorResources = inspectorResources;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -58,10 +61,13 @@ namespace Gadget.Inspector
                         Status = current.ToString()
                     }, stoppingToken);
                 }
-
+                var metrics = _inspectorResources.CheckMachineHealth();
+                await _publishEndpoint.Publish<IMetricsData>(metrics);
                 await Task.Delay(TimeSpan.FromSeconds(1), stoppingToken);
             }
         }
+
+
 
         private async Task RegisterAgent(CancellationToken stoppingToken)
         {

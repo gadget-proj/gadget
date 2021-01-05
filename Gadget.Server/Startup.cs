@@ -27,6 +27,7 @@ namespace Gadget.Server
             {
                 x.AddConsumer<ServiceStatusChangedConsumer>();
                 x.AddConsumer<RegisterNewAgentConsumer>();
+                x.AddConsumer<MachineHealthConsumer>();
                 x.UsingRabbitMq((context, cfg) => { cfg.ConfigureEndpoints(context); });
             });
             services.AddMassTransitHostedService();

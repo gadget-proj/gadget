@@ -30,42 +30,40 @@ namespace Gadget.Server.Agents
         public async Task<IActionResult> GetAllAgents()
         {
             var agents = await _context.Agents
-                .Include(a=>a.Services)
                 .ToListAsync();
             var keys = _agents.Select(a => a.Name.Replace("-", ""));
             return await Task.FromResult<IActionResult>(Ok(agents.Select(a => new AgentDto
             {
-                Name = a.Name,
-                Services = a.Services.Select(s => new ServiceDto
-                {
-                    Name = s.Name,
-                    Status = s.Status
-                })
+                Name = a.Name
             })));
         }
 
         [HttpGet("{agent}")]
+        [Route("machine/{agent}")]
         public Task<IActionResult> GetAgentInfo(string agent)
         {
-            var services = _agents.FirstOrDefault(a => a.Name.Replace("-", "") == agent)?.Services;
+            var machine = _context.Agents
+               .Include(a => a.Services)
+               .FirstOrDefault(x=>x.Name == agent);
+            var services = machine?.Services;
             return services is null
                 ? Task.FromResult<IActionResult>(NotFound())
-                : Task.FromResult<IActionResult>(Ok(services));
+                : Task.FromResult<IActionResult>(Ok(services.Select(s=>new ServiceDto(s.Name, s.Status))));
         }
 
-        [HttpGet("{agent}/start")]
-        public async Task<IActionResult> StartService(string agent)
+        [HttpGet("{service}/start")]
+        public async Task<IActionResult> StartService(string service)
         {
-            var sendEndpoint = await _busControl.GetSendEndpoint(new Uri($"exchange:{agent}"));
-            await sendEndpoint.Send<IStartService>(new { }, context => { context.SetRoutingKey(agent); });
+            var sendEndpoint = await _busControl.GetSendEndpoint(new Uri($"exchange:{service}"));
+            await sendEndpoint.Send<IStartService>(new { }, context => { context.SetRoutingKey(service); });
             return Accepted();
         }
 
-        [HttpGet("{agent}/stop")]
-        public async Task<IActionResult> StopService(string agent)
+        [HttpGet("{service}/stop")]
+        public async Task<IActionResult> StopService(string service)
         {
-            var sendEndpoint = await _busControl.GetSendEndpoint(new Uri($"exchange:{agent}"));
-            await sendEndpoint.Send<IStartService>(new { }, context => { context.SetRoutingKey(agent); });
+            var sendEndpoint = await _busControl.GetSendEndpoint(new Uri($"exchange:{service}"));
+            await sendEndpoint.Send<IStartService>(new { }, context => { context.SetRoutingKey(service); });
             return Accepted();
         }
 
