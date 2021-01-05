@@ -46,9 +46,7 @@ namespace Gadget.Server
             });
 
             services.AddSignalR();
-            services.AddControllers().AddNewtonsoftJson(options =>
-                options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
-);
+            services.AddControllers();
             services.AddSingleton<ICollection<Agent>>(new List<Agent>());
         }
 

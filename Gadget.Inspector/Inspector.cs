@@ -1,5 +1,4 @@
 using Gadget.Messaging.Contracts.Commands;
-using Gadget.Messaging.Contracts.Data;
 using Gadget.Messaging.Contracts.Events;
 using Gadget.Messaging.SignalR;
 using MassTransit;

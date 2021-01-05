@@ -7,7 +7,13 @@ namespace Gadget.Server.Agents.Dto
 
     public class ServiceDto
     {
-        public string Name { get; set; }
-        public string Status { get; set; }
+        public ServiceDto(string name, string status)
+        {
+            Name = name;
+            Status = status;
+        }
+
+        public string Name {get;}
+        public string Status {get;}
     }
 }

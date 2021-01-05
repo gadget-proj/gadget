@@ -1,4 +1,4 @@
-﻿namespace Gadget.Messaging.Contracts.Data
+﻿namespace Gadget.Messaging.Contracts.Events
 {
     public interface IMetricsData
     {

@@ -48,7 +48,7 @@ namespace Gadget.Server.Agents
             var services = machine?.Services;
             return services is null
                 ? Task.FromResult<IActionResult>(NotFound())
-                : Task.FromResult<IActionResult>(Ok(services));
+                : Task.FromResult<IActionResult>(Ok(services.Select(s=>new ServiceDto(s.Name, s.Status))));
         }
 
         [HttpGet("{service}/start")]

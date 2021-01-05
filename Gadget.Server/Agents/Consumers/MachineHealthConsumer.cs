@@ -1,10 +1,9 @@
-﻿using Gadget.Messaging.Contracts.Data;
+﻿using Gadget.Messaging.Contracts.Events;
 using Gadget.Messaging.SignalR;
 using Gadget.Server.Hubs;
 using MassTransit;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
-using System;
 using System.Threading.Tasks;
 
 namespace Gadget.Server.Agents.Consumers
