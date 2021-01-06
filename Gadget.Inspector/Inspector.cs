@@ -62,6 +62,9 @@ namespace Gadget.Inspector
                     }, stoppingToken);
                 }
                 var metrics = _inspectorResources.CheckMachineHealth();
+                var services = ServiceController.GetServices();
+                metrics.ServicesCount = services.Count();
+                metrics.ServicesRunning = services.Where(x => x.Status == ServiceControllerStatus.Running).Count();
                 await _publishEndpoint.Publish<IMetricsData>(metrics);
                 await Task.Delay(TimeSpan.FromSeconds(1), stoppingToken);
             }

@@ -28,7 +28,9 @@ namespace Gadget.Server.Agents.Consumers
                 MemoryFree = context.Message.MemoryFree,
                 MemoryTotal = context.Message.MemoryTotal,
                 DiscTotal = context.Message.DiscTotal,
-                DiscOccupied = context.Message.DiscOccupied
+                DiscOccupied = context.Message.DiscOccupied,
+                ServicesCount = context.Message.ServicesCount,
+                ServicesRunning  = context.Message.ServicesRunning
             });
         }
     }
