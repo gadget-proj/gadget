@@ -43,7 +43,7 @@ namespace Gadget.Server.Agents.Consumers
             {
                 //I dont like this, TODO check MassTransit serialization constraints
                 var service = JsonConvert.DeserializeObject<ServiceDescriptor>(s.ToString());
-                return new Service(service?.Name, service?.Status, agent);
+                return new Service(service?.Name, service?.Status, agent, service?.LogOnAs, service?.Description);
             }));
             _agents.Add(agent);
 

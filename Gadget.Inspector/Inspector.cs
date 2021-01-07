@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Management;
 using System.ServiceProcess;
 using System.Threading;
 using System.Threading.Tasks;
@@ -81,9 +82,27 @@ namespace Gadget.Inspector
                 Services = ServiceController.GetServices().Select(s => new ServiceDescriptor
                 {
                     Name = s.ServiceName,
-                    Status = s.Status.ToString()
+                    Status = s.Status.ToString(), 
+                    LogOnAs = GetServiceUser(s.ServiceName),
+                    Description = GetServiceDescription(s.ServiceName)
                 })
             }, stoppingToken);
+        }
+
+        private string GetServiceUser(string serviceName)
+        {
+            //ManagementObject wmiService = new ManagementObject("Win32_Service.Name='" + serviceName + "'");
+            //wmiService.Get();
+            //return  wmiService["startname"].ToString();
+            return "User Florek";
+        }
+
+        private string GetServiceDescription(string serviceName)
+        {
+            //ManagementObject service = new ManagementObject(new ManagementPath(string.Format("Win32_Service.Name='{0}'", serviceName)));
+            //return service["Description"].ToString();
+            return "lucek";
+
         }
     }
 }
