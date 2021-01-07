@@ -91,18 +91,20 @@ namespace Gadget.Inspector
 
         private string GetServiceUser(string serviceName)
         {
-            //ManagementObject wmiService = new ManagementObject("Win32_Service.Name='" + serviceName + "'");
+            //var command = $"Win32_Service.Name='{serviceName}'";
+            //var wmiService = new ManagementObject(command);
             //wmiService.Get();
-            //return  wmiService["startname"].ToString();
-            return "User Florek";
+            //return wmiService["startname"].ToString();
+            return "fdsddgdg";
         }
 
         private string GetServiceDescription(string serviceName)
         {
-            //ManagementObject service = new ManagementObject(new ManagementPath(string.Format("Win32_Service.Name='{0}'", serviceName)));
-            //return service["Description"].ToString();
-            return "lucek";
-
+            //var command = $"Win32_Service.Name='{serviceName}'";
+            //var wmiService = new ManagementObject(command);
+            //var tmp = wmiService["Description"].ToString();
+            //return tmp;
+            return "fddfdf";
         }
     }
 }
