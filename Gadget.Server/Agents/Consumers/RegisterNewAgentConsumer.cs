@@ -38,7 +38,7 @@ namespace Gadget.Server.Agents.Consumers
                 return;
             }
 
-            var agent = new Agent(context.Message.Agent);
+            var agent = new Agent(context.Message.Agent, context.Message.Address);
             agent.AddServices(context.Message.Services?.Select(s =>
             {
                 //I dont like this, TODO check MassTransit serialization constraints

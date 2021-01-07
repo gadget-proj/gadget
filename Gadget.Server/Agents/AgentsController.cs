@@ -34,7 +34,8 @@ namespace Gadget.Server.Agents
             var keys = _agents.Select(a => a.Name.Replace("-", ""));
             return await Task.FromResult<IActionResult>(Ok(agents.Select(a => new AgentDto
             {
-                Name = a.Name
+                Name = a.Name,
+                Address = a.Address
             })));
         }
 

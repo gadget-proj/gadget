@@ -10,9 +10,10 @@ namespace Gadget.Server.Domain.Entities
         private readonly ICollection<Service> _services = new List<Service>();
         public Guid Id { get; private set; }
 
-        public Agent(string name)
+        public Agent(string name, string address)
         {
             Name = name;
+            Address = address;
             Id = Guid.NewGuid();
         }
 
@@ -22,7 +23,7 @@ namespace Gadget.Server.Domain.Entities
 
         public string Name { get; }
         public IEnumerable<Service> Services => _services.ToImmutableList();
-
+        public string Address { get; set; }
         public void AddService(Service service)
         {
             _services.Add(service);

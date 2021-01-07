@@ -19,6 +19,7 @@ namespace Gadget.Server
             modelBuilder.Entity<Service>(builder => builder.Property(a => a.LogOnAs));
             modelBuilder.Entity<Service>(builder => builder.Property(a => a.Description));
             modelBuilder.Entity<Agent>(builder => builder.Property(a => a.Name));
+            modelBuilder.Entity<Agent>(builder => builder.Property(a => a.Address));
         }
 
         public DbSet<Agent> Agents { get; set; }
