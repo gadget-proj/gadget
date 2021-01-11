@@ -26,11 +26,4 @@
       <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.1" />
     </ItemGroup>
 
-    
-    <ItemGroup>
-      <None Update="gadget.db">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
-    </ItemGroup>
-
 </Project>

@@ -16,10 +16,10 @@ services:
       - rabbitmq
     environment:
       - MT_RMQ__HOST=rabbitmq
-  seq:
-    image: "datalust/seq:latest"
-    environment:
-      - ACCEPT_EULA=Y
-    ports:
-      - 5341:5341
-      - 4444:80
+#  seq:
+#    image: "datalust/seq:latest"
+#    environment:
+#      - ACCEPT_EULA=Y
+#    ports:
+#      - 5341:5341
+#      - 4444:80
