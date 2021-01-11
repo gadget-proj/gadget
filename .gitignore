@@ -339,3 +339,4 @@ ASALocalRun/
 # BeatPulse healthcheck temp database
 healthchecksdb
 /Gadget.Hub/Properties
+/Gadget.Server/gadget.db
