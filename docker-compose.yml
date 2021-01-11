@@ -8,7 +8,8 @@ services:
       - 15672:15672
   gadget:
     build:
-      context: Gadget.Server
+      context: .
+      dockerfile: Dockerfile.server
     ports:
       - 5000:5000
   seq:
