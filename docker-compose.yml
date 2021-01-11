@@ -6,6 +6,11 @@ services:
       - 5672:5672
       - 5673:5673
       - 15672:15672
+  gadget:
+    build:
+      context: .
+    ports:
+      - 5000:5000
   seq:
     image: "datalust/seq:latest"
     environment:

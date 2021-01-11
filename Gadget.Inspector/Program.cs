@@ -35,6 +35,12 @@ namespace Gadget.Inspector
                         x.AddConsumers(Assembly.GetExecutingAssembly());
                         x.UsingRabbitMq((context, cfg) =>
                         {
+                            cfg.Host("ec2-18-130-225-41.eu-west-2.compute.amazonaws.com",
+                                configurator =>
+                                {
+                                    configurator.Username("guest");
+                                    configurator.Password("guest");
+                                });
                             var id = Environment.MachineName;
                             cfg.ReceiveEndpoint(id, e =>
                             {
