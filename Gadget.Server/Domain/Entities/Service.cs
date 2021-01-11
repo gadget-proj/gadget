@@ -5,11 +5,13 @@ namespace Gadget.Server.Domain.Entities
 {
     public class Service
     {
-        public Service(string name, string status, Agent agent)
+        public Service(string name, string status, Agent agent, string logOnAs, string description)
         {
             Name = name;
             Status = status;
             Agent = agent;
+            LogOnAs = logOnAs;
+            Description = description;
             Id = Guid.NewGuid();
         }
 
@@ -20,6 +22,8 @@ namespace Gadget.Server.Domain.Entities
         public Guid Id { get; }
         public string Name { get; }
         public string Status { get; set; }
+        public string LogOnAs { get; set; }
+        public string Description { get; set; }
 
         public Agent Agent { get; }
 

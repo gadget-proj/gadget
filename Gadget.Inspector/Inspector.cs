@@ -7,6 +7,8 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Management;
+using System.Net;
 using System.ServiceProcess;
 using System.Threading;
 using System.Threading.Tasks;
@@ -62,6 +64,9 @@ namespace Gadget.Inspector
                     }, stoppingToken);
                 }
                 var metrics = _inspectorResources.CheckMachineHealth();
+                var services = ServiceController.GetServices();
+                metrics.ServicesCount = services.Count();
+                metrics.ServicesRunning = services.Where(x => x.Status == ServiceControllerStatus.Running).Count();
                 await _publishEndpoint.Publish<IMetricsData>(metrics);
                 await Task.Delay(TimeSpan.FromSeconds(1), stoppingToken);
             }
@@ -71,16 +76,58 @@ namespace Gadget.Inspector
 
         private async Task RegisterAgent(CancellationToken stoppingToken)
         {
+            var tmp = Dns.GetHostEntry(Dns.GetHostName());
+
             _logger.LogInformation($"Registering new agent {Environment.MachineName}");
             await _publishEndpoint.Publish<IRegisterNewAgent>(new
             {
                 Agent = Environment.MachineName,
+                Address = GetAddress(),
                 Services = ServiceController.GetServices().Select(s => new ServiceDescriptor
                 {
                     Name = s.ServiceName,
-                    Status = s.Status.ToString()
+                    Status = s.Status.ToString(), 
+                    LogOnAs = GetServiceUser(s.ServiceName),
+                    Description = GetServiceDescription(s.ServiceName)
                 })
             }, stoppingToken);
+        }
+
+        private string GetAddress()
+        {
+            var adresses = Dns.GetHostEntry(Dns.GetHostName()).AddressList;
+            return adresses.FirstOrDefault(x => x.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork).ToString();
+        }
+
+        private string GetServiceUser(string serviceName)
+        {
+            string output = "";
+            var command = $"Win32_Service.Name='{serviceName}'";
+            var wmiService = new ManagementObject(command);
+            wmiService.Get();
+            try
+            {
+                output =  wmiService["startname"].ToString();
+            }
+            catch (Exception e)
+            {
+            }
+            return output;
+        }
+
+        private string GetServiceDescription(string serviceName)
+        {
+            string output = "";
+            var command = $"Win32_Service.Name='{serviceName}'";
+            var wmiService = new ManagementObject(command);
+            try
+            {
+                output = wmiService["Description"].ToString();
+            }
+            catch (Exception e)
+            {
+            }
+            return output;
         }
     }
 }

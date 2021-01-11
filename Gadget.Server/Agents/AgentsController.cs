@@ -34,7 +34,8 @@ namespace Gadget.Server.Agents
             var keys = _agents.Select(a => a.Name.Replace("-", ""));
             return await Task.FromResult<IActionResult>(Ok(agents.Select(a => new AgentDto
             {
-                Name = a.Name
+                Name = a.Name,
+                Address = a.Address
             })));
         }
 
@@ -48,7 +49,7 @@ namespace Gadget.Server.Agents
             var services = machine?.Services;
             return services is null
                 ? Task.FromResult<IActionResult>(NotFound())
-                : Task.FromResult<IActionResult>(Ok(services.Select(s=>new ServiceDto(s.Name, s.Status))));
+                : Task.FromResult<IActionResult>(Ok(services.Select(s=>new ServiceDto(s.Name, s.Status, s.LogOnAs, s.Description))));
         }
 
         [HttpGet("{service}/start")]

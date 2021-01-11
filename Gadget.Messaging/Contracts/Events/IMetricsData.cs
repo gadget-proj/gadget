@@ -8,5 +8,7 @@
         float MemoryTotal {get;}
         int DiscTotal {get;}
         int DiscOccupied { get;}
+        int ServicesCount {get;}
+        int ServicesRunning {get;}
     }
 }
