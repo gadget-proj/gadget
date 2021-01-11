@@ -12,6 +12,10 @@ services:
       dockerfile: Dockerfile.server
     ports:
       - 5000:5000
+    depends_on:
+      - rabbitmq
+    environment:
+      - MT_RMQ__HOST=rabbitmq
   seq:
     image: "datalust/seq:latest"
     environment:

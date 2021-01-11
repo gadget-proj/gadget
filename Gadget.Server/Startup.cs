@@ -29,7 +29,16 @@ namespace Gadget.Server
                 x.AddConsumer<ServiceStatusChangedConsumer>();
                 x.AddConsumer<RegisterNewAgentConsumer>();
                 x.AddConsumer<MachineHealthConsumer>();
-                x.UsingRabbitMq((context, cfg) => { cfg.ConfigureEndpoints(context); });
+                x.UsingRabbitMq((context, cfg) =>
+                {
+                    cfg.Host(Configuration.GetConnectionString("RabbitMq"),
+                        configurator =>
+                        {
+                            configurator.Username("guest");
+                            configurator.Password("guest");
+                        });
+                    cfg.ConfigureEndpoints(context);
+                });
             });
             services.AddMassTransitHostedService();
             services.AddCors(options =>
