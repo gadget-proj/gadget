@@ -35,6 +35,12 @@ namespace Gadget.Inspector
                         x.AddConsumers(Assembly.GetExecutingAssembly());
                         x.UsingRabbitMq((context, cfg) =>
                         {
+                            cfg.Host(host.Configuration.GetConnectionString("RabbitMq"),
+                                configurator =>
+                                {
+                                    configurator.Username("guest");
+                                    configurator.Password("guest");
+                                });
                             var id = Environment.MachineName;
                             cfg.ReceiveEndpoint(id, e =>
                             {

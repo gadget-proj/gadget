@@ -28,7 +28,16 @@ namespace Gadget.Server
                 x.AddConsumer<ServiceStatusChangedConsumer>();
                 x.AddConsumer<RegisterNewAgentConsumer>();
                 x.AddConsumer<MachineHealthConsumer>();
-                x.UsingRabbitMq((context, cfg) => { cfg.ConfigureEndpoints(context); });
+                x.UsingRabbitMq((context, cfg) =>
+                {
+                    cfg.Host(Configuration.GetConnectionString("RabbitMq"),
+                        configurator =>
+                        {
+                            configurator.Username("guest");
+                            configurator.Password("guest");
+                        });
+                    cfg.ConfigureEndpoints(context);
+                });
             });
             services.AddMassTransitHostedService();
             services.AddCors(options =>
@@ -52,6 +61,16 @@ namespace Gadget.Server
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            using (var serviceScope = app.ApplicationServices
+                .GetRequiredService<IServiceScopeFactory>()
+                .CreateScope())
+            {
+                using (var context = serviceScope.ServiceProvider.GetService<GadgetContext>())
+                {
+                    context?.Database.Migrate();
+                    
+                }
+            }
             if (env.IsDevelopment()) app.UseDeveloperExceptionPage();
             app.UseCors("AllowAll");
             app.UseRouting();
