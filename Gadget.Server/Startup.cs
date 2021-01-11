@@ -22,8 +22,7 @@ namespace Gadget.Server
         public IConfiguration Configuration { get; private set; }
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<GadgetContext>();
-            // services.AddDbContext<GadgetContext>(builder => builder.UseSqlite("Data Source=gadget.db"));
+            services.AddDbContext<GadgetContext>(builder => builder.UseSqlite("Data Source=gadget.db"));
             services.AddMassTransit(x =>
             {
                 x.AddConsumer<ServiceStatusChangedConsumer>();
