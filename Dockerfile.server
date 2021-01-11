@@ -9,8 +9,11 @@ COPY . .
 WORKDIR "/app/Gadget.Server"
 RUN dotnet build "Gadget.Server.csproj" -c Release -o /app/build
 
+
 FROM build AS publish
 RUN dotnet publish "Gadget.Server.csproj" -c Release -o /app/publish
+
+
 
 FROM publish AS final
 WORKDIR /app

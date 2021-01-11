@@ -61,6 +61,16 @@ namespace Gadget.Server
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            using (var serviceScope = app.ApplicationServices
+                .GetRequiredService<IServiceScopeFactory>()
+                .CreateScope())
+            {
+                using (var context = serviceScope.ServiceProvider.GetService<GadgetContext>())
+                {
+                    context?.Database.Migrate();
+                    
+                }
+            }
             if (env.IsDevelopment()) app.UseDeveloperExceptionPage();
             app.UseCors("AllowAll");
             app.UseRouting();
