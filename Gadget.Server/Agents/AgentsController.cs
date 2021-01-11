@@ -8,6 +8,7 @@ using Gadget.Server.Domain.Entities;
 using MassTransit;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace Gadget.Server.Agents
 {
@@ -18,12 +19,13 @@ namespace Gadget.Server.Agents
         private readonly ICollection<Agent> _agents;
         private readonly IBusControl _busControl;
         private readonly GadgetContext _context;
-
-        public AgentsController(ICollection<Agent> agents, IBusControl busControl, GadgetContext context)
+        private readonly ILogger<AgentsController> _logger;
+        public AgentsController(ICollection<Agent> agents, IBusControl busControl, GadgetContext context, ILogger<AgentsController> logger)
         {
             _agents = agents;
             _busControl = busControl;
             _context = context;
+            _logger = logger;
         }
 
         [HttpGet]
@@ -54,7 +56,8 @@ namespace Gadget.Server.Agents
 
         [HttpGet("{service}/start")]
         public async Task<IActionResult> StartService(string service)
-        {
+        {   
+            _logger.LogInformation(service);
             var sendEndpoint = await _busControl.GetSendEndpoint(new Uri($"exchange:{service}"));
             await sendEndpoint.Send<IStartService>(new { }, context => { context.SetRoutingKey(service); });
             return Accepted();
