@@ -40,7 +40,6 @@ namespace Gadget.Server.Agents
         }
 
         [HttpGet("{agent}")]
-        [Route("machine/{agent}")]
         public Task<IActionResult> GetAgentInfo(string agent)
         {
             var machine = _context.Agents
@@ -52,7 +51,7 @@ namespace Gadget.Server.Agents
                 : Task.FromResult<IActionResult>(Ok(services.Select(s=>new ServiceDto(s.Name, s.Status, s.LogOnAs, s.Description))));
         }
 
-        [HttpGet("{service}/start")]
+        [HttpPost("{service}/start")]
         public async Task<IActionResult> StartService(string service)
         {
             var sendEndpoint = await _busControl.GetSendEndpoint(new Uri($"exchange:{service}"));
@@ -60,7 +59,7 @@ namespace Gadget.Server.Agents
             return Accepted();
         }
 
-        [HttpGet("{service}/stop")]
+        [HttpPost("{service}/stop")]
         public async Task<IActionResult> StopService(string service)
         {
             var sendEndpoint = await _busControl.GetSendEndpoint(new Uri($"exchange:{service}"));
