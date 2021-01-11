@@ -8,5 +8,7 @@
         public float MemoryTotal { get; set; }
         public int DiscTotal { get; set; }
         public int DiscOccupied { get; set; }
+        public int ServicesCount { get; set; }
+        public int ServicesRunning { get; set; }
     }
 }
