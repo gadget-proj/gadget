@@ -56,19 +56,27 @@ namespace Gadget.Server.Agents
                     new ServiceDto(s.Name, s.Status, s.LogOnAs, s.Description))));
         }
 
-        [HttpPost("{service}/start")]
-        public async Task<IActionResult> StartService(string service)
+        [HttpGet("{agent}/{service}/start")]
+        public async Task<IActionResult> StartService(string agent, string service)
         {
-            var sendEndpoint = await _busControl.GetSendEndpoint(new Uri($"exchange:{service}"));
-            await sendEndpoint.Send<IStartService>(new { }, context => { context.SetRoutingKey(service); });
+            await _publishEndpoint.Publish<IStartService>(new
+            {
+                ServiceName = service,
+                Agent = agent
+            },
+                context => { context.SetRoutingKey(service); });
             return Accepted();
         }
 
-        [HttpPost("{service}/stop")]
-        public async Task<IActionResult> StopService(string service)
+        [HttpGet("{agent}/{service}/stop")]
+        public async Task<IActionResult> StopService(string agent, string service)
         {
-            var sendEndpoint = await _busControl.GetSendEndpoint(new Uri($"exchange:{service}"));
-            await sendEndpoint.Send<IStartService>(new { }, context => { context.SetRoutingKey(service); });
+            await _publishEndpoint.Publish<IStopService>(new
+            {
+                ServiceName = service,
+                Agent = agent
+            },
+                context => { context.SetRoutingKey(service); });
             return Accepted();
         }
 
