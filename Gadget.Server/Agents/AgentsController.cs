@@ -17,15 +17,17 @@ namespace Gadget.Server.Agents
     public class AgentsController : ControllerBase
     {
         private readonly ICollection<Agent> _agents;
-        private readonly IBusControl _busControl;
+        private readonly IPublishEndpoint _publishEndpoint;
         private readonly GadgetContext _context;
         private readonly ILogger<AgentsController> _logger;
-        public AgentsController(ICollection<Agent> agents, IBusControl busControl, GadgetContext context, ILogger<AgentsController> logger)
+
+        public AgentsController(ICollection<Agent> agents, GadgetContext context, ILogger<AgentsController> logger,
+            IPublishEndpoint publishEndpoint)
         {
             _agents = agents;
-            _busControl = busControl;
             _context = context;
             _logger = logger;
+            _publishEndpoint = publishEndpoint;
         }
 
         [HttpGet]
@@ -46,28 +48,36 @@ namespace Gadget.Server.Agents
         public Task<IActionResult> GetAgentInfo(string agent)
         {
             var machine = _context.Agents
-               .Include(a => a.Services)
-               .FirstOrDefault(x=>x.Name == agent);
+                .Include(a => a.Services)
+                .FirstOrDefault(x => x.Name == agent);
             var services = machine?.Services;
             return services is null
                 ? Task.FromResult<IActionResult>(NotFound())
-                : Task.FromResult<IActionResult>(Ok(services.Select(s=>new ServiceDto(s.Name, s.Status, s.LogOnAs, s.Description))));
+                : Task.FromResult<IActionResult>(Ok(services.Select(s =>
+                    new ServiceDto(s.Name, s.Status, s.LogOnAs, s.Description))));
         }
 
-        [HttpGet("{service}/start")]
-        public async Task<IActionResult> StartService(string service)
-        {   
-            _logger.LogInformation(service);
-            var sendEndpoint = await _busControl.GetSendEndpoint(new Uri($"exchange:{service}"));
-            await sendEndpoint.Send<IStartService>(new { }, context => { context.SetRoutingKey(service); });
+        [HttpGet("{agent}/{service}/start")]
+        public async Task<IActionResult> StartService(string agent, string service)
+        {
+            await _publishEndpoint.Publish<IStartService>(new
+                {
+                    ServiceName = service,
+                    Agent = agent
+                },
+                context => { context.SetRoutingKey(service); });
             return Accepted();
         }
 
-        [HttpGet("{service}/stop")]
-        public async Task<IActionResult> StopService(string service)
+        [HttpGet("{agent}/{service}/stop")]
+        public async Task<IActionResult> StopService(string agent, string service)
         {
-            var sendEndpoint = await _busControl.GetSendEndpoint(new Uri($"exchange:{service}"));
-            await sendEndpoint.Send<IStartService>(new { }, context => { context.SetRoutingKey(service); });
+            await _publishEndpoint.Publish<IStopService>(new
+                {
+                    ServiceName = service,
+                    Agent = agent
+                },
+                context => { context.SetRoutingKey(service); });
             return Accepted();
         }
 

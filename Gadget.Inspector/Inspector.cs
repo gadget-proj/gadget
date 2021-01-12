@@ -67,7 +67,7 @@ namespace Gadget.Inspector
                 var services = ServiceController.GetServices();
                 metrics.ServicesCount = services.Count();
                 metrics.ServicesRunning = services.Where(x => x.Status == ServiceControllerStatus.Running).Count();
-                await _publishEndpoint.Publish<IMetricsData>(metrics);
+                // await _publishEndpoint.Publish<IMetricsData>(metrics);
                 await Task.Delay(TimeSpan.FromSeconds(1), stoppingToken);
             }
         }
