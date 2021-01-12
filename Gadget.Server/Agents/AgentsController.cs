@@ -44,7 +44,6 @@ namespace Gadget.Server.Agents
         }
 
         [HttpGet("{agent}")]
-        [Route("machine/{agent}")]
         public Task<IActionResult> GetAgentInfo(string agent)
         {
             var machine = _context.Agents
@@ -57,31 +56,31 @@ namespace Gadget.Server.Agents
                     new ServiceDto(s.Name, s.Status, s.LogOnAs, s.Description))));
         }
 
-        [HttpGet("{agent}/{service}/start")]
+        [HttpPost("{agent}/{service}/start")]
         public async Task<IActionResult> StartService(string agent, string service)
         {
             await _publishEndpoint.Publish<IStartService>(new
-                {
-                    ServiceName = service,
-                    Agent = agent
-                },
-                context => { context.SetRoutingKey(service); });
+            {
+                ServiceName = service,
+                Agent = agent
+            },
+               context => { context.SetRoutingKey(service); });
             return Accepted();
         }
 
-        [HttpGet("{agent}/{service}/stop")]
+        [HttpPost("{agent}/{service}/stop")]
         public async Task<IActionResult> StopService(string agent, string service)
         {
             await _publishEndpoint.Publish<IStopService>(new
-                {
-                    ServiceName = service,
-                    Agent = agent
-                },
+            {
+                ServiceName = service,
+                Agent = agent
+            },
                 context => { context.SetRoutingKey(service); });
             return Accepted();
         }
 
-        [HttpGet("{agent}/{serviceName}")]
+        [HttpPost("{agent}/{serviceName}")]
         public async Task<IActionResult> GetServiceInfo(string agent, string serviceName)
         {
             var service = _agents.FirstOrDefault(a => a.Name.Replace("-", "") == agent)?.Services
