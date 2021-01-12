@@ -44,38 +44,15 @@ namespace Gadget.Inspector
                                     configurator.Username("guest");
                                     configurator.Password("guest");
                                 });
-                            cfg.ReceiveEndpoint("event-listener", e =>
+                            cfg.ReceiveEndpoint("gadget", e =>
                             {
                                 e.ConfigureConsumer<StartServiceConsumer>(context);
                                 e.ConfigureConsumer<StopServiceConsumer>(context);
                             });
                         });
-                        // x.UsingRabbitMq((context, cfg) =>
-                        // {
-                        //     x.AddConsumer<StartServiceConsumer>();
-                        //     x.AddConsumer<StopServiceConsumer>();
-                        //
-                        //
-                        //     // cfg.ConfigureEndpoints(context);
-                        //
-                        //     // var id = Environment.MachineName;
-                        //     // cfg.ReceiveEndpoint(id, e =>
-                        //     // {
-                        //     //     e.Bind<IStopService>(c =>
-                        //     //     {
-                        //     //         c.RoutingKey = id;
-                        //     //         c.ExchangeType = ExchangeType.Direct;
-                        //     //     });
-                        //     //     e.Bind<IStartService>(c =>
-                        //     //     {
-                        //     //         c.RoutingKey = id;
-                        //     //         c.ExchangeType = ExchangeType.Direct;
-                        //     //     });
-                        //     // });
-                        // });
+                       
                     });
                     services.AddMassTransitHostedService();
-                    // services.AddHostedService<Inspector>();
                     services.AddHostedService<Inspector>();
                     services.AddLogging(options => options.AddConsole());
                     services.AddScoped(_ => new PerformanceCounter("Processor", "% Processor Time", "_Total"));
