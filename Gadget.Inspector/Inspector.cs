@@ -65,9 +65,9 @@ namespace Gadget.Inspector
                 }
                 var metrics = _inspectorResources.CheckMachineHealth();
                 var services = ServiceController.GetServices();
-                metrics.ServicesCount = services.Count();
-                metrics.ServicesRunning = services.Where(x => x.Status == ServiceControllerStatus.Running).Count();
-                await _publishEndpoint.Publish<IMetricsData>(metrics);
+                metrics.ServicesCount = services.Length;
+                metrics.ServicesRunning = services.Count(x => x.Status == ServiceControllerStatus.Running);
+                await _publishEndpoint.Publish<IMetricsData>(metrics, stoppingToken);
                 await Task.Delay(TimeSpan.FromSeconds(1), stoppingToken);
             }
         }
@@ -76,8 +76,6 @@ namespace Gadget.Inspector
 
         private async Task RegisterAgent(CancellationToken stoppingToken)
         {
-            var tmp = Dns.GetHostEntry(Dns.GetHostName());
-
             _logger.LogInformation($"Registering new agent {Environment.MachineName}");
             await _publishEndpoint.Publish<IRegisterNewAgent>(new
             {
@@ -93,15 +91,15 @@ namespace Gadget.Inspector
             }, stoppingToken);
         }
 
-        private string GetAddress()
+        private static string GetAddress()
         {
-            var adresses = Dns.GetHostEntry(Dns.GetHostName()).AddressList;
-            return adresses.FirstOrDefault(x => x.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork).ToString();
+            var addresses = Dns.GetHostEntry(Dns.GetHostName()).AddressList;
+            return addresses.FirstOrDefault(x => x.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)?.ToString();
         }
 
-        private string GetServiceUser(string serviceName)
+        private static string GetServiceUser(string serviceName)
         {
-            string output = "";
+            var output = "";
             var command = $"Win32_Service.Name='{serviceName}'";
             var wmiService = new ManagementObject(command);
             wmiService.Get();
@@ -111,13 +109,15 @@ namespace Gadget.Inspector
             }
             catch (Exception e)
             {
+                // ignored
             }
+
             return output;
         }
 
-        private string GetServiceDescription(string serviceName)
+        private static string GetServiceDescription(string serviceName)
         {
-            string output = "";
+            var output = "";
             var command = $"Win32_Service.Name='{serviceName}'";
             var wmiService = new ManagementObject(command);
             try
@@ -126,7 +126,9 @@ namespace Gadget.Inspector
             }
             catch (Exception e)
             {
+                // ignored
             }
+
             return output;
         }
     }

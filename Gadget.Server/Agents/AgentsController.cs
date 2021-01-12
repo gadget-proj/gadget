@@ -8,6 +8,7 @@ using Gadget.Server.Domain.Entities;
 using MassTransit;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace Gadget.Server.Agents
 {
@@ -16,14 +17,17 @@ namespace Gadget.Server.Agents
     public class AgentsController : ControllerBase
     {
         private readonly ICollection<Agent> _agents;
-        private readonly IBusControl _busControl;
+        private readonly IPublishEndpoint _publishEndpoint;
         private readonly GadgetContext _context;
+        private readonly ILogger<AgentsController> _logger;
 
-        public AgentsController(ICollection<Agent> agents, IBusControl busControl, GadgetContext context)
+        public AgentsController(ICollection<Agent> agents, GadgetContext context, ILogger<AgentsController> logger,
+            IPublishEndpoint publishEndpoint)
         {
             _agents = agents;
-            _busControl = busControl;
             _context = context;
+            _logger = logger;
+            _publishEndpoint = publishEndpoint;
         }
 
         [HttpGet]
@@ -43,12 +47,13 @@ namespace Gadget.Server.Agents
         public Task<IActionResult> GetAgentInfo(string agent)
         {
             var machine = _context.Agents
-               .Include(a => a.Services)
-               .FirstOrDefault(x=>x.Name == agent);
+                .Include(a => a.Services)
+                .FirstOrDefault(x => x.Name == agent);
             var services = machine?.Services;
             return services is null
                 ? Task.FromResult<IActionResult>(NotFound())
-                : Task.FromResult<IActionResult>(Ok(services.Select(s=>new ServiceDto(s.Name, s.Status, s.LogOnAs, s.Description))));
+                : Task.FromResult<IActionResult>(Ok(services.Select(s =>
+                    new ServiceDto(s.Name, s.Status, s.LogOnAs, s.Description))));
         }
 
         [HttpPost("{service}/start")]

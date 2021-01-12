@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Reflection;
+using Gadget.Inspector.Consumers;
 using Gadget.Messaging.Contracts.Commands;
 using MassTransit;
 using Microsoft.Extensions.Configuration;
@@ -32,6 +33,8 @@ namespace Gadget.Inspector
                 {
                     services.AddMassTransit(x =>
                     {
+                        x.AddConsumer<StartServiceConsumer>();
+                        x.AddConsumer<StopServiceConsumer>();
                         x.AddConsumers(Assembly.GetExecutingAssembly());
                         x.UsingRabbitMq((context, cfg) =>
                         {
@@ -41,24 +44,15 @@ namespace Gadget.Inspector
                                     configurator.Username("guest");
                                     configurator.Password("guest");
                                 });
-                            var id = Environment.MachineName;
-                            cfg.ReceiveEndpoint(id, e =>
+                            cfg.ReceiveEndpoint("gadget", e =>
                             {
-                                e.Bind<IStopService>(c =>
-                                {
-                                    c.RoutingKey = id;
-                                    c.ExchangeType = ExchangeType.Direct;
-                                });
-                                e.Bind<IStartService>(c =>
-                                {
-                                    c.RoutingKey = id;
-                                    c.ExchangeType = ExchangeType.Direct;
-                                });
+                                e.ConfigureConsumer<StartServiceConsumer>(context);
+                                e.ConfigureConsumer<StopServiceConsumer>(context);
                             });
                         });
+                       
                     });
                     services.AddMassTransitHostedService();
-                    // services.AddHostedService<Inspector>();
                     services.AddHostedService<Inspector>();
                     services.AddLogging(options => options.AddConsole());
                     services.AddScoped(_ => new PerformanceCounter("Processor", "% Processor Time", "_Total"));

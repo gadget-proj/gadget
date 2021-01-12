@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace Gadget.Server
 {
@@ -59,7 +60,7 @@ namespace Gadget.Server
             services.AddSingleton<ICollection<Agent>>(new List<Agent>());
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILogger<Startup> logger)
         {
             using (var serviceScope = app.ApplicationServices
                 .GetRequiredService<IServiceScopeFactory>()
@@ -67,8 +68,8 @@ namespace Gadget.Server
             {
                 using (var context = serviceScope.ServiceProvider.GetService<GadgetContext>())
                 {
-                    context?.Database.Migrate();
-                    
+                    logger.LogCritical("ensurecreated");
+                    context.Database.EnsureCreated();
                 }
             }
             if (env.IsDevelopment()) app.UseDeveloperExceptionPage();
