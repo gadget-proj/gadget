@@ -44,7 +44,7 @@ namespace Gadget.Inspector
                                     configurator.Username("guest");
                                     configurator.Password("guest");
                                 });
-                            cfg.ReceiveEndpoint("gadget", e =>
+                            cfg.ReceiveEndpoint(Environment.MachineName, e =>
                             {
                                 e.ConfigureConsumer<StartServiceConsumer>(context);
                                 e.ConfigureConsumer<StopServiceConsumer>(context);
