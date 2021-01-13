@@ -76,7 +76,7 @@ namespace Gadget.Server
             }
             if (env.IsDevelopment()) app.UseDeveloperExceptionPage();
             app.UseCors("AllowAll");
-            app.UseStaticFiles();
+            app.UseFileServer();
             app.UseRouting();
             app.UseEndpoints(endpoints =>
             {
