@@ -28,7 +28,15 @@ namespace Gadget.Inspector.Consumers
                 throw new ApplicationException($"Service {context.Message.ServiceName} could not be found");
             }
 
-            service.Stop();
+            try
+            {
+                service.Refresh();
+                service.Stop();
+            }
+            catch (Exception e)
+            {
+                _logger.LogCritical(e.Message);
+            }
             return Task.CompletedTask;
         }
     }

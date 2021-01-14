@@ -49,6 +49,8 @@ namespace Gadget.Server
                         corsBuilder
                             .WithOrigins("localhost:3000")
                             .WithOrigins("http://localhost:3000")
+                            .WithOrigins("localhost:5000")
+                            .WithOrigins("http://localhost:5000")
                             .AllowAnyMethod()
                             .AllowAnyHeader()
                             .AllowCredentials();
@@ -74,8 +76,8 @@ namespace Gadget.Server
             }
             if (env.IsDevelopment()) app.UseDeveloperExceptionPage();
             app.UseCors("AllowAll");
+            app.UseFileServer();
             app.UseRouting();
-
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapHub<GadgetHub>("/gadget");
