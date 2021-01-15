@@ -7,8 +7,6 @@ namespace Gadget.Server.Domain.Entities
 {
     public class Agent
     {
-        public Guid Id { get; private set; }
-        private readonly ICollection<Service> _services = new List<Service>();
         public Agent(string name, string address)
         {
             Name = name;
@@ -20,10 +18,13 @@ namespace Gadget.Server.Domain.Entities
         {
         }
 
+        public Guid Id { get; private set; }
+        private readonly ICollection<Service> _services = new List<Service>();
         public string Name { get; }
         public IEnumerable<Service> Services => _services.ToImmutableList();
         public string Address { get; set; }
-        public void AddService(Service service)
+
+        private void AddService(Service service)
         {
             _services.Add(service);
         }
@@ -36,10 +37,11 @@ namespace Gadget.Server.Domain.Entities
         public void ChangeServiceStatus(string serviceName, string newStatus)
         {
             var service = _services.FirstOrDefault(s => s.Name == serviceName);
-            if (service == null)
+            if (service is null)
             {
                 throw new ApplicationException($"Service {serviceName} could not be found on agent {Name}");
             }
+
             service.ChangeStatus(newStatus);
         }
     }

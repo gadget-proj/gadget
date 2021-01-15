@@ -15,16 +15,14 @@ namespace Gadget.Server.Agents.Consumers
 {
     public class ServiceStatusChangedConsumer : IConsumer<IServiceStatusChanged>
     {
-        private readonly IHubContext<GadgetHub> _hub;
         private readonly ILogger<ServiceStatusChangedConsumer> _logger;
         private readonly GadgetContext _context;
         private readonly Channel<Notification> _notifications;
 
-        public ServiceStatusChangedConsumer(ILogger<ServiceStatusChangedConsumer> logger, IHubContext<GadgetHub> hub,
-            GadgetContext context, Channel<Notification> notifications)
+        public ServiceStatusChangedConsumer(ILogger<ServiceStatusChangedConsumer> logger, GadgetContext context,
+            Channel<Notification> notifications)
         {
             _logger = logger;
-            _hub = hub;
             _context = context;
             _notifications = notifications;
         }
@@ -47,14 +45,7 @@ namespace Gadget.Server.Agents.Consumers
             agent.ChangeServiceStatus(service, newStatus);
             _context.Agents.Update(agent);
             await _context.SaveChangesAsync();
-            await _notifications.Writer.WriteAsync(
-                new Notification($"Service : {service} on agent : {agent.Name} has changed its status to {newStatus}"));
-            await _hub.Clients.Group("dashboard").SendAsync("ServiceStatusChanged", new ServiceDescriptor
-            {
-                Agent = context.Message.Agent,
-                Name = context.Message.Name,
-                Status = context.Message.Status
-            });
+            await _notifications.Writer.WriteAsync(new Notification(agent.Name, service, newStatus));
             _logger.LogInformation(
                 $"Agent {context.Message.Agent} Svc {context.Message.Name} Status {context.Message.Status}");
         }
