@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Threading.Channels;
+using Gadget.Server.Agents;
 using Gadget.Server.Agents.Consumers;
 using Gadget.Server.Agents.Services;
 using Gadget.Server.Domain.Entities;
@@ -64,6 +65,7 @@ namespace Gadget.Server
             services.AddSignalR();
             services.AddControllers();
             services.AddSingleton<ICollection<Agent>>(new List<Agent>());
+            services.AddTransient<IAgentsService, AgentsService>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILogger<Startup> logger)
