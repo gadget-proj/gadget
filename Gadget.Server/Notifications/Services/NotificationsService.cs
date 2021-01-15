@@ -5,7 +5,7 @@ using Gadget.Server.Domain.Entities;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace Gadget.Server.Agents.Services
+namespace Gadget.Server.Notifications.Services
 {
     public class NotificationsService : BackgroundService
     {

@@ -29,6 +29,7 @@
 
     
     <ItemGroup>
+      <Folder Include="Notifications" />
       <Folder Include="wwwroot" />
     </ItemGroup>
 
