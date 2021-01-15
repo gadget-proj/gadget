@@ -3,6 +3,7 @@ using System.Threading.Channels;
 using Gadget.Server.Agents;
 using Gadget.Server.Agents.Consumers;
 using Gadget.Server.Domain.Entities;
+using Gadget.Server.Extensions;
 using Gadget.Server.Hubs;
 using Gadget.Server.Notifications.Services;
 using MassTransit;
@@ -27,45 +28,7 @@ namespace Gadget.Server
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<GadgetContext>(builder => builder.UseSqlite("Data Source=gadget.db"));
-            services.AddMassTransit(x =>
-            {
-                x.AddConsumer<ServiceStatusChangedConsumer>();
-                x.AddConsumer<RegisterNewAgentConsumer>();
-                x.AddConsumer<MachineHealthConsumer>();
-                x.UsingRabbitMq((context, cfg) =>
-                {
-                    cfg.Host(Configuration.GetConnectionString("RabbitMq"),
-                        configurator =>
-                        {
-                            configurator.Username("guest");
-                            configurator.Password("guest");
-                        });
-                    cfg.ConfigureEndpoints(context);
-                });
-            });
-            services.AddMassTransitHostedService();
-            services.AddCors(options =>
-            {
-                options.AddPolicy("AllowAll",
-                    corsBuilder =>
-                    {
-                        corsBuilder
-                            .WithOrigins("localhost:3000")
-                            .WithOrigins("http://localhost:3000")
-                            .WithOrigins("localhost:5000")
-                            .WithOrigins("http://localhost:5000")
-                            .AllowAnyMethod()
-                            .AllowAnyHeader()
-                            .AllowCredentials();
-                    });
-            });
-            services.AddSingleton(_ => Channel.CreateUnbounded<Notification>());
-            services.AddHostedService<NotificationsService>();
-            services.AddSignalR();
-            services.AddControllers();
-            services.AddSingleton<ICollection<Agent>>(new List<Agent>());
-            services.AddTransient<IAgentsService, AgentsService>();
+            services.AddGadget(Configuration);
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILogger<Startup> logger)
