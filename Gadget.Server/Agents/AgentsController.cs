@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Gadget.Messaging.Contracts.Commands;
-using Gadget.Server.Agents.Dto;
-using Gadget.Server.Domain.Entities;
-using MassTransit;
+﻿using Gadget.Server.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Gadget.Server.Agents
 {

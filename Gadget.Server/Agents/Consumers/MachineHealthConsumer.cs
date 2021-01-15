@@ -22,7 +22,7 @@ namespace Gadget.Server.Agents.Consumers
 
         public async Task Consume(ConsumeContext<IMetricsData> context)
         {
-            await _hub.Clients.Group("dashboard").SendAsync("MachineHealthRecived", new MachineHealthData
+            await _hub.Clients.Group("dashboard").SendAsync("MachineHealthReceived", new MachineHealthData
             {
                 Agent = context.Message.Agent,
                 CpuPercentUsage = context.Message.CpuPercentUsage,
