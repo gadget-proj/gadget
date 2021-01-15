@@ -48,7 +48,7 @@ namespace Gadget.Server.Agents
         {
             var machine = _context.Agents
                 .Include(a => a.Services)
-                .ThenInclude(s => s.Events.Take(1))
+                .ThenInclude(s => s.Events.Take(20))
                 .FirstOrDefault(x => x.Name == agent);
             var services = machine?.Services;
             return services is null

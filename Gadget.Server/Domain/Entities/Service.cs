@@ -26,9 +26,8 @@ namespace Gadget.Server.Domain.Entities
         public string LogOnAs { get; set; }
         public string Description { get; set; }
         public Agent Agent { get; }
-        public ICollection<ServiceEvent> Events = new List<ServiceEvent>();
+        public readonly ICollection<ServiceEvent> Events = new List<ServiceEvent>();
         public static IEqualityComparer<Service> NameComparer { get; } = new NameEqualityComparer();
-
         public void ChangeStatus(string status)
         {
             Status = status;

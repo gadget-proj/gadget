@@ -1,5 +1,7 @@
 using System.Collections.Generic;
+using System.Threading.Channels;
 using Gadget.Server.Agents.Consumers;
+using Gadget.Server.Agents.Services;
 using Gadget.Server.Domain.Entities;
 using Gadget.Server.Hubs;
 using MassTransit;
@@ -21,6 +23,7 @@ namespace Gadget.Server
         }
 
         public IConfiguration Configuration { get; private set; }
+
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<GadgetContext>(builder => builder.UseSqlite("Data Source=gadget.db"));
@@ -56,7 +59,8 @@ namespace Gadget.Server
                             .AllowCredentials();
                     });
             });
-
+            services.AddSingleton(_ => Channel.CreateUnbounded<Notification>());
+            services.AddHostedService<NotificationsService>();
             services.AddSignalR();
             services.AddControllers();
             services.AddSingleton<ICollection<Agent>>(new List<Agent>());
@@ -74,6 +78,7 @@ namespace Gadget.Server
                     context.Database.EnsureCreated();
                 }
             }
+
             if (env.IsDevelopment()) app.UseDeveloperExceptionPage();
             app.UseCors("AllowAll");
             app.UseFileServer();

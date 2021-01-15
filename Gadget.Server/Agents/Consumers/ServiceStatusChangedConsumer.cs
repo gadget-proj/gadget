@@ -1,8 +1,10 @@
 using System;
 using System.Linq;
+using System.Threading.Channels;
 using System.Threading.Tasks;
 using Gadget.Messaging.Contracts.Events;
 using Gadget.Messaging.SignalR;
+using Gadget.Server.Domain.Entities;
 using Gadget.Server.Hubs;
 using MassTransit;
 using Microsoft.AspNetCore.SignalR;
@@ -16,13 +18,15 @@ namespace Gadget.Server.Agents.Consumers
         private readonly IHubContext<GadgetHub> _hub;
         private readonly ILogger<ServiceStatusChangedConsumer> _logger;
         private readonly GadgetContext _context;
+        private readonly Channel<Notification> _notifications;
 
         public ServiceStatusChangedConsumer(ILogger<ServiceStatusChangedConsumer> logger, IHubContext<GadgetHub> hub,
-            GadgetContext context)
+            GadgetContext context, Channel<Notification> notifications)
         {
             _logger = logger;
             _hub = hub;
             _context = context;
+            _notifications = notifications;
         }
 
         public async Task Consume(ConsumeContext<IServiceStatusChanged> context)
@@ -43,6 +47,8 @@ namespace Gadget.Server.Agents.Consumers
             agent.ChangeServiceStatus(service, newStatus);
             _context.Agents.Update(agent);
             await _context.SaveChangesAsync();
+            await _notifications.Writer.WriteAsync(
+                new Notification($"Service : {service} on agent : {agent.Name} has changed its status to {newStatus}"));
             await _hub.Clients.Group("dashboard").SendAsync("ServiceStatusChanged", new ServiceDescriptor
             {
                 Agent = context.Message.Agent,
