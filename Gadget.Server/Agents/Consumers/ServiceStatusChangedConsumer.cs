@@ -3,16 +3,14 @@ using System.Linq;
 using System.Threading.Channels;
 using System.Threading.Tasks;
 using Gadget.Messaging.Contracts.Events;
-using Gadget.Messaging.SignalR;
 using Gadget.Server.Domain.Entities;
-using Gadget.Server.Hubs;
 using MassTransit;
-using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace Gadget.Server.Agents.Consumers
 {
+    // ReSharper disable once ClassNeverInstantiated.Global
     public class ServiceStatusChangedConsumer : IConsumer<IServiceStatusChanged>
     {
         private readonly ILogger<ServiceStatusChangedConsumer> _logger;

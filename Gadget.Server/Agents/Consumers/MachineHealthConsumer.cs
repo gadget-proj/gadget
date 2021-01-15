@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace Gadget.Server.Agents.Consumers
 {
+    // ReSharper disable once ClassNeverInstantiated.Global
     public class MachineHealthConsumer : IConsumer<IMetricsData>
     {
         private readonly IHubContext<GadgetHub> _hub;
@@ -21,7 +22,7 @@ namespace Gadget.Server.Agents.Consumers
 
         public async Task Consume(ConsumeContext<IMetricsData> context)
         {
-            await _hub.Clients.Group("dashboard").SendAsync("MachineHealthRecived", new MachineHealthData 
+            await _hub.Clients.Group("dashboard").SendAsync("MachineHealthRecived", new MachineHealthData
             {
                 Agent = context.Message.Agent,
                 CpuPercentUsage = context.Message.CpuPercentUsage,
@@ -30,7 +31,7 @@ namespace Gadget.Server.Agents.Consumers
                 DiscTotal = context.Message.DiscTotal,
                 DiscOccupied = context.Message.DiscOccupied,
                 ServicesCount = context.Message.ServicesCount,
-                ServicesRunning  = context.Message.ServicesRunning
+                ServicesRunning = context.Message.ServicesRunning
             });
         }
     }

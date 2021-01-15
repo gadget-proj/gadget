@@ -13,6 +13,7 @@ namespace Gadget.Server.Agents.Consumers
     /// <summary>
     /// Handles new agent(Inspector) registration
     /// </summary>
+    // ReSharper disable once ClassNeverInstantiated.Global
     public class RegisterNewAgentConsumer : IConsumer<IRegisterNewAgent>
     {
         private readonly ILogger<RegisterNewAgentConsumer> _logger;
@@ -30,8 +31,7 @@ namespace Gadget.Server.Agents.Consumers
         public async Task Consume(ConsumeContext<IRegisterNewAgent> context)
         {
             _logger.LogInformation($"Trying to register new agent {context.Message.Agent}");
-            var exists = _context.Agents
-                .Any(a => a.Name == context.Message.Agent);
+            var exists = _context.Agents.Any(a => a.Name == context.Message.Agent);
             if (exists)
             {
                 _logger.LogInformation($"Agent {context.Message.Agent} is already registered, skipping");
