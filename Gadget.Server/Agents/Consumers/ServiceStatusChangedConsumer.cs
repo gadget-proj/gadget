@@ -33,7 +33,7 @@ namespace Gadget.Server.Agents.Consumers
 
             var agent = await _context.Agents
                 .Include(a => a.Services)
-                .ThenInclude(s => s.Events)
+                .ThenInclude(s => s.Events.Take(1))
                 .FirstOrDefaultAsync(a => a.Name == agentName);
             if (agent == null)
             {
