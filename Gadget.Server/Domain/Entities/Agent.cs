@@ -7,9 +7,8 @@ namespace Gadget.Server.Domain.Entities
 {
     public class Agent
     {
-        private readonly ICollection<Service> _services = new List<Service>();
         public Guid Id { get; private set; }
-
+        private readonly ICollection<Service> _services = new List<Service>();
         public Agent(string name, string address)
         {
             Name = name;
@@ -41,8 +40,7 @@ namespace Gadget.Server.Domain.Entities
             {
                 throw new ApplicationException($"Service {serviceName} could not be found on agent {Name}");
             }
-
-            service.Status = newStatus;
+            service.ChangeStatus(newStatus);
         }
     }
 }

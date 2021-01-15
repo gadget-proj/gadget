@@ -45,8 +45,8 @@ namespace Gadget.Server.Agents.Consumers
                 var service = JsonConvert.DeserializeObject<ServiceDescriptor>(s.ToString());
                 return new Service(service?.Name, service?.Status, agent, service?.LogOnAs, service?.Description);
             }));
-            _agents.Add(agent);
 
+            _agents.Add(agent);
             await _context.Agents.AddAsync(agent);
             await _context.SaveChangesAsync();
         }

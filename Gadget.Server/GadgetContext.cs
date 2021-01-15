@@ -18,8 +18,10 @@ namespace Gadget.Server
             modelBuilder.Entity<Service>(builder => builder.Property(a => a.Status));
             modelBuilder.Entity<Service>(builder => builder.Property(a => a.LogOnAs));
             modelBuilder.Entity<Service>(builder => builder.Property(a => a.Description));
+            modelBuilder.Entity<Service>(builder => builder.HasMany(s => s.Events));
             modelBuilder.Entity<Agent>(builder => builder.Property(a => a.Name));
             modelBuilder.Entity<Agent>(builder => builder.Property(a => a.Address));
+            modelBuilder.Entity<ServiceEvent>(builder => builder.HasKey(s => s.Id));
         }
 
         public DbSet<Agent> Agents { get; set; }

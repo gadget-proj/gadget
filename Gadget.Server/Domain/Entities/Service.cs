@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 
 namespace Gadget.Server.Domain.Entities
 {
@@ -24,10 +25,15 @@ namespace Gadget.Server.Domain.Entities
         public string Status { get; set; }
         public string LogOnAs { get; set; }
         public string Description { get; set; }
-
         public Agent Agent { get; }
-
+        public ICollection<ServiceEvent> Events = new List<ServiceEvent>();
         public static IEqualityComparer<Service> NameComparer { get; } = new NameEqualityComparer();
+
+        public void ChangeStatus(string status)
+        {
+            Status = status;
+            Events.Add(new ServiceEvent(status));
+        }
 
         private sealed class NameEqualityComparer : IEqualityComparer<Service>
         {

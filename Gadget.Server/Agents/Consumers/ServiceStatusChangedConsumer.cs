@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Gadget.Messaging.Contracts.Events;
 using Gadget.Messaging.SignalR;
@@ -32,6 +33,7 @@ namespace Gadget.Server.Agents.Consumers
 
             var agent = await _context.Agents
                 .Include(a => a.Services)
+                .ThenInclude(s => s.Events)
                 .FirstOrDefaultAsync(a => a.Name == agentName);
             if (agent == null)
             {
@@ -39,6 +41,7 @@ namespace Gadget.Server.Agents.Consumers
             }
 
             agent.ChangeServiceStatus(service, newStatus);
+            _context.Agents.Update(agent);
             await _context.SaveChangesAsync();
             await _hub.Clients.Group("dashboard").SendAsync("ServiceStatusChanged", new ServiceDescriptor
             {

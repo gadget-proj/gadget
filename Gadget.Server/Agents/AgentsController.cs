@@ -48,23 +48,24 @@ namespace Gadget.Server.Agents
         {
             var machine = _context.Agents
                 .Include(a => a.Services)
+                .ThenInclude(s => s.Events)
                 .FirstOrDefault(x => x.Name == agent);
             var services = machine?.Services;
             return services is null
                 ? Task.FromResult<IActionResult>(NotFound())
                 : Task.FromResult<IActionResult>(Ok(services.Select(s =>
-                    new ServiceDto(s.Name, s.Status, s.LogOnAs, s.Description))));
+                    new ServiceDto(s.Name, s.Status, s.LogOnAs, s.Description, s.Events))));
         }
 
         [HttpPost("{agent}/{service}/start")]
         public async Task<IActionResult> StartService(string agent, string service)
         {
             await _publishEndpoint.Publish<IStartService>(new
-            {
-                ServiceName = service,
-                Agent = agent
-            },
-               context => { context.SetRoutingKey(service); });
+                {
+                    ServiceName = service,
+                    Agent = agent
+                },
+                context => { context.SetRoutingKey(service); });
             return Accepted();
         }
 
@@ -72,10 +73,10 @@ namespace Gadget.Server.Agents
         public async Task<IActionResult> StopService(string agent, string service)
         {
             await _publishEndpoint.Publish<IStopService>(new
-            {
-                ServiceName = service,
-                Agent = agent
-            },
+                {
+                    ServiceName = service,
+                    Agent = agent
+                },
                 context => { context.SetRoutingKey(service); });
             return Accepted();
         }
