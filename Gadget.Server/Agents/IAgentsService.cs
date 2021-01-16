@@ -1,13 +1,12 @@
-﻿using System;
+﻿using Gadget.Messaging.Contracts.Commands;
+using Gadget.Server.Agents.Dto;
+using MassTransit;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Gadget.Messaging.Contracts.Commands;
-using Gadget.Server.Agents.Dto;
-using MassTransit;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 
 namespace Gadget.Server.Agents
 {
@@ -17,6 +16,7 @@ namespace Gadget.Server.Agents
         Task<IEnumerable<ServiceDto>> GetServices(string agentName);
         Task StartService(string agentName, string serviceName);
         Task StopService(string agentName, string serviceName);
+        Task<IEnumerable<EventDto>> GetEvents(int number);
     }
 
     public class AgentsService : IAgentsService
@@ -39,6 +39,21 @@ namespace Gadget.Server.Agents
             {
                 Name = a.Name,
                 Address = a.Address
+            }));
+        }
+
+        public async Task<IEnumerable<EventDto>> GetEvents(int number)
+        {
+            var events = await _context.ServiceEvents
+                        .OrderByDescending(x => x.CreatedAt)
+                        .Take(number)
+                        .ToListAsync();
+            return await Task.FromResult(events.Select(e => new EventDto
+            {
+                CreatedAt = e.CreatedAt.ToString("hh:mm dd-MM-yyyy"),
+                Status = e.Status,
+                Agent = "Lorem",// to do 
+                Service = "Ipsum"
             }));
         }
 

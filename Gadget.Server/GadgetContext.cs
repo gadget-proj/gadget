@@ -26,5 +26,6 @@ namespace Gadget.Server
 
         public DbSet<Agent> Agents { get; set; }
         public DbSet<Service> Services { get; set; }
+        public DbSet<ServiceEvent> ServiceEvents { get; set; }
     }
 }

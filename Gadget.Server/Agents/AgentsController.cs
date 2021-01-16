@@ -28,6 +28,12 @@ namespace Gadget.Server.Agents
             return Ok(await _agentsService.GetAgents());
         }
 
+        [HttpGet("events/{number}")]
+        public async Task<IActionResult> GetLatestEvents(int number)
+        {
+            return Ok(await _agentsService.GetEvents(number));
+        }
+
         [HttpGet("{agent}")]
         public async Task<IActionResult> GetAgentInfo(string agent)
         {
