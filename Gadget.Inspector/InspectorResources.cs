@@ -1,22 +1,46 @@
-﻿using Gadget.Messaging.SignalR;
+﻿using Gadget.Messaging.Contracts.Events;
+using Gadget.Messaging.SignalR;
+using MassTransit;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Management;
+using System.ServiceProcess;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Gadget.Inspector
 {
- 
-    public class InspectorResources
+    public class InspectorResources : BackgroundService
     {
         private readonly PerformanceCounter _cpuCounter;
+        private readonly IPublishEndpoint _publishEndpoint;
 
-        public InspectorResources(PerformanceCounter cpuCounter)
+        public InspectorResources(
+            PerformanceCounter cpuCounter, 
+            IPublishEndpoint publishEndpoint)
         {
             _cpuCounter = cpuCounter;
+            _publishEndpoint = publishEndpoint;
         }
-        public MachineHealthData CheckMachineHealth()
+
+        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+        {
+            while (!stoppingToken.IsCancellationRequested)
+            {
+                var metrics = CheckMachineHealth();
+                var services = ServiceController.GetServices();
+                metrics.ServicesCount = services.Length;
+                metrics.ServicesRunning = services.Count(x => x.Status == ServiceControllerStatus.Running);
+                await _publishEndpoint.Publish<IMetricsData>(metrics, stoppingToken);
+                await Task.Delay(TimeSpan.FromSeconds(5), stoppingToken);
+            }
+        }
+       
+        private MachineHealthData CheckMachineHealth()
         {
             var output = new MachineHealthData
             {

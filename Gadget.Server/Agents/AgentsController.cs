@@ -20,6 +20,12 @@ namespace Gadget.Server.Agents
             return Ok(await _agentsService.GetAgents());
         }
 
+        [HttpGet("events/{number}")]
+        public async Task<IActionResult> GetLatestEvents(int number)
+        {
+            return Ok(await _agentsService.GetEvents(number));
+        }
+
         [HttpGet("{agent}")]
         public async Task<IActionResult> GetAgentInfo(string agent)
         {
@@ -37,6 +43,13 @@ namespace Gadget.Server.Agents
         public async Task<IActionResult> StopService(string agent, string service)
         {
             await _agentsService.StopService(agent, service);
+            return Accepted();
+        }
+
+        [HttpPost("{agent}/{service}/restart")]
+        public async Task<IActionResult> RestrtService(string agent, string service)
+        {
+            await _agentsService.RestartService(agent, service);
             return Accepted();
         }
     }

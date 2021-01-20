@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Gadget.Server.Agents.Dto;
-using Microsoft.AspNetCore.Mvc;
+
 
 namespace Gadget.Server.Agents
 {
@@ -11,5 +11,7 @@ namespace Gadget.Server.Agents
         Task<IEnumerable<ServiceDto>> GetServices(string agentName);
         Task StartService(string agentName, string serviceName);
         Task StopService(string agentName, string serviceName);
+        Task RestartService(string agentName, string serviceName);
+        Task<IEnumerable<EventDto>> GetEvents(int number);
     }
 }

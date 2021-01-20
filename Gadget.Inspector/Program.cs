@@ -35,6 +35,7 @@ namespace Gadget.Inspector
                     {
                         x.AddConsumer<StartServiceConsumer>();
                         x.AddConsumer<StopServiceConsumer>();
+                        x.AddConsumer<RestartServiceConsumer>();
                         x.AddConsumers(Assembly.GetExecutingAssembly());
                         x.UsingRabbitMq((context, cfg) =>
                         {
@@ -48,12 +49,14 @@ namespace Gadget.Inspector
                             {
                                 e.ConfigureConsumer<StartServiceConsumer>(context);
                                 e.ConfigureConsumer<StopServiceConsumer>(context);
+                                e.ConfigureConsumer<RestartServiceConsumer>(context);
                             });
                         });
                        
                     });
                     services.AddMassTransitHostedService();
                     services.AddHostedService<Inspector>();
+                    services.AddHostedService<InspectorResources>();
                     services.AddLogging(options => options.AddConsole());
                     services.AddScoped(_ => new PerformanceCounter("Processor", "% Processor Time", "_Total"));
                     services.AddScoped<InspectorResources>();
