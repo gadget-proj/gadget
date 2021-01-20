@@ -24,7 +24,7 @@ namespace Gadget.Server.Agents.Dto
         public string Name { get; }
         public string Status { get; }
         public IEnumerable<ServiceEvent> Events { get; }
-        public string LogOnAs { get; set; }
-        public string Description { get; set; }
+        public string LogOnAs { get;  }
+        public string Description { get;  }
     }
 }
