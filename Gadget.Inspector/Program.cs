@@ -54,6 +54,7 @@ namespace Gadget.Inspector
                     });
                     services.AddMassTransitHostedService();
                     services.AddHostedService<Inspector>();
+                    services.AddHostedService<InspectorResources>();
                     services.AddLogging(options => options.AddConsole());
                     services.AddScoped(_ => new PerformanceCounter("Processor", "% Processor Time", "_Total"));
                     services.AddScoped<InspectorResources>();

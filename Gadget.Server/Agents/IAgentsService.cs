@@ -48,6 +48,7 @@ namespace Gadget.Server.Agents
                         .OrderByDescending(x => x.CreatedAt)
                         .Take(number)
                         .ToListAsync();
+
             return await Task.FromResult(events.Select(e => new EventDto
             {
                 CreatedAt = e.CreatedAt.ToString("hh:mm dd-MM-yyyy"),

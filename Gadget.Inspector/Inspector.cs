@@ -21,7 +21,6 @@ namespace Gadget.Inspector
         private readonly ILogger<Inspector> _logger;
         private readonly IDictionary<string, ServiceControllerStatus> _services =
             new Dictionary<string, ServiceControllerStatus>();
-        private readonly InspectorResources _inspectorResources;
 
         public Inspector(IPublishEndpoint publishEndpoint, 
             ILogger<Inspector> logger,
@@ -29,7 +28,6 @@ namespace Gadget.Inspector
         {
             _publishEndpoint = publishEndpoint;
             _logger = logger;
-            _inspectorResources = inspectorResources;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -63,16 +61,10 @@ namespace Gadget.Inspector
                         Status = current.ToString()
                     }, stoppingToken);
                 }
-                var metrics = _inspectorResources.CheckMachineHealth();
-                var services = ServiceController.GetServices();
-                metrics.ServicesCount = services.Length;
-                metrics.ServicesRunning = services.Count(x => x.Status == ServiceControllerStatus.Running);
-                await _publishEndpoint.Publish<IMetricsData>(metrics, stoppingToken);
+                
                 await Task.Delay(TimeSpan.FromSeconds(1), stoppingToken);
             }
         }
-
-
 
         private async Task RegisterAgent(CancellationToken stoppingToken)
         {
