@@ -1,15 +1,8 @@
-using System.Collections.Generic;
-using System.Threading.Channels;
-using Gadget.Server.Agents;
-using Gadget.Server.Agents.Consumers;
-using Gadget.Server.Domain.Entities;
 using Gadget.Server.Extensions;
 using Gadget.Server.Hubs;
-using Gadget.Server.Notifications.Services;
-using MassTransit;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -50,9 +43,11 @@ namespace Gadget.Server
             app.UseRouting();
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapGet("/agents", async ctx => await ctx.Response.WriteAsync(""));
                 endpoints.MapHub<GadgetHub>("/gadget");
                 endpoints.MapControllers();
             });
         }
     }
+
 }

@@ -4,10 +4,9 @@ namespace Gadget.Server.Domain.Entities
 {
     public class ServiceEvent
     {
-        public int Id { get; private set; }
-        public string Status { get; private set; }
-        public DateTime CreatedAt { get; private set; }
-        public Guid ServiceId { get; set; }
+        public Guid Id { get; }
+        public string Status { get; }
+        public DateTime CreatedAt { get; }
 
         private ServiceEvent()
         {

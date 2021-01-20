@@ -1,7 +1,4 @@
-﻿using Gadget.Server.Domain.Entities;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using System.Collections.Generic;
+﻿using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 
 namespace Gadget.Server.Agents
@@ -10,15 +7,10 @@ namespace Gadget.Server.Agents
     [Route("[controller]")]
     public class AgentsController : ControllerBase
     {
-        private readonly GadgetContext _context;
-        private readonly ILogger<AgentsController> _logger;
         private readonly IAgentsService _agentsService;
 
-        public AgentsController(ICollection<Agent> agents, GadgetContext context, ILogger<AgentsController> logger,
-            IAgentsService agentsService)
+        public AgentsController(IAgentsService agentsService)
         {
-            _context = context;
-            _logger = logger;
             _agentsService = agentsService;
         }
 

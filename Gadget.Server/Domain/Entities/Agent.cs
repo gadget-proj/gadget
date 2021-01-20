@@ -18,11 +18,11 @@ namespace Gadget.Server.Domain.Entities
         {
         }
 
-        public Guid Id { get; private set; }
+        public Guid Id { get;  }
         private readonly ICollection<Service> _services = new List<Service>();
         public string Name { get; }
         public IEnumerable<Service> Services => _services.ToImmutableList();
-        public string Address { get; set; }
+        public string Address { get;  }
 
         private void AddService(Service service)
         {
