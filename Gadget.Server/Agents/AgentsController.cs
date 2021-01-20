@@ -21,9 +21,9 @@ namespace Gadget.Server.Agents
         }
 
         [HttpGet("events/{number}")]
-        public async Task<IActionResult> GetLatestEvents(int number)
+        public async Task<IActionResult> GetLatestEvents(int count)
         {
-            return Ok(await _agentsService.GetEvents(number));
+            return Ok(await _agentsService.GetLatestEvents(count));
         }
 
         [HttpGet("{agent}")]
@@ -47,7 +47,7 @@ namespace Gadget.Server.Agents
         }
 
         [HttpPost("{agent}/{service}/restart")]
-        public async Task<IActionResult> RestrtService(string agent, string service)
+        public async Task<IActionResult> RestartService(string agent, string service)
         {
             await _agentsService.RestartService(agent, service);
             return Accepted();

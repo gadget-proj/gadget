@@ -33,6 +33,22 @@ namespace Gadget.Server.Agents
             }));
         }
 
+        public async Task<IEnumerable<EventDto>> GetLatestEvents(int count)
+        {
+            var events = await _context.ServiceEvents
+                       .OrderByDescending(x => x.CreatedAt)
+                       .Take(count)
+                       .ToListAsync();
+
+            return await Task.FromResult(events.Select(e => new EventDto
+            {
+                CreatedAt = e.CreatedAt.ToString("hh:mm dd-MM-yyyy"),
+                Status = e.Status,
+                Agent = "Lorem",// to do 
+                Service = "Ipsum"
+            }));
+        }
+
         public async Task<IEnumerable<ServiceDto>> GetServices(string agentName)
         {
             var machine = _context.Agents
@@ -42,6 +58,23 @@ namespace Gadget.Server.Agents
             var services = machine?.Services;
             var dto = services?.Select(s => new ServiceDto(s.Name, s.Status, s.LogOnAs, s.Description, s.Events));
             return await Task.FromResult(dto);
+        }
+
+        public async Task RestartService(string agentName, string serviceName)
+        {
+            try
+            {
+                await _publishEndpoint.Publish<IRestartService>(new
+                {
+                    ServiceName = serviceName,
+                    Agent = agentName
+                },
+                    context => { context.SetRoutingKey(serviceName); });
+            }
+            catch (Exception e)
+            {
+                _logger.LogCritical(e.Message);
+            }
         }
 
         public async Task StartService(string agentName, string serviceName)
