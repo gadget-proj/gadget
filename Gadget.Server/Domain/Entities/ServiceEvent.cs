@@ -12,7 +12,7 @@ namespace Gadget.Server.Domain.Entities
         {
         }
 
-        public ServiceEvent(string status)
+        public ServiceEvent(string status, Guid serviceId)
         {
             Status = status ?? throw new ArgumentNullException(nameof(status));
             CreatedAt = DateTime.UtcNow;

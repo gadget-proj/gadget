@@ -12,6 +12,6 @@ namespace Gadget.Server.Agents
         Task StartService(string agentName, string serviceName);
         Task StopService(string agentName, string serviceName);
         Task RestartService(string agentName, string serviceName);
-        Task<IEnumerable<EventDto>> GetEvents(int number);
+        Task<IEnumerable<EventDto>> GetLatestEvents(int count);
     }
 }
