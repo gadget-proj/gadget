@@ -16,6 +16,7 @@ namespace Gadget.Server.Agents
         Task<IEnumerable<ServiceDto>> GetServices(string agentName);
         Task StartService(string agentName, string serviceName);
         Task StopService(string agentName, string serviceName);
+        Task RestartService(string agentName, string serviceName);
         Task<IEnumerable<EventDto>> GetEvents(int number);
     }
 
@@ -95,6 +96,23 @@ namespace Gadget.Server.Agents
                         ServiceName = serviceName,
                         Agent = agentName
                     },
+                    context => { context.SetRoutingKey(serviceName); });
+            }
+            catch (Exception e)
+            {
+                _logger.LogCritical(e.Message);
+            }
+        }
+
+        public async Task RestartService(string agentName, string serviceName)
+        {
+            try
+            {
+                await _publishEndpoint.Publish<IRestartService>(new
+                {
+                    ServiceName = serviceName,
+                    Agent = agentName
+                },
                     context => { context.SetRoutingKey(serviceName); });
             }
             catch (Exception e)

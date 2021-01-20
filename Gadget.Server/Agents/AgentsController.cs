@@ -53,5 +53,12 @@ namespace Gadget.Server.Agents
             await _agentsService.StopService(agent, service);
             return Accepted();
         }
+
+        [HttpPost("{agent}/{service}/restart")]
+        public async Task<IActionResult> RestrtService(string agent, string service)
+        {
+            await _agentsService.RestartService(agent, service);
+            return Accepted();
+        }
     }
 }
