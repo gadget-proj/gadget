@@ -20,7 +20,7 @@ namespace Gadget.Server.Agents
             return Ok(await _agentsService.GetAgents());
         }
 
-        [HttpGet("events/{number}")]
+        [HttpGet("events/{count}")]
         public async Task<IActionResult> GetLatestEvents(int count)
         {
             return Ok(await _agentsService.GetLatestEvents(count));

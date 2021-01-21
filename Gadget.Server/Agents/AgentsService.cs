@@ -37,6 +37,8 @@ namespace Gadget.Server.Agents
         {
             var events = await _context.ServiceEvents
                        .OrderByDescending(x => x.CreatedAt)
+                       .Include(x=>x.Service)
+                       //.ThenInclude(y=>y.Agent) to do does not work
                        .Take(count)
                        .ToListAsync();
 
@@ -44,8 +46,8 @@ namespace Gadget.Server.Agents
             {
                 CreatedAt = e.CreatedAt.ToString("hh:mm dd-MM-yyyy"),
                 Status = e.Status,
-                Agent = "Lorem",// to do 
-                Service = "Ipsum"
+                Agent = "lorem",//e.Service.Agent.Name,
+                Service = e.Service.Name
             }));
         }
 

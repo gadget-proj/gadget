@@ -41,7 +41,7 @@ namespace Gadget.Server.Domain.Entities
             {
                 throw new ApplicationException($"Service {serviceName} could not be found on agent {Name}");
             }
-
+            
             service.ChangeStatus(newStatus);
         }
     }

@@ -40,6 +40,13 @@ namespace Gadget.Server.Agents.Consumers
                 throw new ApplicationException($"Agent {agentName} is not registered");
             }
 
+            var changedService = agent.Services.FirstOrDefault(s => s.Name == service);
+            if (changedService != null)
+            {
+                var newEvent = new ServiceEvent(newStatus, changedService.Id);
+                changedService.Events.Add(newEvent);
+            }
+
             agent.ChangeServiceStatus(service, newStatus);
             _context.Agents.Update(agent);
             await _context.SaveChangesAsync();
