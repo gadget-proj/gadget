@@ -24,9 +24,10 @@ namespace Gadget.Server
             modelBuilder.Entity<Service>(builder => builder.HasMany(s => s.Events));
             
             modelBuilder.Entity<ServiceEvent>(builder => builder.HasKey(s => s.Id));
-            modelBuilder.Entity<ServiceEvent>(builder => builder.Property(s => s.Id));
             modelBuilder.Entity<ServiceEvent>(builder => builder.Property(s => s.Status));
             modelBuilder.Entity<ServiceEvent>(builder => builder.Property(s => s.CreatedAt));
+            modelBuilder.Entity<ServiceEvent>(builder => builder.HasOne(s => s.Service).WithMany(x => x.Events).HasForeignKey(y => y.ServiceId));
+
         }
 
         public DbSet<Agent> Agents { get; set; }

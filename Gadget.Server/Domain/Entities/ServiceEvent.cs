@@ -7,6 +7,8 @@ namespace Gadget.Server.Domain.Entities
         public Guid Id { get; }
         public string Status { get; }
         public DateTime CreatedAt { get; }
+        public Guid ServiceId { get; }
+        public Service Service { get; }
 
         private ServiceEvent()
         {
@@ -16,6 +18,7 @@ namespace Gadget.Server.Domain.Entities
         {
             Status = status ?? throw new ArgumentNullException(nameof(status));
             CreatedAt = DateTime.UtcNow;
+            ServiceId = serviceId;
         }
     }
 }
