@@ -1,12 +1,16 @@
+using Gadget.Server.Authorization;
 using Gadget.Server.Extensions;
 using Gadget.Server.Hubs;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
+using System;
+using System.Text;
 
 namespace Gadget.Server
 {
@@ -22,6 +26,25 @@ namespace Gadget.Server
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddGadget(Configuration);
+            services.AddSingleton<TokenManager>();
+            services.AddAuthentication(x =>
+            {
+                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(x =>
+            {
+                var secret = Configuration.GetValue<string>("SecurityKey");
+                var key = Encoding.ASCII.GetBytes(secret);
+                x.RequireHttpsMetadata = false;
+                x.SaveToken = true;
+                x.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    ValidateIssuer = false,
+                    ValidateAudience = false
+                };
+            });
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILogger<Startup> logger)
@@ -41,12 +64,15 @@ namespace Gadget.Server
             app.UseCors("AllowAll");
             app.UseFileServer();
             app.UseRouting();
+            app.UseAuthentication();
+            app.UseAuthorization();
             app.UseEndpoints(endpoints =>
             {
                 //endpoints.MapGet("/agents", async ctx => await ctx.Response.WriteAsync(""));
                 endpoints.MapHub<GadgetHub>("/gadget");
                 endpoints.MapControllers();
             });
+            
         }
     }
 

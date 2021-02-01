@@ -4,6 +4,8 @@ using Gadget.Server.Hubs;
 using MassTransit;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
+using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Gadget.Server.Agents.Consumers
@@ -13,7 +15,7 @@ namespace Gadget.Server.Agents.Consumers
     {
         private readonly IHubContext<GadgetHub> _hub;
         private readonly ILogger<MachineHealthConsumer> _logger;
-
+        private Dictionary<string, DateTime> _agentLastChecks;
         public MachineHealthConsumer(ILogger<MachineHealthConsumer> logger, IHubContext<GadgetHub> hub)
         {
             _logger = logger;
