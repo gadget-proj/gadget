@@ -1,4 +1,4 @@
-﻿namespace Gadget.Messaging.SignalR
+﻿namespace Gadget.Messaging.SignalR.v1
 {
     public class MachineHealthData
     {

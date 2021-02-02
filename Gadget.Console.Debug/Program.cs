@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Gadget.Messaging.SignalR;
+using Gadget.Messaging.SignalR.v1;
 using Microsoft.AspNetCore.SignalR.Client;
 
 namespace Gadget.ConsoleApp.Debug

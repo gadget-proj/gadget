@@ -1,6 +1,8 @@
 ﻿using System.Threading.Tasks;
 using Gadget.Messaging.Contracts.Events;
+using Gadget.Messaging.Contracts.Events.v1;
 using Gadget.Messaging.SignalR;
+using Gadget.Messaging.SignalR.v1;
 using Gadget.Server.Hubs;
 using MassTransit;
 using Microsoft.AspNetCore.SignalR;

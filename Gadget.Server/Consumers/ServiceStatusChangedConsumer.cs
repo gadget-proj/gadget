@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Gadget.Messaging.Contracts.Events;
+using Gadget.Messaging.Contracts.Events.v1;
 using Gadget.Server.Domain.Entities;
 using Gadget.Server.Persistence;
 using MassTransit;

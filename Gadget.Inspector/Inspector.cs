@@ -12,6 +12,9 @@ using System.Net;
 using System.ServiceProcess;
 using System.Threading;
 using System.Threading.Tasks;
+using Gadget.Messaging.Contracts.Commands.v1;
+using Gadget.Messaging.Contracts.Events.v1;
+using Gadget.Messaging.SignalR.v1;
 
 namespace Gadget.Inspector
 {

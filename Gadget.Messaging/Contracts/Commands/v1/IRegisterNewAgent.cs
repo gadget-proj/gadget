@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Gadget.Messaging.Contracts.Commands
+namespace Gadget.Messaging.Contracts.Commands.v1
 {
     public interface IRegisterNewAgent
     {

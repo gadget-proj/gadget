@@ -1,4 +1,4 @@
-﻿namespace Gadget.Messaging.SignalR
+﻿namespace Gadget.Messaging.SignalR.v1
 {
     /// <summary>
     /// ServiceDescriptor describes a windows service, its name and current status
