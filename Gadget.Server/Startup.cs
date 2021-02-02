@@ -1,8 +1,11 @@
-using Gadget.Server.Extensions;
+using Gadget.Server.Consumers;
 using Gadget.Server.Hubs;
+using Gadget.Server.Persistence;
+using Gadget.Server.Services;
+using MassTransit;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -21,7 +24,42 @@ namespace Gadget.Server
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddGadget(Configuration);
+            services.AddDbContext<GadgetContext>(builder => builder.UseSqlite("Data Source=gadget.db"));
+            services.AddMassTransit(x =>
+            {
+                x.AddConsumer<ServiceStatusChangedConsumer>();
+                x.AddConsumer<RegisterNewAgentConsumer>();
+                x.AddConsumer<MachineHealthConsumer>();
+                x.UsingRabbitMq((context, cfg) =>
+                {
+                    cfg.Host(Configuration.GetConnectionString("RabbitMq"),
+                        configurator =>
+                        {
+                            configurator.Username("guest");
+                            configurator.Password("guest");
+                        });
+                    cfg.ConfigureEndpoints(context);
+                });
+            });
+            services.AddMassTransitHostedService();
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAll",
+                    corsBuilder =>
+                    {
+                        corsBuilder
+                            .WithOrigins("localhost:3000")
+                            .WithOrigins("http://localhost:3000")
+                            .WithOrigins("localhost:5000")
+                            .WithOrigins("http://localhost:5000")
+                            .AllowAnyMethod()
+                            .AllowAnyHeader()
+                            .AllowCredentials();
+                    });
+            });
+            services.AddSignalR();
+            services.AddControllers();
+            services.AddTransient<IAgentsService, AgentsService>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILogger<Startup> logger)
@@ -48,5 +86,4 @@ namespace Gadget.Server
             });
         }
     }
-
 }

@@ -1,7 +1,7 @@
 using Gadget.Server.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace Gadget.Server
+namespace Gadget.Server.Persistence
 {
     public class GadgetContext : DbContext
     {

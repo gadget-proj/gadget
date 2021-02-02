@@ -1,12 +1,12 @@
-﻿using Gadget.Messaging.Contracts.Events;
+﻿using System.Threading.Tasks;
+using Gadget.Messaging.Contracts.Events;
 using Gadget.Messaging.SignalR;
 using Gadget.Server.Hubs;
 using MassTransit;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
-using System.Threading.Tasks;
 
-namespace Gadget.Server.Agents.Consumers
+namespace Gadget.Server.Consumers
 {
     // ReSharper disable once ClassNeverInstantiated.Global
     public class MachineHealthConsumer : IConsumer<IMetricsData>

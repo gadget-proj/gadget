@@ -4,11 +4,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using Gadget.Messaging.Contracts.Commands;
 using Gadget.Server.Agents.Dto;
+using Gadget.Server.Persistence;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
-namespace Gadget.Server.Agents
+namespace Gadget.Server.Services
 {
     public class AgentsService : IAgentsService
     {

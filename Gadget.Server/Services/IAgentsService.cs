@@ -2,8 +2,7 @@
 using System.Threading.Tasks;
 using Gadget.Server.Agents.Dto;
 
-
-namespace Gadget.Server.Agents
+namespace Gadget.Server.Services
 {
     public interface IAgentsService
     {

@@ -1,7 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using Gadget.Server.Services;
+using Microsoft.AspNetCore.Mvc;
 
-namespace Gadget.Server.Agents
+namespace Gadget.Server.Controllers
 {
     [ApiController]
     [Route("[controller]")]

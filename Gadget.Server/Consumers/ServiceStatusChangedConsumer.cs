@@ -3,11 +3,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using Gadget.Messaging.Contracts.Events;
 using Gadget.Server.Domain.Entities;
+using Gadget.Server.Persistence;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
-namespace Gadget.Server.Agents.Consumers
+namespace Gadget.Server.Consumers
 {
     // ReSharper disable once ClassNeverInstantiated.Global
     public class ServiceStatusChangedConsumer : IConsumer<IServiceStatusChanged>
