@@ -5,8 +5,10 @@ using Gadget.Messaging.Contracts.Events.v1;
 using Gadget.Messaging.SignalR.v1;
 using Gadget.Notifications.Domain.ValueObjects;
 using Gadget.Notifications.Hubs;
+using Gadget.Notifications.Persistence;
 using MassTransit;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace Gadget.Notifications.Consumers
@@ -16,12 +18,14 @@ namespace Gadget.Notifications.Consumers
         private readonly ILogger<ServiceStatusChangedConsumer> _logger;
         private readonly IHubContext<NotificationsHub> _hub;
         private readonly ChannelWriter<Notification> _channel;
+        private readonly NotificationsContext _notificationsContext;
 
         public ServiceStatusChangedConsumer(ILogger<ServiceStatusChangedConsumer> logger,
-            IHubContext<NotificationsHub> hub, Channel<Notification> channel)
+            IHubContext<NotificationsHub> hub, Channel<Notification> channel, NotificationsContext notificationsContext)
         {
             _logger = logger;
             _hub = hub;
+            _notificationsContext = notificationsContext;
             _channel = channel.Writer;
         }
 
@@ -38,9 +42,24 @@ namespace Gadget.Notifications.Consumers
                     Status = context.Message.Status
                 }, context.CancellationToken);
                 _logger.LogInformation("Trying to enqueue webhook notification");
-                await _channel.WriteAsync(new Notification(context.Message.Agent, context.Message.Name,
-                    context.Message.Status, new Uri("http://localhost:5000/webhooks")));
-                _logger.LogInformation("Enqueued webhook notification");
+                
+                var agent = await _notificationsContext.Services
+                    .Include(s=>s.Webhooks)
+                    .FirstOrDefaultAsync(s =>
+                    s.Agent == context.Message.Agent && s.Name == context.Message.Name);
+                
+                if (agent is null)
+                {
+                    _logger.LogInformation("There are not webhooks registered for this event, skipping");
+                    return;
+                }
+
+                foreach (var agentWebhook in agent.Webhooks)
+                {
+                    await _channel.WriteAsync(new Notification(context.Message.Agent, context.Message.Name,
+                        context.Message.Status, agentWebhook.Uri));
+                    _logger.LogInformation("Enqueued webhook notification");
+                }
             }
             catch (Exception e)
             {

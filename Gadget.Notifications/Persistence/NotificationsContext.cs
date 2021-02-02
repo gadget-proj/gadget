@@ -1,5 +1,6 @@
 ﻿using System;
 using Gadget.Notifications.Domain.Entities;
+using Gadget.Notifications.Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 
 namespace Gadget.Notifications.Persistence
@@ -20,8 +21,11 @@ namespace Gadget.Notifications.Persistence
             {
                 w.WithOwner().HasForeignKey("OwnerId");
                 w.Property<Guid>("Id");
+                w.Property(wh => wh.Uri);
+                w.Property(wh => wh.CreatedAt);
                 w.HasKey("Id");
             }));
+
         }
 
         public DbSet<Service> Services { get; set; }

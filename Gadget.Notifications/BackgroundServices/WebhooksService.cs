@@ -1,4 +1,6 @@
 ﻿using System.Net.Http;
+using System.Net.Http.Json;
+using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
@@ -44,8 +46,17 @@ namespace Gadget.Notifications.BackgroundServices
 
                 _logger.LogInformation(
                     $"Received new webhook notification request for service {notification.ServiceName}");
-                await _client.PostAsync(notification.Webhook, null!, stoppingToken);
+                await _client.PostAsJsonAsync(notification.Webhook, new InvokeWebhook
+                {
+                    Content =
+                        $"Service : {notification.ServiceName} Agent : {notification.Agent} Status : {notification.Status}"
+                }, cancellationToken: stoppingToken);
             }
+        }
+
+        public class InvokeWebhook
+        {
+            [JsonPropertyName("content")] public string Content { get; set; }
         }
     }
 }

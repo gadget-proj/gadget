@@ -34,7 +34,9 @@ namespace Gadget.Notifications.Controllers
         public async Task<IActionResult> CreateNewWebhook(string agentName, string serviceName,
             CreateWebhook createWebhook)
         {
-            var agent = await _context.Services.FirstOrDefaultAsync(s => s.Agent == agentName);
+            var agent = await _context.Services
+                .Include(s=>s.Webhooks)
+                .FirstOrDefaultAsync(s => s.Agent == agentName);
             if (agent is null)
             {
                 agent = new Service(agentName, serviceName);
