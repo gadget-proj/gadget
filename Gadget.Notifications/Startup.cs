@@ -1,8 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Channels;
 using System.Threading.Tasks;
+using Gadget.Notifications.BackgroundServices;
 using Gadget.Notifications.Consumers;
+using Gadget.Notifications.Domain.ValueObjects;
 using Gadget.Notifications.Hubs;
 using MassTransit;
 using Microsoft.AspNetCore.Builder;
@@ -27,6 +30,9 @@ namespace Gadget.Notifications
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddHttpClient<WebhooksService>();
+            services.AddHostedService<WebhooksService>();
+            services.AddSingleton(_ => Channel.CreateUnbounded<Notification>());
             services.AddSignalR();
             services.AddMassTransit(x =>
             {

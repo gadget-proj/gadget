@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Threading.Channels;
 using System.Threading.Tasks;
 using Gadget.Messaging.Contracts.Events;
 using Gadget.Messaging.SignalR;
+using Gadget.Notifications.Domain.ValueObjects;
 using Gadget.Notifications.Hubs;
 using MassTransit;
 using Microsoft.AspNetCore.SignalR;
@@ -13,12 +15,14 @@ namespace Gadget.Notifications.Consumers
     {
         private readonly ILogger<ServiceStatusChangedConsumer> _logger;
         private readonly IHubContext<NotificationsHub> _hub;
+        private readonly ChannelWriter<Notification> _channel;
 
         public ServiceStatusChangedConsumer(ILogger<ServiceStatusChangedConsumer> logger,
-            IHubContext<NotificationsHub> hub)
+            IHubContext<NotificationsHub> hub, Channel<Notification> channel)
         {
             _logger = logger;
             _hub = hub;
+            _channel = channel.Writer;
         }
 
         public async Task Consume(ConsumeContext<IServiceStatusChanged> context)
