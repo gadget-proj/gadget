@@ -43,7 +43,6 @@ namespace Gadget.Server
             app.UseRouting();
             app.UseEndpoints(endpoints =>
             {
-                //endpoints.MapGet("/agents", async ctx => await ctx.Response.WriteAsync(""));
                 endpoints.MapHub<GadgetHub>("/gadget");
                 endpoints.MapControllers();
             });

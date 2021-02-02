@@ -51,6 +51,7 @@ namespace Gadget.Inspector
                                 e.ConfigureConsumer<StopServiceConsumer>(context);
                                 e.ConfigureConsumer<RestartServiceConsumer>(context);
                             });
+                            
                         });
                        
                     });

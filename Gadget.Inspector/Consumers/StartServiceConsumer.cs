@@ -22,12 +22,13 @@ namespace Gadget.Inspector.Consumers
             _logger.LogInformation($"Trying to start {context.Message.ServiceName}");
             var service = ServiceController.GetServices()
                 .FirstOrDefault(s => s.ServiceName == context.Message.ServiceName);
-            if (service == null)
+            if (service is null)
             {
                 throw new ApplicationException($"Service {context.Message.ServiceName} could not be found");
             }
 
             service.Start();
+            
             return Task.CompletedTask;
         }
     }

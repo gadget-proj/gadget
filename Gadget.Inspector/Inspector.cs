@@ -59,7 +59,8 @@ namespace Gadget.Inspector
                         Agent = Environment.MachineName,
                         Name = serviceController.ServiceName,
                         Status = current.ToString()
-                    }, stoppingToken);
+                    },  stoppingToken);
+                    
                 }
                 
                 await Task.Delay(TimeSpan.FromSeconds(1), stoppingToken);
@@ -87,6 +88,8 @@ namespace Gadget.Inspector
         {
             var addresses = Dns.GetHostEntry(Dns.GetHostName()).AddressList;
             return addresses.FirstOrDefault(x => x.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)?.ToString();
+            return 
+                "";
         }
 
         private static string GetServiceUser(string serviceName)

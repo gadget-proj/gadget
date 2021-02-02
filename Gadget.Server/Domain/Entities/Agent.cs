@@ -18,11 +18,13 @@ namespace Gadget.Server.Domain.Entities
         {
         }
 
-        public Guid Id { get;  }
-        private readonly ICollection<Service> _services = new List<Service>();
+        public Guid Id { get; }
         public string Name { get; }
+        public string Address { get; }
+        private readonly ICollection<Service> _services = new List<Service>();
         public IEnumerable<Service> Services => _services.ToImmutableList();
-        public string Address { get;  }
+        private readonly ICollection<Uri> _webhooks = new HashSet<Uri>();
+        public ICollection<Uri> Webhooks => _webhooks.ToImmutableList();
 
         private void AddService(Service service)
         {
@@ -32,6 +34,19 @@ namespace Gadget.Server.Domain.Entities
         public void AddServices(IEnumerable<Service> services)
         {
             foreach (var service in services) AddService(service);
+        }
+
+        private void AddWebhook(Uri webhook)
+        {
+            _webhooks.Add(webhook);
+        }
+
+        public void AddWebhooks(IEnumerable<Uri> webhooks)
+        {
+            foreach (var webhook in webhooks)
+            {
+                AddWebhook(webhook);
+            }
         }
 
         public void ChangeServiceStatus(string serviceName, string newStatus)

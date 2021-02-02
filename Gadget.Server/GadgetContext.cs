@@ -15,7 +15,7 @@ namespace Gadget.Server
             modelBuilder.Entity<Agent>(builder => builder.HasMany(a => a.Services));
             modelBuilder.Entity<Agent>(builder => builder.Property(a => a.Name));
             modelBuilder.Entity<Agent>(builder => builder.Property(a => a.Address));
-            
+
             modelBuilder.Entity<Service>(builder => builder.HasKey(a => a.Id));
             modelBuilder.Entity<Service>(builder => builder.Property(a => a.Name));
             modelBuilder.Entity<Service>(builder => builder.Property(a => a.Status));
