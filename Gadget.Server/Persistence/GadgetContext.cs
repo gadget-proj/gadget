@@ -26,7 +26,9 @@ namespace Gadget.Server.Persistence
             modelBuilder.Entity<ServiceEvent>(builder => builder.HasKey(s => s.Id));
             modelBuilder.Entity<ServiceEvent>(builder => builder.Property(s => s.Status));
             modelBuilder.Entity<ServiceEvent>(builder => builder.Property(s => s.CreatedAt));
-            modelBuilder.Entity<ServiceEvent>(builder => builder.HasOne(s => s.Service).WithMany(x => x.Events).HasForeignKey(y => y.ServiceId));
+            modelBuilder.Entity<ServiceEvent>(builder => builder.HasOne(s => s.Service)
+                .WithMany(x => x.Events)
+                .HasForeignKey(y => y.ServiceId));
 
         }
 

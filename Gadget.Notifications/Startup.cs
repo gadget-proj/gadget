@@ -51,7 +51,7 @@ namespace Gadget.Notifications
                 });
             });
             services.AddMassTransitHostedService();
-
+            services.AddControllers();
             services.AddCors(options =>
             {
                 options.AddPolicy("AllowAll",
@@ -82,6 +82,7 @@ namespace Gadget.Notifications
                     context.Database.EnsureCreated();
                 }
             }
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -92,7 +93,7 @@ namespace Gadget.Notifications
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapHub<NotificationsHub>("/notifications");
-                endpoints.MapGet("/", async context => { await context.Response.WriteAsync("Hello World!"); });
+                endpoints.MapControllers();
             });
         }
     }

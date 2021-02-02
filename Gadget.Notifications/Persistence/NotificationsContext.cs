@@ -1,4 +1,5 @@
-﻿using Gadget.Notifications.Domain.Entities;
+﻿using System;
+using Gadget.Notifications.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Gadget.Notifications.Persistence
@@ -15,7 +16,12 @@ namespace Gadget.Notifications.Persistence
             modelBuilder.Entity<Service>(s => s.Property(ss => ss.Name));
             modelBuilder.Entity<Service>(s => s.Property(ss => ss.Agent));
             modelBuilder.Entity<Service>(s => s.HasIndex(ss => ss.Name));
-            modelBuilder.Entity<Service>(s => s.OwnsMany(ss => ss.Webhooks));
+            modelBuilder.Entity<Service>(s => s.OwnsMany(ss => ss.Webhooks, w =>
+            {
+                w.WithOwner().HasForeignKey("OwnerId");
+                w.Property<Guid>("Id");
+                w.HasKey("Id");
+            }));
         }
 
         public DbSet<Service> Services { get; set; }

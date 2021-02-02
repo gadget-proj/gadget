@@ -1,0 +1,8 @@
+﻿POST http://localhost:5000/webhooks/DESKTOP-6PDIBOR/BTAGService
+Content-Type: application/json
+
+{
+"Uri":"http://localhost:5000/webhooks"
+}
+
+###
