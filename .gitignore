@@ -343,3 +343,4 @@ healthchecksdb
 .docker
 Gadget.Server/Migrations
 Gadget.Server/gadget.db**
+/Gadget.Notifications/notifications.db
