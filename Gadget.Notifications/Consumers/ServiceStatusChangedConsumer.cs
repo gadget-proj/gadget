@@ -37,6 +37,10 @@ namespace Gadget.Notifications.Consumers
                     Name = context.Message.Name,
                     Status = context.Message.Status
                 }, context.CancellationToken);
+                _logger.LogInformation("Trying to enqueue webhook notification");
+                await _channel.WriteAsync(new Notification(context.Message.Agent, context.Message.Name,
+                    context.Message.Status));
+                _logger.LogInformation("Enqueued webhook notification");
             }
             catch (Exception e)
             {
