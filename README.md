@@ -6,4 +6,4 @@
 - **Gadget.Server** is a central server that all inspector report to, it has an ability to command every connected agent
 ---
 #### Architecture behind Gadget
-![](https://i.imgur.com/xGPBw16_d.webp?maxwidth=1520&fidelity=grand)
+![](https://i.imgur.com/dEuEPRc.png)
