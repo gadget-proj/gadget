@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Threading.Channels;
 using System.Threading.Tasks;
-using Gadget.Messaging.Contracts.Events;
 using Gadget.Messaging.Contracts.Events.v1;
-using Gadget.Messaging.SignalR;
 using Gadget.Messaging.SignalR.v1;
 using Gadget.Notifications.Domain.ValueObjects;
 using Gadget.Notifications.Hubs;

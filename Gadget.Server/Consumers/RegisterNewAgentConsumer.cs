@@ -20,14 +20,11 @@ namespace Gadget.Server.Consumers
     public class RegisterNewAgentConsumer : IConsumer<IRegisterNewAgent>
     {
         private readonly ILogger<RegisterNewAgentConsumer> _logger;
-        private readonly ICollection<Agent> _agents;
         private readonly GadgetContext _context;
 
-        public RegisterNewAgentConsumer(ILogger<RegisterNewAgentConsumer> logger, ICollection<Agent> agents,
-            GadgetContext context)
+        public RegisterNewAgentConsumer(ILogger<RegisterNewAgentConsumer> logger, GadgetContext context)
         {
             _logger = logger;
-            _agents = agents;
             _context = context;
         }
 
@@ -49,7 +46,6 @@ namespace Gadget.Server.Consumers
                 return new Service(service?.Name, service?.Status, agent, service?.LogOnAs, service?.Description);
             }));
 
-            _agents.Add(agent);
             await _context.Agents.AddAsync(agent);
             await _context.SaveChangesAsync();
         }
