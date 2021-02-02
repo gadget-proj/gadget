@@ -1,9 +1,7 @@
 ﻿using System.Collections.Generic;
-using System.Threading.Channels;
 using Gadget.Server.Agents;
 using Gadget.Server.Agents.Consumers;
 using Gadget.Server.Domain.Entities;
-using Gadget.Server.Notifications.Services;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -48,8 +46,6 @@ namespace Gadget.Server.Extensions
                             .AllowCredentials();
                     });
             });
-            services.AddSingleton(_ => Channel.CreateUnbounded<Notification>());
-            services.AddHostedService<NotificationsService>();
             services.AddSignalR();
             services.AddControllers();
             services.AddSingleton<ICollection<Agent>>(new List<Agent>());

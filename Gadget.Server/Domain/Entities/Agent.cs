@@ -7,15 +7,15 @@ namespace Gadget.Server.Domain.Entities
 {
     public class Agent
     {
-        public Agent(string name, string address)
-        {
-            Name = name;
-            Address = address;
-            Id = Guid.NewGuid();
-        }
-
         private Agent()
         {
+        }
+
+        public Agent(string name, string address)
+        {
+            Name = name ?? throw new ArgumentNullException(nameof(name));
+            Address = address ?? throw new ArgumentNullException(nameof(address));
+            Id = Guid.NewGuid();
         }
 
         public Guid Id { get; }
@@ -23,8 +23,6 @@ namespace Gadget.Server.Domain.Entities
         public string Address { get; }
         private readonly ICollection<Service> _services = new List<Service>();
         public IEnumerable<Service> Services => _services.ToImmutableList();
-        private readonly ICollection<Uri> _webhooks = new HashSet<Uri>();
-        public ICollection<Uri> Webhooks => _webhooks.ToImmutableList();
 
         private void AddService(Service service)
         {
@@ -36,18 +34,6 @@ namespace Gadget.Server.Domain.Entities
             foreach (var service in services) AddService(service);
         }
 
-        private void AddWebhook(Uri webhook)
-        {
-            _webhooks.Add(webhook);
-        }
-
-        public void AddWebhooks(IEnumerable<Uri> webhooks)
-        {
-            foreach (var webhook in webhooks)
-            {
-                AddWebhook(webhook);
-            }
-        }
 
         public void ChangeServiceStatus(string serviceName, string newStatus)
         {
@@ -56,7 +42,7 @@ namespace Gadget.Server.Domain.Entities
             {
                 throw new ApplicationException($"Service {serviceName} could not be found on agent {Name}");
             }
-            
+
             service.ChangeStatus(newStatus);
         }
     }
