@@ -1,19 +1,18 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Channels;
-using System.Threading.Tasks;
 using Gadget.Notifications.BackgroundServices;
 using Gadget.Notifications.Consumers;
 using Gadget.Notifications.Domain.ValueObjects;
 using Gadget.Notifications.Hubs;
+using Gadget.Notifications.Persistence;
 using MassTransit;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace Gadget.Notifications
 {
@@ -30,6 +29,8 @@ namespace Gadget.Notifications
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddDbContext<NotificationsContext>(builder => builder.UseSqlite("Data Source=notifications.db"));
+
             services.AddHttpClient<WebhooksService>();
             services.AddHostedService<WebhooksService>();
             services.AddSingleton(_ => Channel.CreateUnbounded<Notification>());
@@ -50,18 +51,44 @@ namespace Gadget.Notifications
                 });
             });
             services.AddMassTransitHostedService();
+
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAll",
+                    corsBuilder =>
+                    {
+                        corsBuilder
+                            .WithOrigins("localhost:3000")
+                            .WithOrigins("http://localhost:3000")
+                            .WithOrigins("localhost:5000")
+                            .WithOrigins("http://localhost:5000")
+                            .AllowAnyMethod()
+                            .AllowAnyHeader()
+                            .AllowCredentials();
+                    });
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILogger<Startup> logger)
         {
+            using (var serviceScope = app.ApplicationServices
+                .GetRequiredService<IServiceScopeFactory>()
+                .CreateScope())
+            {
+                using (var context = serviceScope.ServiceProvider.GetService<NotificationsContext>())
+                {
+                    logger.LogCritical("ensurecreated");
+                    context.Database.EnsureCreated();
+                }
+            }
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseCors("AllowAll");
             app.UseRouting();
-
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapHub<NotificationsHub>("/notifications");
