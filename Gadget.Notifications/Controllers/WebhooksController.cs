@@ -36,7 +36,7 @@ namespace Gadget.Notifications.Controllers
         {
             var agent = await _context.Services
                 .Include(s=>s.Webhooks)
-                .FirstOrDefaultAsync(s => s.Agent == agentName);
+                .FirstOrDefaultAsync(s => s.Agent == agentName && s.Name == serviceName);
             if (agent is null)
             {
                 agent = new Service(agentName, serviceName);

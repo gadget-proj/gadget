@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Channels;
 using System.Threading.Tasks;
 using Gadget.Messaging.Contracts.Events.v1;
@@ -32,7 +33,7 @@ namespace Gadget.Notifications.Consumers
         public async Task Consume(ConsumeContext<IServiceStatusChanged> context)
         {
             _logger.LogInformation(
-                $"Service {context.Message.Agent} has changed its status to {context.Message.Status}");
+                $"Service {context.Message.Name} has changed its status to {context.Message.Status}");
             try
             {
                 await _hub.Clients.Group("dashboard").SendAsync("ServiceStatusChanged", new ServiceDescriptor

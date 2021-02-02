@@ -1,6 +1,6 @@
-﻿POST http://localhost:5000/webhooks/DESKTOP-6PDIBOR/BTAGService
+﻿POST http://localhost:5000/webhooks/DESKTOP-6PDIBOR/ClipSVC
 Content-Type: application/json
-//hackme
+
 {
 "Uri":"https://discord.com/api/webhooks/806050278683049984/EJSocoVKoFRZ1Z9bLqK-QEYJCj3ZlphONoiGlAs7vKJj2VV8m1tAdwUONq9h1BCK11cC"
 }
