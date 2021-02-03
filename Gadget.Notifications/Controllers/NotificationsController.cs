@@ -24,7 +24,7 @@ namespace Gadget.Notifications.Controllers
         [HttpPost("{agentName}/{serviceName}")]
         public async Task<IActionResult> CreateNotification(string agentName, string serviceName)
         {
-            var notification = new Notif(agentName, serviceName);
+            var notification = new Notification(agentName, serviceName);
             await _context.Notifications.AddAsync(notification);
             await _context.SaveChangesAsync();
             return Created("", "");
@@ -34,7 +34,7 @@ namespace Gadget.Notifications.Controllers
         public async Task<IActionResult> CreateWebhook(string agentName, string serviceName,
             CreateWebhook createWebhook)
         {
-            var notification = new Notif(agentName, serviceName);
+            var notification = new Notification(agentName, serviceName);
             var webhook = new Webhook(new Uri(createWebhook.Uri));
             notification.AddWebhook(webhook);
             await _context.Notifications.AddAsync(notification);

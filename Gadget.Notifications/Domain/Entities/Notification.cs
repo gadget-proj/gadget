@@ -5,7 +5,7 @@ using Gadget.Notifications.Domain.ValueObjects;
 
 namespace Gadget.Notifications.Domain.Entities
 {
-    public class Notif
+    public class Notification
     {
         public Guid Id { get; }
         public string Agent { get; }
@@ -13,8 +13,9 @@ namespace Gadget.Notifications.Domain.Entities
         private readonly ISet<Webhook> _webhooks = new HashSet<Webhook>();
         public IEnumerable<Webhook> Webhooks => _webhooks.ToImmutableList();
 
-        public Notif(string agent, string service)
+        public Notification(string agent, string service)
         {
+            Id = Guid.NewGuid();
             Agent = agent ?? throw new ArgumentNullException(nameof(agent));
             Service = service ?? throw new ArgumentNullException(nameof(service));
         }

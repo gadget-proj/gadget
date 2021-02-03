@@ -10,6 +10,11 @@
 - **Gadget.Server** is a control plane like service, it commands Inspectors to invoke requested actions, like turn off service **A**, restart service **B**
 
 - **Gadget.Notifications** is a notifications service, whenever service of your interest change its state it notifies all configured parties
+
+- **Gadget.Messaging** contains contracts shared between services 
 ---
 #### Architecture behind Gadget
 ![](https://i.imgur.com/dEuEPRc.png)
+
+#### Dependency Diagram
+![](https://i.imgur.com/kTpGly9.png)
