@@ -14,7 +14,7 @@
 
 - **Gadget.Messaging** contains contracts shared between services 
 ---
-### 
+### Caveats 
 - **Gadget.Inspector** needs to be run as a user with rights to modify installed Windows services (basically administrator account or the one you've used to install your services)
 ---
 #### Architecture behind Gadget
