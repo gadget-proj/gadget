@@ -2,7 +2,7 @@
 ---
 ### Functionality
 * Remote Windows services management, ability to turn a service on or off
-* Notifications, currently only webhooks, more to come
+* Notifications, webhooks and websockets, more to come
 
 ### Bulding blocks
 - **Gadget.Inspector** is an agent that runs on each of your Windows machines you'd wish to monitor
