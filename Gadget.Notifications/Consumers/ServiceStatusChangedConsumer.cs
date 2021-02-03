@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
 using Gadget.Messaging.Contracts.Events.v1;
@@ -18,11 +19,11 @@ namespace Gadget.Notifications.Consumers
     {
         private readonly ILogger<ServiceStatusChangedConsumer> _logger;
         private readonly IHubContext<NotificationsHub> _hub;
-        private readonly ChannelWriter<Notification> _channel;
+        private readonly ChannelWriter<Message> _channel;
         private readonly NotificationsContext _notificationsContext;
 
         public ServiceStatusChangedConsumer(ILogger<ServiceStatusChangedConsumer> logger,
-            IHubContext<NotificationsHub> hub, Channel<Notification> channel, NotificationsContext notificationsContext)
+            IHubContext<NotificationsHub> hub, Channel<Message> channel, NotificationsContext notificationsContext)
         {
             _logger = logger;
             _hub = hub;
@@ -36,29 +37,28 @@ namespace Gadget.Notifications.Consumers
                 $"Service {context.Message.Name} has changed its status to {context.Message.Status}");
             try
             {
-                await _hub.Clients.Group("dashboard").SendAsync("ServiceStatusChanged", new ServiceDescriptor
-                {
-                    Agent = context.Message.Agent,
-                    Name = context.Message.Name,
-                    Status = context.Message.Status
-                }, context.CancellationToken);
+                await SendSignalRNotification(context);
                 _logger.LogInformation("Trying to enqueue webhook notification");
-                
-                var agent = await _notificationsContext.Services
-                    .Include(s=>s.Webhooks)
-                    .FirstOrDefaultAsync(s =>
-                    s.Agent == context.Message.Agent && s.Name == context.Message.Name);
-                
-                if (agent is null)
+
+                var webhooksForNotification = await _notificationsContext.Notifications
+                    .Include(s => s.Webhooks)
+                    .Where(n => n.Agent == context.Message.Agent && n.Service == context.Message.Name)
+                    .AsNoTracking()
+                    .SelectMany(s => s.Webhooks)
+                    .ToListAsync();
+
+                if (!webhooksForNotification.Any())
                 {
                     _logger.LogInformation("There are not webhooks registered for this event, skipping");
                     return;
                 }
 
-                foreach (var agentWebhook in agent.Webhooks)
+                foreach (var agentWebhook in webhooksForNotification)
                 {
-                    await _channel.WriteAsync(new Notification(context.Message.Agent, context.Message.Name,
-                        context.Message.Status, agentWebhook.Uri));
+                    await _channel.WriteAsync(
+                        new Message(
+                            $"Service : {context.Message.Name} Agent : {context.Message.Agent} Status : {context.Message.Status}",
+                            agentWebhook.Uri));
                     _logger.LogInformation("Enqueued webhook notification");
                 }
             }
@@ -69,6 +69,16 @@ namespace Gadget.Notifications.Consumers
             }
 
             _logger.LogInformation("Invoked hub notification");
+        }
+
+        private async Task SendSignalRNotification(ConsumeContext<IServiceStatusChanged> context)
+        {
+            await _hub.Clients.Group("dashboard").SendAsync("ServiceStatusChanged", new ServiceDescriptor
+            {
+                Agent = context.Message.Agent,
+                Name = context.Message.Name,
+                Status = context.Message.Status
+            }, context.CancellationToken);
         }
     }
 }

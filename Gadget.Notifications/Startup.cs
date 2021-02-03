@@ -33,7 +33,7 @@ namespace Gadget.Notifications
 
             services.AddHttpClient<WebhooksService>();
             services.AddHostedService<WebhooksService>();
-            services.AddSingleton(_ => Channel.CreateUnbounded<Notification>());
+            services.AddSingleton(_ => Channel.CreateUnbounded<Message>());
             services.AddSignalR();
             services.AddMassTransit(x =>
             {

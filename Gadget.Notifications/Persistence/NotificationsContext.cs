@@ -13,11 +13,10 @@ namespace Gadget.Notifications.Persistence
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Service>(s => s.HasKey(ss => ss.Id));
-            modelBuilder.Entity<Service>(s => s.Property(ss => ss.Name));
-            modelBuilder.Entity<Service>(s => s.Property(ss => ss.Agent));
-            modelBuilder.Entity<Service>(s => s.HasIndex(ss => ss.Name));
-            modelBuilder.Entity<Service>(s => s.OwnsMany(ss => ss.Webhooks, w =>
+            modelBuilder.Entity<Notif>(s => s.HasKey(ss => ss.Id));
+            modelBuilder.Entity<Notif>(s => s.Property(ss => ss.Agent));
+            modelBuilder.Entity<Notif>(s => s.HasIndex(ss => ss.Service));
+            modelBuilder.Entity<Notif>(s => s.OwnsMany(ss => ss.Webhooks, w =>
             {
                 w.WithOwner().HasForeignKey("OwnerId");
                 w.Property<Guid>("Id");
@@ -25,9 +24,8 @@ namespace Gadget.Notifications.Persistence
                 w.Property(wh => wh.CreatedAt);
                 w.HasKey("Id");
             }));
-
         }
 
-        public DbSet<Service> Services { get; set; }
+        public DbSet<Notif> Notifications { get; set; }
     }
 }

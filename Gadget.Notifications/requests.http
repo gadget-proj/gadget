@@ -1,4 +1,4 @@
-﻿POST http://localhost:5000/webhooks/DESKTOP-6PDIBOR/ClipSVC
+﻿POST http://localhost:5000/webhooks/DESKTOP-6PDIBOR/BTAGService
 Content-Type: application/json
 
 {
