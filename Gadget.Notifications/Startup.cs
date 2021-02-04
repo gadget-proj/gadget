@@ -2,6 +2,7 @@ using System.Threading.Channels;
 using Gadget.Notifications.BackgroundServices;
 using Gadget.Notifications.Consumers;
 using Gadget.Notifications.Domain.ValueObjects;
+using Gadget.Notifications.Extensions;
 using Gadget.Notifications.Hubs;
 using Gadget.Notifications.Persistence;
 using MassTransit;
@@ -29,13 +30,10 @@ namespace Gadget.Notifications
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddEmailNotifications();
+            services.AddWebhooksNotifications();
+            
             services.AddDbContext<NotificationsContext>(builder => builder.UseSqlite("Data Source=notifications.db"));
-
-            services.AddHttpClient<WebhooksService>();
-            services.AddHostedService<WebhooksService>();
-            services.AddHostedService<EmailService>();
-            services.AddSingleton(_ => Channel.CreateUnbounded<DiscordMessage>());
-            services.AddSingleton(_ => Channel.CreateUnbounded<EmailMessage>());
             services.AddSignalR();
             services.AddMassTransit(x =>
             {
