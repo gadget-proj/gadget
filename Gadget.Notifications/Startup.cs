@@ -33,7 +33,9 @@ namespace Gadget.Notifications
 
             services.AddHttpClient<WebhooksService>();
             services.AddHostedService<WebhooksService>();
-            services.AddSingleton(_ => Channel.CreateUnbounded<Message>());
+            services.AddHostedService<EmailService>();
+            services.AddSingleton(_ => Channel.CreateUnbounded<DiscordMessage>());
+            services.AddSingleton(_ => Channel.CreateUnbounded<EmailMessage>());
             services.AddSignalR();
             services.AddMassTransit(x =>
             {
@@ -92,6 +94,7 @@ namespace Gadget.Notifications
             app.UseRouting();
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapGet("/", async context => await context.Response.WriteAsync(":))"));
                 endpoints.MapHub<NotificationsHub>("/notifications");
                 endpoints.MapControllers();
             });

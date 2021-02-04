@@ -91,8 +91,6 @@ namespace Gadget.Inspector
         {
             var addresses = Dns.GetHostEntry(Dns.GetHostName()).AddressList;
             return addresses.FirstOrDefault(x => x.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)?.ToString();
-            return 
-                "";
         }
 
         private static string GetServiceUser(string serviceName)

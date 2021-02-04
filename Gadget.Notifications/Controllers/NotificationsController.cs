@@ -1,7 +1,7 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using Gadget.Notifications.Domain.Entities;
+using Gadget.Notifications.Domain.Enums;
 using Gadget.Notifications.Domain.ValueObjects;
 using Gadget.Notifications.Persistence;
 using Gadget.Notifications.Requests;
@@ -35,8 +35,8 @@ namespace Gadget.Notifications.Controllers
             CreateWebhook createWebhook)
         {
             var notification = new Notification(agentName, serviceName);
-            var webhook = new Webhook(new Uri(createWebhook.Uri));
-            notification.AddWebhook(webhook);
+            var notifier = new Notifier(agentName, serviceName, createWebhook.Uri, NotifierType.Discord);
+            notification.AddNotifier(notifier);
             await _context.Notifications.AddAsync(notification);
             await _context.SaveChangesAsync();
             return Created("", "");
@@ -49,6 +49,12 @@ namespace Gadget.Notifications.Controllers
                 .Where(s => s.Agent == agentName)
                 .ToListAsync();
             return Ok(webhooks);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Get()
+        {
+            return Ok(":)");
         }
     }
 }

@@ -10,8 +10,8 @@ namespace Gadget.Notifications.Domain.Entities
         public Guid Id { get; }
         public string Agent { get; }
         public string Service { get; }
-        private readonly ISet<Webhook> _webhooks = new HashSet<Webhook>();
-        public IEnumerable<Webhook> Webhooks => _webhooks.ToImmutableList();
+        private readonly ISet<Notifier> _notifiers = new HashSet<Notifier>();
+        public IEnumerable<Notifier> Notifiers => _notifiers.ToImmutableList();
 
         public Notification(string agent, string service)
         {
@@ -20,9 +20,9 @@ namespace Gadget.Notifications.Domain.Entities
             Service = service ?? throw new ArgumentNullException(nameof(service));
         }
 
-        public void AddWebhook(Webhook webhook)
+        public void AddNotifier(Notifier notifier)
         {
-            _webhooks.Add(webhook);
+            _notifiers.Add(notifier);
         }
     }
 }

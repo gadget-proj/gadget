@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Linq;
-using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
 using Gadget.Messaging.Contracts.Events.v1;
 using Gadget.Messaging.SignalR.v1;
+using Gadget.Notifications.Domain.Enums;
 using Gadget.Notifications.Domain.ValueObjects;
 using Gadget.Notifications.Hubs;
 using Gadget.Notifications.Persistence;
@@ -19,16 +19,42 @@ namespace Gadget.Notifications.Consumers
     {
         private readonly ILogger<ServiceStatusChangedConsumer> _logger;
         private readonly IHubContext<NotificationsHub> _hub;
-        private readonly ChannelWriter<Message> _channel;
+        private readonly ChannelWriter<DiscordMessage> _discord;
+        private readonly ChannelWriter<EmailMessage> _emails;
         private readonly NotificationsContext _notificationsContext;
 
         public ServiceStatusChangedConsumer(ILogger<ServiceStatusChangedConsumer> logger,
-            IHubContext<NotificationsHub> hub, Channel<Message> channel, NotificationsContext notificationsContext)
+            IHubContext<NotificationsHub> hub, Channel<DiscordMessage> channel,
+            NotificationsContext notificationsContext, Channel<EmailMessage> emails)
         {
             _logger = logger;
             _hub = hub;
             _notificationsContext = notificationsContext;
-            _channel = channel.Writer;
+            _emails = emails;
+            _discord = channel.Writer;
+        }
+
+        private async Task EnqueueMessage(Notifier notifier, string status)
+        {
+            switch (notifier.NotifierType)
+            {
+                case NotifierType.Discord:
+                    var discordMessage = new DiscordMessage(
+                        $"Agent : {notifier.AgentName} Service : {notifier.ServiceName} Status : {status}",
+                        new Uri(notifier.Receiver));
+                    await _discord.WriteAsync(discordMessage);
+                    _logger.LogInformation("Enqueued discord message");
+                    break;
+                case NotifierType.Email:
+                    var emailMessage = new EmailMessage(
+                        $"Agent : {notifier.AgentName} Service : {notifier.ServiceName} Status : {status}",
+                        notifier.Receiver);
+                    await _emails.WriteAsync(emailMessage);
+                    _logger.LogInformation("Enqueued email message");
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
         }
 
         public async Task Consume(ConsumeContext<IServiceStatusChanged> context)
@@ -40,26 +66,16 @@ namespace Gadget.Notifications.Consumers
                 await SendSignalRNotification(context);
                 _logger.LogInformation("Trying to enqueue webhook notification");
 
-                var webhooksForNotification = await _notificationsContext.Notifications
-                    .Include(s => s.Webhooks)
+                var notifiers = await _notificationsContext.Notifications
+                    .Include(s => s.Notifiers)
                     .Where(n => n.Agent == context.Message.Agent && n.Service == context.Message.Name)
                     .AsNoTracking()
-                    .SelectMany(s => s.Webhooks)
-                    .ToListAsync();
+                    .SelectMany(s => s.Notifiers)
+                    .ToListAsync(context.CancellationToken);
 
-                if (!webhooksForNotification.Any())
+                foreach (var notifier in notifiers)
                 {
-                    _logger.LogInformation("There are not webhooks registered for this event, skipping");
-                    return;
-                }
-
-                foreach (var agentWebhook in webhooksForNotification)
-                {
-                    await _channel.WriteAsync(
-                        new Message(
-                            $"Service : {context.Message.Name} Agent : {context.Message.Agent} Status : {context.Message.Status}",
-                            agentWebhook.Uri));
-                    _logger.LogInformation("Enqueued webhook notification");
+                    await EnqueueMessage(notifier, context.Message.Status);
                 }
             }
             catch (Exception e)

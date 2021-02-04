@@ -15,12 +15,12 @@ namespace Gadget.Notifications.BackgroundServices
     /// </summary>
     public class WebhooksService : BackgroundService
     {
-        private readonly ChannelReader<Message> _channel;
+        private readonly ChannelReader<DiscordMessage> _channel;
         private readonly HttpClient _client;
         private readonly ILogger<WebhooksService> _logger;
 
 
-        public WebhooksService(Channel<Message> channel, HttpClient client, ILogger<WebhooksService> logger)
+        public WebhooksService(Channel<DiscordMessage> channel, HttpClient client, ILogger<WebhooksService> logger)
         {
             _channel = channel.Reader;
             _client = client;
@@ -31,16 +31,17 @@ namespace Gadget.Notifications.BackgroundServices
         {
             await foreach (var message in _channel.ReadAllAsync(stoppingToken))
             {
+                _logger.LogInformation("Processing new webhook request");
                 await SendWebhookNotification(message, stoppingToken);
             }
         }
 
-        private async Task SendWebhookNotification(Message message, CancellationToken stoppingToken)
+        private async Task SendWebhookNotification(DiscordMessage discordMessage, CancellationToken stoppingToken)
         {
-            _logger.LogInformation($"Sending webhook notification {message.Body}");
-            await _client.PostAsJsonAsync(message.Receiver, new InvokeWebhook
+            _logger.LogInformation($"Sending webhook notification {discordMessage.Body}");
+            await _client.PostAsJsonAsync(discordMessage.Receiver, new InvokeWebhook
             {
-                Content = message.Body
+                Content = discordMessage.Body
             }, cancellationToken: stoppingToken);
         }
 
