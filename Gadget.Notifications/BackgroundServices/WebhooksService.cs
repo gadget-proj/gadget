@@ -1,10 +1,10 @@
-﻿using System.Net.Http;
-using System.Net.Http.Json;
-using System.Text.Json.Serialization;
+﻿using System;
 using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
 using Gadget.Notifications.Domain.ValueObjects;
+using Gadget.Notifications.Services.Interfaces;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
@@ -16,42 +16,30 @@ namespace Gadget.Notifications.BackgroundServices
     public class WebhooksService : BackgroundService
     {
         private readonly ChannelReader<DiscordMessage> _channel;
-        private readonly HttpClient _client;
         private readonly ILogger<WebhooksService> _logger;
+        private readonly IServiceProvider _services;
 
-
-        public WebhooksService(Channel<DiscordMessage> channel, HttpClient client, ILogger<WebhooksService> logger)
+        public WebhooksService(Channel<DiscordMessage> channel, ILogger<WebhooksService> logger,
+            IServiceProvider services)
         {
             _channel = channel.Reader;
-            _client = client;
             _logger = logger;
+            _services = services;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             await foreach (var message in _channel.ReadAllAsync(stoppingToken))
             {
+                var webhooksService = _services.GetService<IWebhooksService>();
+                if (webhooksService is null)
+                {
+                    continue;
+                }
+
                 _logger.LogInformation("Processing new webhook request");
-                await SendWebhookNotification(message, stoppingToken);
+                await webhooksService.SendDiscordMessage(message, stoppingToken);
             }
-        }
-
-        private async Task SendWebhookNotification(DiscordMessage discordMessage, CancellationToken stoppingToken)
-        {
-            _logger.LogInformation($"Sending webhook notification {discordMessage.Body}");
-            await _client.PostAsJsonAsync(discordMessage.Receiver, new InvokeWebhook
-            {
-                Content = discordMessage.Body
-            }, cancellationToken: stoppingToken);
-        }
-
-
-        /// <summary>
-        /// Webhook payload
-        /// </summary>
-        private class InvokeWebhook
-        {
-            [JsonPropertyName("content")] public string Content { get; set; }
         }
     }
 }

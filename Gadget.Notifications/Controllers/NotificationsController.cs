@@ -1,12 +1,9 @@
-﻿using System.Linq;
+﻿using System.Threading;
 using System.Threading.Tasks;
-using Gadget.Notifications.Domain.Entities;
 using Gadget.Notifications.Domain.Enums;
-using Gadget.Notifications.Domain.ValueObjects;
-using Gadget.Notifications.Persistence;
 using Gadget.Notifications.Requests;
+using Gadget.Notifications.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace Gadget.Notifications.Controllers
 {
@@ -14,47 +11,28 @@ namespace Gadget.Notifications.Controllers
     [Route("[controller]")]
     public class NotificationsController : ControllerBase
     {
-        private readonly NotificationsContext _context;
+        private readonly INotificationsService _notificationsService;
 
-        public NotificationsController(NotificationsContext context)
+        public NotificationsController(INotificationsService notificationsService)
         {
-            _context = context;
+            _notificationsService = notificationsService;
         }
 
         [HttpPost("{agentName}/{serviceName}")]
-        public async Task<IActionResult> CreateNotification(string agentName, string serviceName)
+        public async Task<IActionResult> CreateNotification(string agentName, string serviceName,
+            CancellationToken cancellationToken)
         {
-            var notification = new Notification(agentName, serviceName);
-            await _context.Notifications.AddAsync(notification);
-            await _context.SaveChangesAsync();
+            await _notificationsService.RegisterNotification(agentName, serviceName, cancellationToken);
             return Created("", "");
         }
 
         [HttpPost("{agentName}/{serviceName}/webhooks")]
         public async Task<IActionResult> CreateWebhook(string agentName, string serviceName,
-            CreateWebhook createWebhook)
+            CreateWebhook createWebhook, CancellationToken cancellationToken)
         {
-            var notification = new Notification(agentName, serviceName);
-            var notifier = new Notifier(agentName, serviceName, createWebhook.Uri, NotifierType.Discord);
-            notification.AddNotifier(notifier);
-            await _context.Notifications.AddAsync(notification);
-            await _context.SaveChangesAsync();
+            await _notificationsService.RegisterNotifier(agentName, serviceName, createWebhook.Uri,
+                NotifierType.Discord, cancellationToken);
             return Created("", "");
-        }
-
-        [HttpGet("{agentName}/webhooks")]
-        public async Task<IActionResult> GetWebhooks(string agentName)
-        {
-            var webhooks = await _context.Notifications
-                .Where(s => s.Agent == agentName)
-                .ToListAsync();
-            return Ok(webhooks);
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> Get()
-        {
-            return Ok(":)");
         }
     }
 }

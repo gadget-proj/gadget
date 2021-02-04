@@ -5,6 +5,7 @@ using Gadget.Notifications.Domain.ValueObjects;
 using Gadget.Notifications.Extensions;
 using Gadget.Notifications.Hubs;
 using Gadget.Notifications.Persistence;
+using Gadget.Notifications.Services.Interfaces;
 using MassTransit;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -30,9 +31,9 @@ namespace Gadget.Notifications
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddTransient<INotificationsService, NotificationsService>();
             services.AddEmailNotifications();
             services.AddWebhooksNotifications();
-            
             services.AddDbContext<NotificationsContext>(builder => builder.UseSqlite("Data Source=notifications.db"));
             services.AddSignalR();
             services.AddMassTransit(x =>

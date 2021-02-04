@@ -1,4 +1,4 @@
-﻿POST http://localhost:5000/notifications/DESKTOP-6PDIBOR/BTAGService/webhooks
+﻿POST http://localhost:5000/notifications/DESKTOP-6PDIBOR/tzautoupdate/webhooks
 Content-Type: application/json
 
 {
