@@ -16,6 +16,7 @@
         <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="5.0.0" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.0" />
         <PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.0" />
+        <PackageReference Include="Seq.Extensions.Logging" Version="6.0.0" />
         <PackageReference Include="System.ServiceProcess.ServiceController" Version="5.0.0" />
         <PackageReference Include="System.Threading.Channels" Version="5.0.0" />
         <PackageReference Include="System.Diagnostics.PerformanceCounter" Version="5.0.0" />

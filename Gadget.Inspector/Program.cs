@@ -31,6 +31,7 @@ namespace Gadget.Inspector
                 })
                 .ConfigureServices((host, services) =>
                 {
+                    services.AddLogging(cfg => cfg.AddSeq());
                     services.AddMassTransit(x =>
                     {
                         x.AddConsumer<StartServiceConsumer>();

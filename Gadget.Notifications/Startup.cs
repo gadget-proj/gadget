@@ -31,6 +31,7 @@ namespace Gadget.Notifications
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddLogging(cfg => cfg.AddSeq());
             services.AddTransient<INotificationsService, NotificationsService>();
             services.AddEmailNotifications();
             services.AddWebhooksNotifications();

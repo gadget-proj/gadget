@@ -17,6 +17,7 @@
         <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="5.0.1" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="5.0.1" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.1" />
+        <PackageReference Include="Seq.Extensions.Logging" Version="6.0.0" />
       <PackageReference Include="System.Threading.Channels" Version="5.0.0" />
     </ItemGroup>
 

@@ -24,6 +24,7 @@ namespace Gadget.Server
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddLogging(cfg => cfg.AddSeq());
             services.AddDbContext<GadgetContext>(builder => builder.UseSqlite("Data Source=gadget.db"));
             services.AddMassTransit(x =>
             {
