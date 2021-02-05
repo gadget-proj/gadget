@@ -1,23 +1,10 @@
+using Gadget.Server;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 
-namespace Gadget.Server
-{
-    public static class Program
+Host.CreateDefaultBuilder(args)
+    .ConfigureWebHostDefaults(webBuilder =>
     {
-        public static void Main(string[] args)
-        {
-            CreateHostBuilder(args).Build().Run();
-        }
-
-        private static IHostBuilder CreateHostBuilder(string[] args)
-        {
-            return Host.CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(webBuilder =>
-                {
-                    webBuilder.UseUrls("http://localhost:5001");
-                    webBuilder.UseStartup<Startup>();
-                });
-        }
-    }
-}
+        webBuilder.UseUrls("http://localhost:5001");
+        webBuilder.UseStartup<Startup>();
+    }).Build().Run();

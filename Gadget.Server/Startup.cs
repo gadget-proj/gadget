@@ -76,7 +76,11 @@ namespace Gadget.Server
                 }
             }
 
-            if (env.IsDevelopment()) app.UseDeveloperExceptionPage();
+            if (env.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+            }
+
             app.UseCors("AllowAll");
             app.UseFileServer();
             app.UseRouting();
