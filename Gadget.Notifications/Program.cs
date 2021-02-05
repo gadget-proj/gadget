@@ -1,10 +1,23 @@
-using Gadget.Notifications;
+using System.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 
-Host.CreateDefaultBuilder(args)
-    .ConfigureWebHostDefaults(webBuilder =>
+namespace Gadget.Notifications
+{
+    public class Program
     {
-        webBuilder.UseUrls("http://localhost:5000");
-        webBuilder.UseStartup<Startup>();
-    });
+        public static void Main(string[] args)
+        {
+            Activity.DefaultIdFormat = ActivityIdFormat.W3C;
+            CreateHostBuilder(args).Build().Run();
+        }
+
+        public static IHostBuilder CreateHostBuilder(string[] args) =>
+            Host.CreateDefaultBuilder(args)
+                .ConfigureWebHostDefaults(webBuilder =>
+                {
+                    webBuilder.UseUrls("http://localhost:5000");
+                    webBuilder.UseStartup<Startup>();
+                });
+    }
+}

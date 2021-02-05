@@ -6,6 +6,7 @@
         <ApplicationManifest>app.manifest</ApplicationManifest>
     </PropertyGroup>
 
+    
     <ItemGroup>
         <PackageReference Include="MassTransit" Version="7.0.7" />
         <PackageReference Include="MassTransit.AspNetCore" Version="7.0.7" />

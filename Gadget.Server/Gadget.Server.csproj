@@ -6,6 +6,11 @@
         <RootNamespace>Gadget.Server</RootNamespace>
     </PropertyGroup>
 
+    <PropertyGroup>
+        <ContainerBaseImage>mcr.microsoft.com/dotnet/sdk</ContainerBaseImage>
+        <ContainerBaseTag>5.0</ContainerBaseTag>
+    </PropertyGroup>
+    
     <ItemGroup>
         <ProjectReference Include="..\Gadget.Messaging\Gadget.Messaging.csproj" />
     </ItemGroup>
