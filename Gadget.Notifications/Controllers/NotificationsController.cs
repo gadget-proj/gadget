@@ -1,8 +1,7 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
-using Gadget.Notifications.Domain.Enums;
+﻿using System.Threading.Tasks;
+using Gadget.Common;
+using Gadget.Notifications.Commands;
 using Gadget.Notifications.Requests;
-using Gadget.Notifications.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Gadget.Notifications.Controllers
@@ -11,27 +10,36 @@ namespace Gadget.Notifications.Controllers
     [Route("[controller]")]
     public class NotificationsController : ControllerBase
     {
-        private readonly INotificationsService _notificationsService;
+        private readonly IDispatcher _dispatcher;
 
-        public NotificationsController(INotificationsService notificationsService)
+        public NotificationsController(IDispatcher dispatcher)
         {
-            _notificationsService = notificationsService;
+            _dispatcher = dispatcher;
         }
 
         [HttpPost("{agentName}/{serviceName}")]
-        public async Task<IActionResult> CreateNotification(string agentName, string serviceName,
-            CancellationToken cancellationToken)
+        public async Task<IActionResult> CreateNotification(string agentName, string serviceName)
         {
-            await _notificationsService.RegisterNotification(agentName, serviceName, cancellationToken);
+            var command = new CreateNotificationCommand
+            {
+                AgentName = agentName,
+                ServiceName = serviceName,
+            };
+            await _dispatcher.Send(command);
             return Created("", "");
         }
 
         [HttpPost("{agentName}/{serviceName}/webhooks")]
         public async Task<IActionResult> CreateWebhook(string agentName, string serviceName,
-            CreateWebhook createWebhook, CancellationToken cancellationToken)
+            CreateWebhook createWebhook)
         {
-            await _notificationsService.RegisterNotifier(agentName, serviceName, createWebhook.Uri,
-                NotifierType.Discord, cancellationToken);
+            var command = new CreateWebhookCommand
+            {
+                AgentName = agentName,
+                ServiceName = serviceName,
+                Receiver = createWebhook.Uri
+            };
+            await _dispatcher.Send(command);
             return Created("", "");
         }
     }

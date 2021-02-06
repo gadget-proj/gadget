@@ -1,3 +1,6 @@
+using System.Reflection;
+using Gadget.Common;
+using Gadget.Common.Extensions;
 using Gadget.Notifications.Consumers;
 using Gadget.Notifications.Extensions;
 using Gadget.Notifications.Hubs;
@@ -29,8 +32,9 @@ namespace Gadget.Notifications
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddTransient<IDispatcher, Dispatcher>();
+            services.AddHandlers(Assembly.GetExecutingAssembly());
             services.AddLogging(cfg => cfg.AddSeq());
-            services.AddTransient<INotificationsService, NotificationsService>();
             services.AddEmailNotifications();
             services.AddWebhooksNotifications();
             services.AddDbContext<NotificationsContext>(builder => builder.UseSqlite("Data Source=notifications.db"));
