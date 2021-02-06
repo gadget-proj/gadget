@@ -1,12 +1,10 @@
-using System.Threading.Channels;
-using Gadget.Notifications.BackgroundServices;
 using Gadget.Notifications.Consumers;
-using Gadget.Notifications.Domain.ValueObjects;
 using Gadget.Notifications.Extensions;
 using Gadget.Notifications.Hubs;
 using Gadget.Notifications.Persistence;
 using Gadget.Notifications.Services.Interfaces;
 using MassTransit;
+using MassTransit.ActivityTracing;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -49,6 +47,8 @@ namespace Gadget.Notifications
                             configurator.Username("guest");
                             configurator.Password("guest");
                         });
+                    cfg.PropagateActivityTracingContext();
+
                     cfg.ConfigureEndpoints(context);
                 });
             });
@@ -64,6 +64,8 @@ namespace Gadget.Notifications
                             .WithOrigins("http://localhost:3000")
                             .WithOrigins("localhost:5000")
                             .WithOrigins("http://localhost:5000")
+                            .WithOrigins("https://localhost:5005")
+                            .WithOrigins("https://localhost:5006")
                             .AllowAnyMethod()
                             .AllowAnyHeader()
                             .AllowCredentials();

@@ -11,6 +11,7 @@
     
     <ItemGroup>
       <PackageReference Include="MassTransit" Version="7.1.5-develop.3280" />
+      <PackageReference Include="MassTransit.ActivityTracing" Version="0.1.0" />
       <PackageReference Include="MassTransit.AspNetCore" Version="7.1.4" />
       <PackageReference Include="MassTransit.Extensions.DependencyInjection" Version="7.1.5-develop.3276" />
       <PackageReference Include="MassTransit.RabbitMQ" Version="7.1.5-develop.3276" />
