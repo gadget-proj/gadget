@@ -3,6 +3,7 @@ using Gadget.Server.Hubs;
 using Gadget.Server.Persistence;
 using Gadget.Server.Services;
 using MassTransit;
+using MassTransit.ActivityTracing;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -39,6 +40,8 @@ namespace Gadget.Server
                             configurator.Username("guest");
                             configurator.Password("guest");
                         });
+                    cfg.PropagateActivityTracingContext();
+
                     cfg.ConfigureEndpoints(context);
                 });
             });
@@ -53,6 +56,7 @@ namespace Gadget.Server
                             .WithOrigins("http://localhost:3000")
                             .WithOrigins("localhost:5000")
                             .WithOrigins("http://localhost:5000")
+                            .WithOrigins("https://localhost:5005")
                             .AllowAnyMethod()
                             .AllowAnyHeader()
                             .AllowCredentials();
@@ -76,7 +80,11 @@ namespace Gadget.Server
                 }
             }
 
-            if (env.IsDevelopment()) app.UseDeveloperExceptionPage();
+            if (env.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+            }
+
             app.UseCors("AllowAll");
             app.UseFileServer();
             app.UseRouting();
