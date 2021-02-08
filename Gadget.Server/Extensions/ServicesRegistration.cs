@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading.Channels;
-using Gadget.Server.Agents;
+﻿using Gadget.Server.Agents;
 using Gadget.Server.Agents.Consumers;
 using Gadget.Server.Domain.Entities;
 using Gadget.Server.Notifications.Services;
@@ -8,6 +6,8 @@ using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System.Collections.Generic;
+using System.Threading.Channels;
 
 namespace Gadget.Server.Extensions
 {
@@ -54,6 +54,7 @@ namespace Gadget.Server.Extensions
             services.AddControllers();
             services.AddSingleton<ICollection<Agent>>(new List<Agent>());
             services.AddTransient<IAgentsService, AgentsService>();
+            //services.AddHostedService<AgentHealthCheck>();
             return services;
         }
     }
