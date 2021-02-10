@@ -1,5 +1,7 @@
 ﻿using Gadget.Messaging.Contracts.Commands;
+using Gadget.Server.Hubs;
 using MassTransit;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
@@ -24,12 +26,37 @@ namespace Gadget.Server.Agents.HealthCheck
             using (var scope = _serviceProvider.CreateScope())
             {
                 var agentsService = scope.ServiceProvider.GetService<IAgentsService>();
-                var client = scope.ServiceProvider.GetService<IRequestClient<CheckAgentHealth>>();
+                var bus = scope.ServiceProvider.GetService<IBus>();
+                var hub = scope.ServiceProvider.GetService<IHubContext<GadgetHub>>();
+
+                var agents = await agentsService.GetAgents();
+                var counter = 0;
+                
                 while (!stoppingToken.IsCancellationRequested)
                 {
-                    var tmp = await agentsService.GetAgents();
-                    var response = await client.GetResponse<CheckAgentHealth>(new { Agent = tmp.First().Name, IsAlive = false },stoppingToken);
-                    var mes = response.Message;
+                    if (counter ==10) // check new registered agents every tenth check
+                    {
+                        agents = await agentsService.GetAgents();
+                        counter = 0;
+                    }
+
+                    foreach (var a in agents)
+                    {
+                        var client = bus.CreateRequestClient<CheckAgentHealth>(new Uri($"queue:{a.Name}"));
+                        var response = client.GetResponse<CheckAgentHealth>(new {IsAlive = false }, stoppingToken);
+                        // mass transit documentation says that set request time out aoutside registration wont work
+                        if (await Task.WhenAny(response, Task.Delay(2000))== response)
+                        {
+                           await hub.Clients.Group("dashboard").SendAsync("AgentHealthCheck", new {Agent=a.Name, IsAlive= true });
+                        }
+                        else
+                        {
+                            await hub.Clients.Group("dashboard").SendAsync("AgentHealthCheck", new { Agent = a.Name, IsAlive = true });
+                        }
+
+                        await Task.Delay(TimeSpan.FromSeconds(2), stoppingToken);
+                    }
+                    counter++;
                     await Task.Delay(TimeSpan.FromSeconds(6), stoppingToken);
                 }
             }

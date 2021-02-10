@@ -8,7 +8,7 @@ namespace Gadget.Inspector.Consumers
     {
         public async Task Consume(ConsumeContext<CheckAgentHealth> context)
         {
-            await context.RespondAsync<CheckAgentHealth>(new {Agent = "Lorem", IsAlive = true});
+            await context.RespondAsync<CheckAgentHealth>(new {IsAlive = true});
         }
     }
 }
