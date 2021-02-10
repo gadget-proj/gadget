@@ -20,23 +20,19 @@ namespace Gadget.Server.Agents.HealthCheck
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            await Task.Delay(TimeSpan.FromSeconds(10), stoppingToken);
+            await Task.Delay(TimeSpan.FromSeconds(15), stoppingToken);
             using (var scope = _serviceProvider.CreateScope())
             {
                 var agentsService = scope.ServiceProvider.GetService<IAgentsService>();
+                var client = scope.ServiceProvider.GetService<IRequestClient<CheckAgentHealth>>();
                 while (!stoppingToken.IsCancellationRequested)
                 {
                     var tmp = await agentsService.GetAgents();
-                    var bus = Bus.Factory.CreateUsingRabbitMq();
-                    var adress = new Uri($"rabbitmq://localhost/check-agent-health");
-                    var client = bus.CreateRequestClient<CheckAgentHealth>(adress);
-                    var response = await client.GetResponse<CheckAgentHealth>(new { Agent = tmp.First().Name });
+                    var response = await client.GetResponse<CheckAgentHealth>(new { Agent = tmp.First().Name, IsAlive = false },stoppingToken);
                     var mes = response.Message;
                     await Task.Delay(TimeSpan.FromSeconds(6), stoppingToken);
                 }
             }
-
-            
         }
     }
 }

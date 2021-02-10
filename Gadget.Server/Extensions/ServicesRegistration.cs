@@ -1,5 +1,7 @@
-﻿using Gadget.Server.Agents;
+﻿using Gadget.Messaging.Contracts.Commands;
+using Gadget.Server.Agents;
 using Gadget.Server.Agents.Consumers;
+using Gadget.Server.Agents.HealthCheck;
 using Gadget.Server.Domain.Entities;
 using Gadget.Server.Notifications.Services;
 using MassTransit;
@@ -21,6 +23,7 @@ namespace Gadget.Server.Extensions
                 x.AddConsumer<ServiceStatusChangedConsumer>();
                 x.AddConsumer<RegisterNewAgentConsumer>();
                 x.AddConsumer<MachineHealthConsumer>();
+                x.AddRequestClient<CheckAgentHealth>();
                 x.UsingRabbitMq((context, cfg) =>
                 {
                     cfg.Host(configuration.GetConnectionString("RabbitMq"),
@@ -54,7 +57,7 @@ namespace Gadget.Server.Extensions
             services.AddControllers();
             services.AddSingleton<ICollection<Agent>>(new List<Agent>());
             services.AddTransient<IAgentsService, AgentsService>();
-            //services.AddHostedService<AgentHealthCheck>();
+            services.AddHostedService<AgentHealthCheck>();
             return services;
         }
     }

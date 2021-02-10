@@ -2,7 +2,7 @@
 {
     public interface CheckAgentHealth
     {
-        string Agent { get; set; }
-        bool IsAlive { get;}
+        string Agent {get;}
+        bool IsAlive {get;}
     }
 }

@@ -34,6 +34,7 @@ namespace Gadget.Inspector
                     services.AddMassTransit(x =>
                     {
                         x.AddConsumer<StartServiceConsumer>();
+                        x.AddConsumer<CheckAgentHealthConsumer>();
                         x.AddConsumer<StopServiceConsumer>();
                         x.AddConsumer<RestartServiceConsumer>();
                         x.AddConsumers(Assembly.GetExecutingAssembly());
@@ -50,6 +51,7 @@ namespace Gadget.Inspector
                                 e.ConfigureConsumer<StartServiceConsumer>(context);
                                 e.ConfigureConsumer<StopServiceConsumer>(context);
                                 e.ConfigureConsumer<RestartServiceConsumer>(context);
+                                e.ConfigureConsumer<CheckAgentHealthConsumer>(context);
                             });
                         });
                        
