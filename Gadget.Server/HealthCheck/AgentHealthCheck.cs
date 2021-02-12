@@ -1,15 +1,15 @@
-﻿using Gadget.Messaging.Contracts.Commands;
+﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
+using Gadget.Messaging.Contracts.Commands;
 using Gadget.Server.Hubs;
+using Gadget.Server.Services;
 using MassTransit;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
-namespace Gadget.Server.Agents.HealthCheck
+namespace Gadget.Server.HealthCheck
 {
     public class AgentHealthCheck : BackgroundService
     {

@@ -1,9 +1,9 @@
+using Gadget.Messaging.Contracts.Commands;
 using Gadget.Server.Consumers;
-using Gadget.Server.Hubs;
+using Gadget.Server.HealthCheck;
 using Gadget.Server.Persistence;
 using Gadget.Server.Services;
 using MassTransit;
-using MassTransit.ActivityTracing;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -32,6 +32,7 @@ namespace Gadget.Server
                 x.AddConsumer<ServiceStatusChangedConsumer>();
                 x.AddConsumer<RegisterNewAgentConsumer>();
                 x.AddConsumer<MachineHealthConsumer>();
+                x.AddRequestClient<CheckAgentHealth>();
                 x.UsingRabbitMq((context, cfg) =>
                 {
                     cfg.Host(Configuration.GetConnectionString("RabbitMq"),
@@ -40,8 +41,6 @@ namespace Gadget.Server
                             configurator.Username("guest");
                             configurator.Password("guest");
                         });
-                    cfg.PropagateActivityTracingContext();
-
                     cfg.ConfigureEndpoints(context);
                 });
             });
@@ -62,9 +61,9 @@ namespace Gadget.Server
                             .AllowCredentials();
                     });
             });
-            services.AddSignalR();
             services.AddControllers();
             services.AddTransient<IAgentsService, AgentsService>();
+            services.AddHostedService<AgentHealthCheck>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILogger<Startup> logger)
@@ -76,7 +75,7 @@ namespace Gadget.Server
                 using (var context = serviceScope.ServiceProvider.GetService<GadgetContext>())
                 {
                     logger.LogCritical("ensurecreated");
-                    context.Database.EnsureCreated();
+                    context?.Database.EnsureCreated();
                 }
             }
 
@@ -88,11 +87,7 @@ namespace Gadget.Server
             app.UseCors("AllowAll");
             app.UseFileServer();
             app.UseRouting();
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapHub<GadgetHub>("/gadget");
-                endpoints.MapControllers();
-            });
+            app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
         }
     }
 }

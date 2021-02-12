@@ -97,7 +97,7 @@ namespace Gadget.Notifications
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapGet("/", async context => await context.Response.WriteAsync(":))"));
-                endpoints.MapHub<NotificationsHub>("/notifications");
+                endpoints.MapHub<NotificationsHub>("/gadget");
                 endpoints.MapControllers();
             });
         }

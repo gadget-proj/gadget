@@ -10,7 +10,7 @@ namespace Gadget.ConsoleApp.Debug
     {
         static async Task Main(string[] args)
         {
-            var connection = new HubConnectionBuilder().WithUrl("http://localhost:5000/notifications").Build();
+            var connection = new HubConnectionBuilder().WithUrl("http://localhost:5000/gadget").Build();
             connection.On<ServiceDescriptor>("ServiceStatusChanged",
                 msg => Console.WriteLine($"{msg.Name} {msg.Name} {msg.Status}"));
             await connection.StartAsync();
