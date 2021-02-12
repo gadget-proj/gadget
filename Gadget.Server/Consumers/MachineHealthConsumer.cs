@@ -1,21 +1,21 @@
-﻿using System.Threading.Tasks;
-using Gadget.Messaging.Contracts.Events;
-using Gadget.Messaging.Contracts.Events.v1;
+﻿using Gadget.Messaging.Contracts.Events;
 using Gadget.Messaging.SignalR;
-using Gadget.Messaging.SignalR.v1;
 using Gadget.Server.Hubs;
 using MassTransit;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
-namespace Gadget.Server.Consumers
+namespace Gadget.Server.Agents.Consumers
 {
     // ReSharper disable once ClassNeverInstantiated.Global
     public class MachineHealthConsumer : IConsumer<IMetricsData>
     {
         private readonly IHubContext<GadgetHub> _hub;
         private readonly ILogger<MachineHealthConsumer> _logger;
-
+        private Dictionary<string, DateTime> _agentLastChecks;
         public MachineHealthConsumer(ILogger<MachineHealthConsumer> logger, IHubContext<GadgetHub> hub)
         {
             _logger = logger;
