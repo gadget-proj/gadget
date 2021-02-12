@@ -1,4 +1,3 @@
-
 version: "3"
 services:
   rabbitmq:
@@ -7,20 +6,10 @@ services:
       - 5672:5672
       - 5673:5673
       - 15672:15672
-#  gadget:
-#    build:
-#      context: .
-#      dockerfile: Dockerfile.server
-#    ports:
-#      - 5000:5000
-#    depends_on:
-#      - rabbitmq
-#    environment:
-#      - MT_RMQ__HOST=rabbitmq
-#  seq:
-#    image: "datalust/seq:latest"
-#    environment:
-#      - ACCEPT_EULA=Y
-#    ports:
-#      - 5341:5341
-#      - 4444:80
+  seq:
+    image: "datalust/seq:latest"
+    environment:
+      - ACCEPT_EULA=Y
+    ports:
+      - 5341:5341
+      - 4444:80

@@ -3,6 +3,7 @@ using System.Linq;
 using System.ServiceProcess;
 using System.Threading.Tasks;
 using Gadget.Messaging.Contracts.Commands;
+using Gadget.Messaging.Contracts.Commands.v1;
 using MassTransit;
 using Microsoft.Extensions.Logging;
 
@@ -22,12 +23,13 @@ namespace Gadget.Inspector.Consumers
             _logger.LogInformation($"Trying to start {context.Message.ServiceName}");
             var service = ServiceController.GetServices()
                 .FirstOrDefault(s => s.ServiceName == context.Message.ServiceName);
-            if (service == null)
+            if (service is null)
             {
                 throw new ApplicationException($"Service {context.Message.ServiceName} could not be found");
             }
 
             service.Start();
+            
             return Task.CompletedTask;
         }
     }

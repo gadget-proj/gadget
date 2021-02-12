@@ -3,6 +3,7 @@ using System.Linq;
 using System.ServiceProcess;
 using System.Threading.Tasks;
 using Gadget.Messaging.Contracts.Commands;
+using Gadget.Messaging.Contracts.Commands.v1;
 using MassTransit;
 using Microsoft.Extensions.Logging;
 
