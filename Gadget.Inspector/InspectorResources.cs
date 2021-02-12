@@ -2,7 +2,6 @@
 using Gadget.Messaging.SignalR;
 using MassTransit;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using System;
 using System.Diagnostics;
 using System.IO;
