@@ -1,0 +1,9 @@
+﻿POST http://localhost:5000/notifications/DESKTOP-6PDIBOR/BTAGService/webhooks
+Content-Type: application/json
+
+{
+"Uri":"https://discord.com/api/webhooks/806050278683049984/EJSocoVKoFRZ1Z9bLqK-QEYJCj3ZlphONoiGlAs7vKJj2VV8m1tAdwUONq9h1BCK11cC"
+}
+
+###
+

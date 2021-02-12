@@ -1,0 +1,35 @@
+version: "3"
+services:
+  rabbitmq:
+    image: "rabbitmq:3-management"
+    ports:
+      - 5672:5672
+      - 5673:5673
+      - 15672:15672
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile.server
+    ports:
+      - 5001:5001
+    depends_on:
+      - rabbitmq
+    environment:
+      - MT_RMQ__HOST=rabbitmq
+  notifications:
+    build:
+      context: .
+      dockerfile: Dockerfile.notifications
+    ports:
+      - 5000:5000
+    depends_on:
+      - rabbitmq
+    environment:
+      - MT_RMQ__HOST=rabbitmq
+  seq:
+    image: "datalust/seq:latest"
+    environment:
+      - ACCEPT_EULA=Y
+    ports:
+      - 5341:5341
+      - 4444:80

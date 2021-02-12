@@ -10,6 +10,8 @@ using System.Management;
 using System.ServiceProcess;
 using System.Threading;
 using System.Threading.Tasks;
+using Gadget.Messaging.Contracts.Events.v1;
+using Gadget.Messaging.SignalR.v1;
 
 namespace Gadget.Inspector
 {

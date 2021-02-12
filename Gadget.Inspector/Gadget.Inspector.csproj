@@ -6,8 +6,10 @@
         <ApplicationManifest>app.manifest</ApplicationManifest>
     </PropertyGroup>
 
+    
     <ItemGroup>
         <PackageReference Include="MassTransit" Version="7.0.7" />
+        <PackageReference Include="MassTransit.ActivityTracing" Version="0.1.0" />
         <PackageReference Include="MassTransit.AspNetCore" Version="7.0.7" />
         <PackageReference Include="MassTransit.Extensions.DependencyInjection" Version="7.0.7" />
         <PackageReference Include="MassTransit.RabbitMQ" Version="7.0.7" />
@@ -16,6 +18,7 @@
         <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="5.0.0" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.0" />
         <PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.0" />
+        <PackageReference Include="Seq.Extensions.Logging" Version="6.0.0" />
         <PackageReference Include="System.ServiceProcess.ServiceController" Version="5.0.0" />
         <PackageReference Include="System.Threading.Channels" Version="5.0.0" />
         <PackageReference Include="System.Diagnostics.PerformanceCounter" Version="5.0.0" />
