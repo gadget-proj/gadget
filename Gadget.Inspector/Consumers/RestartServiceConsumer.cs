@@ -1,10 +1,10 @@
-﻿using Gadget.Messaging.Contracts.Commands;
-using MassTransit;
-using Microsoft.Extensions.Logging;
-using System;
+﻿using System;
 using System.Linq;
 using System.ServiceProcess;
 using System.Threading.Tasks;
+using Gadget.Messaging.Contracts.Commands.v1;
+using MassTransit;
+using Microsoft.Extensions.Logging;
 
 namespace Gadget.Inspector.Consumers
 {
@@ -16,6 +16,7 @@ namespace Gadget.Inspector.Consumers
         {
             _logger = logger;
         }
+
 
         public Task Consume(ConsumeContext<IRestartService> context)
         {
@@ -29,7 +30,6 @@ namespace Gadget.Inspector.Consumers
 
             try
             {
-                
                 TimeSpan timeout = TimeSpan.FromMilliseconds(500);
 
                 if (service.Status == ServiceControllerStatus.Running)
@@ -38,9 +38,8 @@ namespace Gadget.Inspector.Consumers
                     service.WaitForStatus(ServiceControllerStatus.Stopped, timeout);
                     service.Start();
                     service.WaitForStatus(ServiceControllerStatus.Running, timeout);
-
                 }
-                else if(service.Status==ServiceControllerStatus.Stopped)
+                else if (service.Status == ServiceControllerStatus.Stopped)
                 {
                     service.Start();
                     service.WaitForStatus(ServiceControllerStatus.Running, timeout);

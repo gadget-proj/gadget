@@ -12,6 +12,9 @@ using System.Net;
 using System.ServiceProcess;
 using System.Threading;
 using System.Threading.Tasks;
+using Gadget.Messaging.Contracts.Commands.v1;
+using Gadget.Messaging.Contracts.Events.v1;
+using Gadget.Messaging.SignalR.v1;
 
 namespace Gadget.Inspector
 {
@@ -59,7 +62,8 @@ namespace Gadget.Inspector
                         Agent = Environment.MachineName,
                         Name = serviceController.ServiceName,
                         Status = current.ToString()
-                    }, stoppingToken);
+                    },  stoppingToken);
+                    
                 }
                 
                 await Task.Delay(TimeSpan.FromSeconds(1), stoppingToken);

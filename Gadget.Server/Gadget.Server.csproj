@@ -6,6 +6,11 @@
         <RootNamespace>Gadget.Server</RootNamespace>
     </PropertyGroup>
 
+    <PropertyGroup>
+        <ContainerBaseImage>mcr.microsoft.com/dotnet/sdk</ContainerBaseImage>
+        <ContainerBaseTag>5.0</ContainerBaseTag>
+    </PropertyGroup>
+    
     <ItemGroup>
         <ProjectReference Include="..\Gadget.Messaging\Gadget.Messaging.csproj" />
     </ItemGroup>
@@ -13,6 +18,7 @@
     
     <ItemGroup>
       <PackageReference Include="MassTransit" Version="7.0.7" />
+      <PackageReference Include="MassTransit.ActivityTracing" Version="0.1.0" />
       <PackageReference Include="MassTransit.AspNetCore" Version="7.0.7" />
       <PackageReference Include="MassTransit.Extensions.DependencyInjection" Version="7.0.7" />
       <PackageReference Include="MassTransit.RabbitMQ" Version="7.0.7" />
@@ -25,12 +31,12 @@
       <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="5.0.1" />
       <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="5.0.1" />
       <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.1" />
+      <PackageReference Include="Seq.Extensions.Logging" Version="6.0.0" />
       <PackageReference Include="System.Threading.Channels" Version="5.0.0" />
     </ItemGroup>
 
     
     <ItemGroup>
-      <Folder Include="Notifications" />
       <Folder Include="wwwroot" />
     </ItemGroup>
 

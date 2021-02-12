@@ -1,7 +1,7 @@
 FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build
 WORKDIR /app
-ENV ASPNETCORE_URLS=http://+:5000
-EXPOSE 5000
+ENV ASPNETCORE_URLS=http://+:5001
+EXPOSE 5001
 
 COPY [".", "app/"]
 RUN dotnet restore "app/Gadget.Server/Gadget.Server.csproj"
