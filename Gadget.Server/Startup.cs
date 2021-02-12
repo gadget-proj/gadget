@@ -1,9 +1,11 @@
 using Gadget.Messaging.Contracts.Commands;
+using Gadget.Server.Authorization;
 using Gadget.Server.Consumers;
 using Gadget.Server.HealthCheck;
 using Gadget.Server.Persistence;
 using Gadget.Server.Services;
 using MassTransit;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -11,6 +13,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace Gadget.Server
 {
@@ -25,6 +29,25 @@ namespace Gadget.Server
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSingleton<TokenManager>();
+            services.AddAuthentication(x =>
+            {
+                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(x =>
+            {
+                var secret = Configuration.GetValue<string>("SecurityKey");
+                var key = Encoding.ASCII.GetBytes(secret);
+                x.RequireHttpsMetadata = false;
+                x.SaveToken = true;
+                x.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    ValidateIssuer = false,
+                    ValidateAudience = false
+                };
+            });
             services.AddLogging(cfg => cfg.AddSeq());
             services.AddDbContext<GadgetContext>(builder => builder.UseSqlite("Data Source=gadget.db"));
             services.AddMassTransit(x =>
@@ -87,6 +110,8 @@ namespace Gadget.Server
             app.UseCors("AllowAll");
             app.UseFileServer();
             app.UseRouting();
+            app.UseAuthentication();
+            app.UseAuthorization();
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
         }
     }
