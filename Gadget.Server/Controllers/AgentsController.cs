@@ -53,5 +53,11 @@ namespace Gadget.Server.Controllers
             await _agentsService.RestartService(agent, service);
             return Accepted();
         }
+        
+        [HttpGet("{agent}/{service}/events")]
+        public async Task<IActionResult> GetServiceEvents(string agent, string service)
+        {
+            return Ok(await _agentsService.GetEvents(agent, service));
+        }
     }
 }
