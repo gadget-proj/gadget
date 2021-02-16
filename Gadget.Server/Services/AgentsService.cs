@@ -70,7 +70,7 @@ namespace Gadget.Server.Services
                 .ThenInclude(s => s.Events.Take(20))
                 .FirstOrDefault(x => x.Name == agentName);
             var services = machine?.Services;
-            var dto = services?.Select(s => new ServiceDto(s.Name, s.Status, s.LogOnAs, s.Description, s.Events));
+            var dto = services?.Select(s => new ServiceDto(s.Name, s.Status, s.LogOnAs, s.Description));
             return await Task.FromResult(dto);
         }
 
