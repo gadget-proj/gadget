@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using Gadget.Server.Domain.Entities;
 
-namespace Gadget.Server.Agents.Dto
+namespace Gadget.Server.Dto.V1
 {
     public class AgentDto
     {

@@ -2,10 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Gadget.Messaging.Contracts.Commands;
 using Gadget.Messaging.Contracts.Commands.v1;
-using Gadget.Server.Agents.Dto;
-using Gadget.Server.Dto;
+using Gadget.Server.Dto.V1;
 using Gadget.Server.Persistence;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
