@@ -1,7 +1,6 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Gadget.Messaging.Contracts.Events;
 using Gadget.Messaging.Contracts.Events.v1;
 using Gadget.Server.Domain.Entities;
 using Gadget.Server.Persistence;
@@ -41,7 +40,7 @@ namespace Gadget.Server.Consumers
             var changedService = agent.Services.FirstOrDefault(s => s.Name == service);
             if (changedService != null)
             {
-                var newEvent = new ServiceEvent(newStatus, changedService.Id);
+                var newEvent = new ServiceEvent(newStatus);
                 changedService.Events.Add(newEvent);
             }
 

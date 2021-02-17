@@ -31,7 +31,7 @@ namespace Gadget.Server.Domain.Entities
         public void ChangeStatus(string status)
         {
             Status = status;
-            Events.Add(new ServiceEvent(status, Id));
+            Events.Add(new ServiceEvent(status));
         }
 
         private sealed class NameEqualityComparer : IEqualityComparer<Service>
