@@ -13,6 +13,6 @@ namespace Gadget.Server.Services
         Task RestartService(string agentName, string serviceName);
         //TODO we could modify GetEvents method and merge them together
         Task<IEnumerable<EventDto>> GetLatestEvents(int count);
-        Task<IEnumerable<EventDto>> GetServiceEvents(string agent, string serviceName, int count);
+        Task<IEnumerable<EventDto>> GetEvents(string agent, string serviceName, int count);
     }
 }

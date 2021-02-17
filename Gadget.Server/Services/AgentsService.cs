@@ -52,7 +52,7 @@ namespace Gadget.Server.Services
             }));
         }
 
-        public async Task<IEnumerable<EventDto>> GetServiceEvents(string agent, string serviceName, int count)
+        public async Task<IEnumerable<EventDto>> GetEvents(string agent, string serviceName, int count)
         {
             var events = await _context.ServiceEvents
                        .OrderByDescending(x => x.CreatedAt)
