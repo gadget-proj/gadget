@@ -21,7 +21,7 @@ namespace Gadget.Server.Domain.Entities
         public Guid Id { get; }
         public string Name { get; }
         public string Address { get; }
-        private readonly ICollection<Service> _services = new List<Service>();
+        private readonly ICollection<Service> _services = new HashSet<Service>();
         public IEnumerable<Service> Services => _services.ToImmutableList();
 
         private void AddService(Service service)
@@ -33,7 +33,6 @@ namespace Gadget.Server.Domain.Entities
         {
             foreach (var service in services) AddService(service);
         }
-
 
         public void ChangeServiceStatus(string serviceName, string newStatus)
         {

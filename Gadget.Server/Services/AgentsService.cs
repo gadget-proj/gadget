@@ -39,7 +39,7 @@ namespace Gadget.Server.Services
             var events = await _context.ServiceEvents
                 .OrderByDescending(x => x.CreatedAt)
                 .Include(x => x.Service)
-                //.ThenInclude(y=>y.Agent) to do does not work
+                .ThenInclude(y=>y.Agent)
                 .Take(count)
                 .ToListAsync();
 
@@ -47,20 +47,21 @@ namespace Gadget.Server.Services
             {
                 CreatedAt = e.CreatedAt,
                 Status = e.Status,
-                Agent = "lorem", //e.Service.Agent.Name,
+                Agent = e.Service.Agent.Name, //e.Service.Agent.Name,
                 Service = e.Service.Name
             }));
         }
 
         public async Task<IEnumerable<EventDto>> GetEvents(string agent, string service)
         {
-            var ag =await _context.Agents
-                .Include(a=>a.Services)
-                .ThenInclude(s=>s.Events)
+            var ag = await _context.Agents
+                .Include(a => a.Services)
+                .ThenInclude(s => s.Events)
                 .FirstOrDefaultAsync(a => a.Name == agent);
-            
+
             var svc = ag.Services.FirstOrDefault(s => s.Name == service);
-            return svc?.Events.Select(e => new EventDto{Agent = agent, Service = service, Status = e.Status, CreatedAt = e.CreatedAt});
+            return svc?.Events.Select(e => new EventDto
+                {Agent = agent, Service = service, Status = e.Status, CreatedAt = e.CreatedAt});
         }
 
         public async Task<IEnumerable<ServiceDto>> GetServices(string agentName)

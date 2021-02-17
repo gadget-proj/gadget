@@ -12,7 +12,8 @@ namespace Gadget.Server.Persistence
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Agent>(builder => builder.HasKey(a => a.Id));
-            modelBuilder.Entity<Agent>(builder => builder.HasMany(a => a.Services));
+            modelBuilder.Entity<Agent>(builder => builder.HasMany(a => a.Services)
+                .WithOne(s=>s.Agent).HasForeignKey("AgentId"));
             modelBuilder.Entity<Agent>(builder => builder.Property(a => a.Name));
             modelBuilder.Entity<Agent>(builder => builder.Property(a => a.Address));
 
@@ -22,14 +23,14 @@ namespace Gadget.Server.Persistence
             modelBuilder.Entity<Service>(builder => builder.Property(a => a.LogOnAs));
             modelBuilder.Entity<Service>(builder => builder.Property(a => a.Description));
             modelBuilder.Entity<Service>(builder => builder.HasMany(s => s.Events));
-            
+            modelBuilder.Entity<Service>(builder => builder.HasOne(s => s.Agent));
+
             modelBuilder.Entity<ServiceEvent>(builder => builder.HasKey(s => s.Id));
             modelBuilder.Entity<ServiceEvent>(builder => builder.Property(s => s.Status));
             modelBuilder.Entity<ServiceEvent>(builder => builder.Property(s => s.CreatedAt));
             modelBuilder.Entity<ServiceEvent>(builder => builder.HasOne(s => s.Service)
                 .WithMany(x => x.Events)
-                .HasForeignKey(y => y.ServiceId));
-
+                .HasForeignKey( "ServiceId"));
         }
 
         public DbSet<Agent> Agents { get; set; }
