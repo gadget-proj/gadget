@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gadget.Notifications", "Gad
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gadget.Console.Debug", "Gadget.Console.Debug\Gadget.Console.Debug.csproj", "{96EE501A-021C-4239-A9F9-E919E8763041}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{60230D37-A210-45EF-A9A5-CDE60C27FA0B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -89,5 +91,12 @@ Global
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {FA2C92DD-1EE8-439B-959A-F80B8A3AE889}
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{5D02AC72-0C1F-4E3C-A4BF-5C845E6344A2} = {60230D37-A210-45EF-A9A5-CDE60C27FA0B}
+		{45CC9A4E-17C7-4358-9396-43370C080FFC} = {60230D37-A210-45EF-A9A5-CDE60C27FA0B}
+		{9361C0F9-E4D5-440C-BBA2-B1626931E902} = {60230D37-A210-45EF-A9A5-CDE60C27FA0B}
+		{AEFB9364-F127-488E-BD98-E4021708250E} = {60230D37-A210-45EF-A9A5-CDE60C27FA0B}
+		{96EE501A-021C-4239-A9F9-E919E8763041} = {60230D37-A210-45EF-A9A5-CDE60C27FA0B}
 	EndGlobalSection
 EndGlobal
