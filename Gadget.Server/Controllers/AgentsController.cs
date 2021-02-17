@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Gadget.Server.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -27,10 +28,10 @@ namespace Gadget.Server.Controllers
             return Ok(await _agentsService.GetLatestEvents(count));
         }
 
-        [HttpGet("{agent}/{service}/events/{count}")]
-        public async Task<IActionResult> GetServiceEvents(string agent, string service, int count)
+        [HttpGet("{agent}/{service}/events")]
+        public async Task<IActionResult> GetServiceEvents(string agent, string service, int count, int skip, DateTime from, DateTime to)
         {
-            return Ok(await _agentsService.GetEvents(agent, service, count));
+            return Ok(await _agentsService.GetEvents(agent, service, from, to, count, skip));
         }
 
         [HttpGet("{agent}")]

@@ -1,5 +1,6 @@
 using Gadget.Server.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using System;
 
 namespace Gadget.Server.Persistence
 {
@@ -20,8 +21,8 @@ namespace Gadget.Server.Persistence
             modelBuilder.Entity<Service>(builder => builder.Property(a => a.Name));
             modelBuilder.Entity<Service>(builder => builder
                                                         .HasOne(a => a.Agent)
-                                                        .WithMany(x=>x.Services)
-                                                        .HasForeignKey(x=>x.AgentId));
+                                                        .WithMany(x => x.Services)
+                                                        .HasForeignKey("AgentId"));
 
             modelBuilder.Entity<Service>(builder => builder.Property(a => a.Status));
             modelBuilder.Entity<Service>(builder => builder.Property(a => a.LogOnAs));

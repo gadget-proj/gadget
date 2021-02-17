@@ -39,7 +39,7 @@ namespace Gadget.Server.Services
             var events = await _context.ServiceEvents
                        .OrderByDescending(x => x.CreatedAt)
                        .Include(x=>x.Service)
-                       .ThenInclude(y=>y.Agent)
+                       .ThenInclude(x=>x.Agent)
                        .Take(count)
                        .ToListAsync();
 
@@ -52,15 +52,33 @@ namespace Gadget.Server.Services
             }));
         }
 
-        public async Task<IEnumerable<EventDto>> GetEvents(string agent, string serviceName, int count)
+        public async Task<IEnumerable<EventDto>> GetEvents(
+            string agent, 
+            string serviceName, 
+            DateTime? from, 
+            DateTime? to,
+            int count = int.MaxValue, 
+            int skip = 0)
         {
+            if (from is null)
+            {
+                from = DateTime.UtcNow.AddYears(-1);
+            }
+            if (to is null)
+            {
+                to = DateTime.UtcNow;
+            }
+
             var events = await _context.ServiceEvents
                        .OrderByDescending(x => x.CreatedAt)
                        .Include(x => x.Service)
                        .ThenInclude(x=>x.Agent)
                        .Where(x=> 
                                 x.Service.Name == serviceName &&
-                                x.Service.Agent.Name == agent)
+                                x.Service.Agent.Name == agent &&
+                                x.CreatedAt>from &&
+                                x.CreatedAt < to)
+                       .Skip(skip)
                        .Take(count)
                        .ToListAsync();
 
