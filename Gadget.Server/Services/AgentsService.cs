@@ -40,15 +40,36 @@ namespace Gadget.Server.Services
             var events = await _context.ServiceEvents
                        .OrderByDescending(x => x.CreatedAt)
                        .Include(x=>x.Service)
-                       //.ThenInclude(y=>y.Agent) to do does not work
+                       .ThenInclude(y=>y.Agent)
                        .Take(count)
                        .ToListAsync();
 
             return await Task.FromResult(events.Select(e => new EventDto
             {
-                CreatedAt = e.CreatedAt.ToString("hh:mm dd-MM-yyyy"),
+                CreatedAt = e.CreatedAt,
                 Status = e.Status,
-                Agent = "lorem",//e.Service.Agent.Name,
+                Agent = e.Service.Agent.Name,
+                Service = e.Service.Name
+            }));
+        }
+
+        public async Task<IEnumerable<EventDto>> GetServiceEvents(string agent, string serviceName, int count)
+        {
+            var events = await _context.ServiceEvents
+                       .OrderByDescending(x => x.CreatedAt)
+                       .Include(x => x.Service)
+                       .ThenInclude(x=>x.Agent)
+                       .Where(x=> 
+                                x.Service.Name == serviceName &&
+                                x.Service.Agent.Name == agent)
+                       .Take(count)
+                       .ToListAsync();
+
+            return await Task.FromResult(events.Select(e => new EventDto
+            {
+                CreatedAt = e.CreatedAt,
+                Status = e.Status,
+                Agent = e.Service.Agent.Name,
                 Service = e.Service.Name
             }));
         }
@@ -60,7 +81,7 @@ namespace Gadget.Server.Services
                 .ThenInclude(s => s.Events.Take(20))
                 .FirstOrDefault(x => x.Name == agentName);
             var services = machine?.Services;
-            var dto = services?.Select(s => new ServiceDto(s.Name, s.Status, s.LogOnAs, s.Description, s.Events));
+            var dto = services?.Select(s => new ServiceDto(s.Name, s.Status, s.LogOnAs, s.Description));
             return await Task.FromResult(dto);
         }
 

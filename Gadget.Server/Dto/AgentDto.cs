@@ -11,14 +11,14 @@ namespace Gadget.Server.Agents.Dto
 
     public class ServiceDto
     {
-        public ServiceDto(string name, string status, string logOnAs, string description,
-            IEnumerable<ServiceEvent> serviceEvents)
+        public ServiceDto(string name, string status, string logOnAs, string description)
+            //IEnumerable<ServiceEvent> serviceEvents)
         {
             Name = name;
             Status = status;
             LogOnAs = logOnAs;
             Description = description;
-            Events = serviceEvents;
+            //Events = serviceEvents;
         }
 
         public string Name { get; }
