@@ -55,16 +55,16 @@ namespace Gadget.Server.Services
         public async Task<IEnumerable<EventDto>> GetEvents(
             string agent, 
             string serviceName, 
-            DateTime? from, 
-            DateTime? to,
+            DateTime from, 
+            DateTime to,
             int count = int.MaxValue, 
             int skip = 0)
         {
-            if (from is null)
+            if (from == DateTime.MinValue)
             {
                 from = DateTime.UtcNow.AddYears(-1);
             }
-            if (to is null)
+            if (to == DateTime.MinValue)
             {
                 to = DateTime.UtcNow;
             }

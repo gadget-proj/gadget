@@ -17,8 +17,8 @@ namespace Gadget.Server.Services
         Task<IEnumerable<EventDto>> GetEvents(
             string agent,
             string serviceName,
-            DateTime? from,
-            DateTime? to,
+            DateTime from,
+            DateTime to,
             int count = int.MaxValue,
             int skip = 0);
     }
