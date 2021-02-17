@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Gadget.Server.Agents.Dto
+namespace Gadget.Server.Dto.V1
 {
     public class EventDto
     {

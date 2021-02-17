@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Gadget.Messaging.Contracts.Commands;
 using Gadget.Messaging.Contracts.Commands.v1;
-using Gadget.Server.Agents.Dto;
+using Gadget.Server.Dto.V1;
 using Gadget.Server.Persistence;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
@@ -74,6 +73,17 @@ namespace Gadget.Server.Services
             }));
         }
 
+        public async Task<IEnumerable<EventDto>> GetEvents(string agent, string service)
+        {
+            var ag =await _context.Agents
+                .Include(a=>a.Services)
+                .ThenInclude(s=>s.Events)
+                .FirstOrDefaultAsync(a => a.Name == agent);
+            
+            var svc = ag.Services.FirstOrDefault(s => s.Name == service);
+            return svc?.Events.Select(e => new EventDto{Agent = agent, Service = service, Status = e.Status, CreatedAt = e.CreatedAt});
+        }
+
         public async Task<IEnumerable<ServiceDto>> GetServices(string agentName)
         {
             var machine = _context.Agents
@@ -90,10 +100,10 @@ namespace Gadget.Server.Services
             try
             {
                 await _publishEndpoint.Publish<IRestartService>(new
-                {
-                    ServiceName = serviceName,
-                    Agent = agentName
-                },
+                    {
+                        ServiceName = serviceName,
+                        Agent = agentName
+                    },
                     context => { context.SetRoutingKey(serviceName); });
             }
             catch (Exception e)

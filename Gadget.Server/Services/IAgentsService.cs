@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Gadget.Server.Agents.Dto;
+using Gadget.Server.Dto.V1;
 
 namespace Gadget.Server.Services
 {
@@ -11,6 +11,7 @@ namespace Gadget.Server.Services
         Task StartService(string agentName, string serviceName);
         Task StopService(string agentName, string serviceName);
         Task RestartService(string agentName, string serviceName);
+        //TODO we could modify GetEvents method and merge them together
         Task<IEnumerable<EventDto>> GetLatestEvents(int count);
         Task<IEnumerable<EventDto>> GetServiceEvents(string agent, string serviceName, int count);
     }
