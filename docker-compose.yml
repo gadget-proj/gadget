@@ -13,3 +13,15 @@ services:
     ports:
       - 5341:5341
       - 4444:80
+  controlplane:
+    build:
+      context: .
+      dockerfile: Dockerfile.server
+    ports:
+      - 5001:5001
+  notifications:
+    build:
+      context: .
+      dockerfile: Dockerfile.notifications
+    ports:
+      - 5000:5000
