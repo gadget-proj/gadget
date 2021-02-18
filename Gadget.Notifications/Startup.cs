@@ -39,6 +39,8 @@ namespace Gadget.Notifications
             {
                 x.AddConsumer<ServiceStatusChangedConsumer>()
                     .Endpoint(cfg => cfg.Name = $"Notifications-{nameof(ServiceStatusChangedConsumer)}");
+                x.AddConsumer<MachineHealthConsumer>()
+                    .Endpoint(cfg => cfg.Name = $"Notifications-{nameof(MachineHealthConsumer)}");
                 x.UsingRabbitMq((context, cfg) =>
                 {
                     cfg.Host(Configuration.GetConnectionString("RabbitMq"),

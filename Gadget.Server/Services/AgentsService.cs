@@ -34,24 +34,62 @@ namespace Gadget.Server.Services
             }));
         }
 
-        public async Task<IEnumerable<EventDto>> GetLatestEvents(int count)
+         public async Task<IEnumerable<EventDto>> GetLatestEvents(int count)
         {
             var events = await _context.ServiceEvents
-                .OrderByDescending(x => x.CreatedAt)
-                .Include(x => x.Service)
-                .ThenInclude(y=>y.Agent)
-                .Take(count)
-                .ToListAsync();
+                       .OrderByDescending(x => x.CreatedAt)
+                       .Include(x=>x.Service)
+                       .ThenInclude(x=>x.Agent)
+                       .Take(count)
+                       .ToListAsync();
 
             return await Task.FromResult(events.Select(e => new EventDto
             {
                 CreatedAt = e.CreatedAt,
                 Status = e.Status,
-                Agent = e.Service.Agent.Name, //e.Service.Agent.Name,
+                Agent = e.Service.Agent.Name,
                 Service = e.Service.Name
             }));
         }
 
+         public async Task<IEnumerable<EventDto>> GetEvents(
+            string agent, 
+            string serviceName, 
+            DateTime from, 
+            DateTime to,
+            int count = int.MaxValue, 
+            int skip = 0)
+        {
+            if (from == DateTime.MinValue)
+            {
+                from = DateTime.UtcNow.AddYears(-1);
+            }
+            if (to == DateTime.MinValue)
+            {
+                to = DateTime.UtcNow;
+            }
+
+            var events = await _context.ServiceEvents
+                       .OrderByDescending(x => x.CreatedAt)
+                       .Include(x => x.Service)
+                       .ThenInclude(x=>x.Agent)
+                       .Where(x=> 
+                                x.Service.Name == serviceName &&
+                                x.Service.Agent.Name == agent &&
+                                x.CreatedAt>from &&
+                                x.CreatedAt < to)
+                       .Skip(skip)
+                       .Take(count)
+                       .ToListAsync();
+
+            return await Task.FromResult(events.Select(e => new EventDto
+            {
+                CreatedAt = e.CreatedAt,
+                Status = e.Status,
+                Agent = e.Service.Agent.Name,
+                Service = e.Service.Name
+            }));
+        }
         public async Task<IEnumerable<EventDto>> GetEvents(string agent, string service)
         {
             var ag = await _context.Agents

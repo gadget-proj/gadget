@@ -346,3 +346,4 @@ Gadget.Server/gadget.db**
 /Gadget.Notifications/notifications.db
 /.tye/docker_store
 /.tye/process_store
+.tye/
