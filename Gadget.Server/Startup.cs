@@ -1,4 +1,3 @@
-using System.Text;
 using Gadget.Messaging.Contracts.Commands;
 using Gadget.Server.Authorization;
 using Gadget.Server.Consumers;
@@ -17,8 +16,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
-
-
 namespace Gadget.Server
 {
     public class Startup
@@ -32,6 +29,25 @@ namespace Gadget.Server
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSingleton<TokenManager>();
+            services.AddAuthentication(x =>
+            {
+                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(x =>
+            {
+                var secret = Configuration.GetValue<string>("SecurityKey");
+                var key = Encoding.ASCII.GetBytes(secret);
+                x.RequireHttpsMetadata = false;
+                x.SaveToken = true;
+                x.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    ValidateIssuer = false,
+                    ValidateAudience = false
+                };
+            });
             services.AddLogging(cfg => cfg.AddSeq());
             services.AddDbContext<GadgetContext>(builder => builder.UseSqlite("Data Source=gadget.db"));
             services.AddMassTransit(x =>
@@ -68,25 +84,6 @@ namespace Gadget.Server
                     });
             });
             services.AddControllers();
-            services.AddAuthentication(x =>
-            {
-                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            }).AddJwtBearer(x =>
-            {
-                var secret = Configuration.GetValue<string>("SecurityKey");
-                var key = Encoding.ASCII.GetBytes(secret);
-                x.RequireHttpsMetadata = false;
-                x.SaveToken = true;
-                x.TokenValidationParameters = new TokenValidationParameters
-                {
-                    ValidateIssuerSigningKey  = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(key),
-                    ValidateIssuer = false,
-                    ValidateAudience = false
-                };
-            });
-            services.AddScoped<TokenManager>();
             services.AddTransient<IAgentsService, AgentsService>();
             services.AddHostedService<AgentHealthCheck>();
         }
@@ -112,9 +109,8 @@ namespace Gadget.Server
             app.UseCors("AllowAll");
             app.UseFileServer();
             app.UseRouting();
-
-            app.UseAuthorization();
             app.UseAuthentication();
+            app.UseAuthorization();
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
         }
     }
