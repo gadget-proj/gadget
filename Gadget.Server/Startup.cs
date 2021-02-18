@@ -1,4 +1,3 @@
-using System.Text;
 using Gadget.Messaging.Contracts.Commands;
 using Gadget.Server.Authorization;
 using Gadget.Server.Consumers;
@@ -16,8 +15,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-
-
 
 namespace Gadget.Server
 {
@@ -87,25 +84,6 @@ namespace Gadget.Server
                     });
             });
             services.AddControllers();
-            services.AddAuthentication(x =>
-            {
-                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            }).AddJwtBearer(x =>
-            {
-                var secret = Configuration.GetValue<string>("SecurityKey");
-                var key = Encoding.ASCII.GetBytes(secret);
-                x.RequireHttpsMetadata = false;
-                x.SaveToken = true;
-                x.TokenValidationParameters = new TokenValidationParameters
-                {
-                    ValidateIssuerSigningKey  = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(key),
-                    ValidateIssuer = false,
-                    ValidateAudience = false
-                };
-            });
-            services.AddScoped<TokenManager>();
             services.AddTransient<IAgentsService, AgentsService>();
             services.AddHostedService<AgentHealthCheck>();
         }
@@ -131,8 +109,7 @@ namespace Gadget.Server
             app.UseCors("AllowAll");
             app.UseFileServer();
             app.UseRouting();
-
-            //app.UseAuthentication();
+            app.UseAuthentication();
             app.UseAuthorization();
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
         }
