@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Gadget.Messaging.SignalR.v1;
+using Gadget.Server.Hubs;
 using Gadget.Server.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 
 namespace Gadget.Server.Controllers
 {
@@ -10,6 +13,7 @@ namespace Gadget.Server.Controllers
     public class AgentsController : ControllerBase
     {
         private readonly IAgentsService _agentsService;
+        private readonly IHubContext<GadgetHub> _hub;
 
         public AgentsController(IAgentsService agentsService)
         {
@@ -50,14 +54,24 @@ namespace Gadget.Server.Controllers
         [HttpPost("{agent}/{service}/stop")]
         public async Task<IActionResult> StopService(string agent, string service)
         {
-            await _agentsService.StopService(agent, service);
+            await _hub.Clients.Group("dashboard").SendAsync("ServiceStatusChanged", new ServiceDescriptor
+            {
+                Agent = agent,
+                Name = service,
+                Status = "Stopped"
+            });
             return Accepted();
         }
 
         [HttpPost("{agent}/{service}/restart")]
         public async Task<IActionResult> RestartService(string agent, string service)
         {
-            await _agentsService.RestartService(agent, service);
+            await _hub.Clients.Group("dashboard").SendAsync("ServiceStatusChanged", new ServiceDescriptor
+            {
+                Agent = agent,
+                Name = service,
+                Status = "Running"
+            });
             return Accepted();
         }
     }
