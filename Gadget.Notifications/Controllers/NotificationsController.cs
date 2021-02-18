@@ -34,5 +34,13 @@ namespace Gadget.Notifications.Controllers
                 NotifierType.Discord, cancellationToken);
             return Created("", "");
         }
+
+        [HttpGet("{agentName}/{serviceName}/webhooks")]
+        public async Task<IActionResult> GetWebhooks(string agentName, string serviceName,
+            CancellationToken cancellationToken)
+        {
+            var webhooks = await _notificationsService.GetWebhooks(agentName, serviceName, cancellationToken);
+            return Ok(webhooks);
+        }
     }
 }

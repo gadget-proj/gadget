@@ -5,6 +5,10 @@ namespace Gadget.Server.Domain.Entities
 {
     public class Service
     {
+        private Service()
+        {
+        }
+
         public Service(string name, string status, Agent agent, string logOnAs, string description)
         {
             Name = name;
@@ -13,10 +17,6 @@ namespace Gadget.Server.Domain.Entities
             LogOnAs = logOnAs;
             Description = description;
             Id = Guid.NewGuid();
-        }
-
-        private Service()
-        {
         }
 
         public Guid Id { get; }
@@ -34,7 +34,7 @@ namespace Gadget.Server.Domain.Entities
         public void ChangeStatus(string status)
         {
             Status = status;
-            Events.Add(new ServiceEvent(status, Id));
+            Events.Add(new ServiceEvent(status));
         }
 
         private sealed class NameEqualityComparer : IEqualityComparer<Service>
