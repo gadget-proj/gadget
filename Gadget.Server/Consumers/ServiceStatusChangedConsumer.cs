@@ -48,10 +48,10 @@ namespace Gadget.Server.Consumers
             var newEvent = new ServiceEvent(newStatus);
             changedService.Events.Add(newEvent);
 
-            if ( newStatus == "Stopped")
+            if (changedService.Restart && newStatus == "Stopped")
             {
                 //Restart
-                _logger.LogWarning(newStatus);
+                _logger.LogInformation($"Trying to restart service {service} on an agent {agentName}");
                 await context.Publish<IStartService>(new
                 {
                     ServiceName = service,
