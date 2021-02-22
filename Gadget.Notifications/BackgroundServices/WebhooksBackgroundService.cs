@@ -13,13 +13,13 @@ namespace Gadget.Notifications.BackgroundServices
     /// <summary>
     /// WebhooksService listens on a incoming notifications to emit
     /// </summary>
-    public class WebhooksService : BackgroundService
+    public class WebhooksBackgroundService : BackgroundService
     {
         private readonly ChannelReader<DiscordMessage> _channel;
-        private readonly ILogger<WebhooksService> _logger;
+        private readonly ILogger<WebhooksBackgroundService> _logger;
         private readonly IServiceProvider _services;
 
-        public WebhooksService(Channel<DiscordMessage> channel, ILogger<WebhooksService> logger,
+        public WebhooksBackgroundService(Channel<DiscordMessage> channel, ILogger<WebhooksBackgroundService> logger,
             IServiceProvider services)
         {
             _channel = channel.Reader;
