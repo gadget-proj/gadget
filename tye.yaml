@@ -22,14 +22,14 @@ services:
       - port: 15672
         name: "ui"
 
-#  - name: notifications
-#    project: Gadget.Notifications/Gadget.Notifications.csproj
-#    bindings:
-#      - port: 5000
-#  - name: controlplane
-#    project: Gadget.Server/Gadget.Server.csproj
-#    bindings:
-#      - port: 5001
+  - name: notifications
+    project: Gadget.Notifications/Gadget.Notifications.csproj
+    bindings:
+      - port: 5000
+  - name: controlplane
+    project: Gadget.Server/Gadget.Server.csproj
+    bindings:
+      - port: 5001
 # project: app.csproj # msbuild project path (relative to this file)
 # executable: app.exe # path to an executable (relative to this file)
 # args: --arg1=3 # arguments to pass to the process
