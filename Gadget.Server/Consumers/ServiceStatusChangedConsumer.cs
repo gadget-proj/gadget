@@ -28,11 +28,13 @@ namespace Gadget.Server.Consumers
             var agentName = context.Message.Agent;
             var service = context.Message.Name;
             var newStatus = context.Message.Status;
+            
             _logger.LogInformation($"Service {service} on an agent {agentName} changed its status to {newStatus}");
             var agent = await _context.Agents
                 .Include(a => a.Services)
                 .ThenInclude(s => s.Events.Take(1))
                 .FirstOrDefaultAsync(a => a.Name == agentName);
+            
             if (agent == null)
             {
                 throw new ApplicationException($"Agent {agentName} is not registered");
@@ -41,7 +43,7 @@ namespace Gadget.Server.Consumers
             var changedService = agent.Services.FirstOrDefault(s => s.Name == service);
             if (changedService is null)
             {
-                _logger.LogCritical($"Service {service} on agent {agentName} is not on this server");
+                _logger.LogError($"Service {service} on agent {agentName} is not registered on this server");
                 return;
             }
 
@@ -62,8 +64,6 @@ namespace Gadget.Server.Consumers
             agent.ChangeServiceStatus(service, newStatus);
             _context.Agents.Update(agent);
             await _context.SaveChangesAsync();
-            _logger.LogInformation(
-                $"Agent {context.Message.Agent} Svc {context.Message.Name} Status {context.Message.Status}");
         }
     }
 }
