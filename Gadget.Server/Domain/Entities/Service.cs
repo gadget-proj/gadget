@@ -5,6 +5,18 @@ namespace Gadget.Server.Domain.Entities
 {
     public class Service
     {
+        public Guid Id { get; }
+        public string Name { get; }
+        public string Status { get; private set; }
+        public string LogOnAs { get; }
+        public string Description { get; }
+        public Agent Agent { get; }
+
+        //public Guid AgentId { get; set; }
+
+        public readonly ICollection<ServiceEvent> Events = new List<ServiceEvent>();
+        public static IEqualityComparer<Service> NameComparer { get; } = new NameEqualityComparer();
+
         private Service()
         {
         }
@@ -18,18 +30,6 @@ namespace Gadget.Server.Domain.Entities
             Description = description;
             Id = Guid.NewGuid();
         }
-
-        public Guid Id { get; }
-        public string Name { get; }
-        public string Status { get; private set; }
-        public string LogOnAs { get; }
-        public string Description { get; }
-        public Agent Agent { get; }
-
-        //public Guid AgentId { get; set; }
-
-        public readonly ICollection<ServiceEvent> Events = new List<ServiceEvent>();
-        public static IEqualityComparer<Service> NameComparer { get; } = new NameEqualityComparer();
 
         public void ChangeStatus(string status)
         {

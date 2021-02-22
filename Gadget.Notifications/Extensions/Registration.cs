@@ -19,7 +19,7 @@ namespace Gadget.Notifications.Extensions
         public static IServiceCollection AddWebhooksNotifications(this IServiceCollection services)
         {
             services.AddHttpClient<IWebhooksService, WebhooksService>();
-            services.AddHostedService<BackgroundServices.WebhooksService>();
+            services.AddHostedService<WebhooksBackgroundService>();
             services.AddSingleton(_ => Channel.CreateUnbounded<DiscordMessage>());
             return services;
         }

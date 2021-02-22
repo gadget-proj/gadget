@@ -1,56 +1,53 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
-using System;
+﻿using System;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
 using System.Text;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Gadget.Server.Authorization
 {
     public class TokenManager
     {
         private readonly string _secret;
+
         public TokenManager(IConfiguration configuration)
         {
             _secret = configuration.GetValue<string>("SecurityKey");
         }
+
         public string GenerateToken(string userName)
         {
-            byte[] key = Encoding.ASCII.GetBytes(_secret);
-            SymmetricSecurityKey securityKey = new SymmetricSecurityKey(key);
+            var key = Encoding.ASCII.GetBytes(_secret);
             var handler = new JwtSecurityTokenHandler();
 
             var descriptor = new SecurityTokenDescriptor
             {
-                Subject = new ClaimsIdentity(new Claim[]
-               {
+                Subject = new ClaimsIdentity(new[]
+                {
                     new Claim(ClaimTypes.Name, userName)
-               }),
+                }),
                 Expires = DateTime.UtcNow.AddHours(1),
                 SigningCredentials = new SigningCredentials(
-                   new SymmetricSecurityKey(key),
-                   SecurityAlgorithms.HmacSha256Signature)
+                    new SymmetricSecurityKey(key),
+                    SecurityAlgorithms.HmacSha256Signature)
             };
-
             var token = handler.CreateJwtSecurityToken(descriptor);
-
             return handler.WriteToken(token);
         }
 
-        public  ClaimsPrincipal GetPrincipal(string token)
+        private ClaimsPrincipal GetPrincipal(string token)
         {
             try
             {
                 var handler = new JwtSecurityTokenHandler();
-                var jwtoken = (JwtSecurityToken)handler.ReadToken(token);
-                if (jwtoken == null)
+                var jwtSecurityToken = (JwtSecurityToken) handler.ReadToken(token);
+                if (jwtSecurityToken == null)
                 {
                     return null;
                 }
 
-                byte[] key = Convert.FromBase64String(_secret);
+                var key = Convert.FromBase64String(_secret);
                 var parameters = new TokenValidationParameters()
                 {
                     RequireExpirationTime = true,
@@ -59,8 +56,7 @@ namespace Gadget.Server.Authorization
                     IssuerSigningKey = new SymmetricSecurityKey(key)
                 };
 
-                SecurityToken securityToken;
-                var principal = handler.ValidateToken(token, parameters, out securityToken);
+                var principal = handler.ValidateToken(token, parameters, out _);
                 return principal;
             }
             catch (Exception)
@@ -68,28 +64,27 @@ namespace Gadget.Server.Authorization
                 return null;
             }
         }
-        public  bool ValidateToken(string token, string userName)
+
+        public bool ValidateToken(string token, string userName)
         {
-
-            var handler = new JwtSecurityTokenHandler();
-
             var principal = GetPrincipal(token);
             if (principal == null)
             {
                 return false;
             }
-            ClaimsIdentity identity = null;
+
+            ClaimsIdentity identity;
             try
             {
-                identity = (ClaimsIdentity)principal.Identity;
+                identity = (ClaimsIdentity) principal.Identity;
             }
             catch (Exception)
             {
                 return false;
             }
 
-            var userNameClaim = identity.FindFirst(ClaimTypes.Name);
-            return userName == userNameClaim.Value;
+            var userNameClaim = identity?.FindFirst(ClaimTypes.Name);
+            return userName == userNameClaim?.Value;
         }
     }
 }

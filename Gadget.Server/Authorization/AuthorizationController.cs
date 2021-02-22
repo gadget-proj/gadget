@@ -28,17 +28,12 @@ namespace Gadget.Server.Authorization
         [HttpPost("login")]
         public async Task<IActionResult> Login(LoginRequest request)
         {
-            if (request.UserName== "lucek" && request.Password== "lucek")// if password hashed is correct
-            {
-                var token = _tokenManager.GenerateToken(request.UserName);
-                return Ok(token);
-            }
-            else
+            if (request.UserName != "lucek" || request.Password != "lucek")
             {
                 return Unauthorized();
             }
-
-            return Ok();
+            var token = _tokenManager.GenerateToken(request.UserName);
+            return Ok(token);
         }
 
         [HttpPost("logout")]
@@ -54,6 +49,7 @@ namespace Gadget.Server.Authorization
             {
                 return Unauthorized();
             }
+
             return Ok(_tokenManager.GenerateToken(request.UserName));
         }
     }

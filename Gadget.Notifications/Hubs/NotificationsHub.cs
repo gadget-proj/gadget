@@ -15,10 +15,10 @@ namespace Gadget.Notifications.Hubs
 
         public override Task OnConnectedAsync()
         {
-            _logger.LogInformation($"{Context.ConnectionId} connected");
             var connectionId = Context.ConnectionId;
+            _logger.LogInformation($"{connectionId} connected to the hub");
             Groups.AddToGroupAsync(connectionId, "dashboard");
-            _logger.LogInformation($"{Context.ConnectionId} successfully joined dashboard group");
+            _logger.LogInformation($"{connectionId} successfully joined dashboard group");
             return Task.CompletedTask;
         }
     }

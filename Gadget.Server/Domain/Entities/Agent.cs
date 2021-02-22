@@ -7,6 +7,12 @@ namespace Gadget.Server.Domain.Entities
 {
     public class Agent
     {
+        public Guid Id { get; }
+        public string Name { get; }
+        public string Address { get; }
+        private readonly ICollection<Service> _services = new HashSet<Service>();
+        public IEnumerable<Service> Services => _services.ToImmutableList();
+
         private Agent()
         {
         }
@@ -17,12 +23,6 @@ namespace Gadget.Server.Domain.Entities
             Address = address ?? throw new ArgumentNullException(nameof(address));
             Id = Guid.NewGuid();
         }
-
-        public Guid Id { get; }
-        public string Name { get; }
-        public string Address { get; }
-        private readonly ICollection<Service> _services = new HashSet<Service>();
-        public IEnumerable<Service> Services => _services.ToImmutableList();
 
         private void AddService(Service service)
         {

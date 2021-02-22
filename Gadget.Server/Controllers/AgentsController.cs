@@ -22,7 +22,7 @@ namespace Gadget.Server.Controllers
             return Ok(await _agentsService.GetAgents());
         }
 
-        [HttpGet("events/{count}")]
+        [HttpGet("events/{count:int}")]
         public async Task<IActionResult> GetLatestEvents(int count)
         {
             return Ok(await _agentsService.GetLatestEvents(count));
