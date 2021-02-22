@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -22,6 +23,8 @@ namespace Gadget.Notifications.Services.Interfaces
 
         Task<IEnumerable<NotificationDto>> GetWebhooks(string agentName, string serviceName,
             CancellationToken cancellationToken);
+
+        IEnumerable<string> GetNotifierTypes();
     }
 
     public class NotificationsService : INotificationsService
@@ -73,6 +76,11 @@ namespace Gadget.Notifications.Services.Interfaces
                 }),
                 Service = n.Service
             });
+        }
+
+        public IEnumerable<string> GetNotifierTypes()
+        {
+            return Enum.GetNames(typeof(NotifierType)).ToList();
         }
     }
 }

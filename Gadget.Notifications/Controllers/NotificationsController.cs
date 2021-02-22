@@ -26,6 +26,13 @@ namespace Gadget.Notifications.Controllers
             return Created("", "");
         }
 
+        [HttpGet("types")]
+        public IActionResult GetNotifierTypes()
+        {
+            var types = _notificationsService.GetNotifierTypes();
+            return Ok(types);
+        }
+
         [HttpPost("{agentName}/{serviceName}/webhooks")]
         public async Task<IActionResult> CreateWebhook(string agentName, string serviceName,
             CreateWebhook createWebhook, CancellationToken cancellationToken)
