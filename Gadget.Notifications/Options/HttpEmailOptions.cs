@@ -1,4 +1,10 @@
 ﻿namespace Gadget.Notifications.Options
 {
-    public record HttpEmailOptions(string LoginUrl, string SendUrl, string Login, string Password);
+    public class HttpEmailOptions
+    {
+        public string LoginUrl { get; set; }
+        public string SendUrl { get; set; }
+        public string Login { get; set; }
+        public string Password { get; set; }
+    }
 }
