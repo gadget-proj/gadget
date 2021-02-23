@@ -12,12 +12,10 @@ namespace Gadget.Notifications.Controllers
     public class NotificationsController : ControllerBase
     {
         private readonly INotificationsService _notificationsService;
-        private readonly IEmailService _emailService;
 
-        public NotificationsController(INotificationsService notificationsService, IEmailService emailService)
+        public NotificationsController(INotificationsService notificationsService)
         {
             _notificationsService = notificationsService;
-            _emailService = emailService;
         }
 
         [HttpPost("{agentName}/{serviceName}")]
@@ -31,8 +29,6 @@ namespace Gadget.Notifications.Controllers
         [HttpGet("types")]
         public async Task<IActionResult> GetNotifierTypes()
         {
-            var canToken = new CancellationToken();
-           await _emailService.SendEmailMessage(new Domain.ValueObjects.EmailMessage("test message", "marcin_mojski@interia.pl"), canToken);
             var types = _notificationsService.GetNotifierTypes();
             return Ok(types);
         }
