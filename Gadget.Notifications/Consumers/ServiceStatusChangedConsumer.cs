@@ -43,7 +43,6 @@ namespace Gadget.Notifications.Consumers
                 await SendSignalRNotification(context);
                 _logger.LogInformation("Trying to enqueue webhook notification");
 
-                var all = _notificationsContext.Notifications.ToList();
                 var notifiers = await _notificationsContext.Notifications
                     .Include(s => s.Notifiers)
                     .Where(n => n.Agent == context.Message.Agent && n.Service == context.Message.Name)

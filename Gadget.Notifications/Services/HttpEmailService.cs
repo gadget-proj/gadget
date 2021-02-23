@@ -16,10 +16,7 @@ namespace Gadget.Notifications.Services
         private readonly ILogger<HttpEmailService> _logger;
         private  HttpEmailOptions _settings;
 
-        public HttpEmailService(
-            HttpClient client, 
-            ILogger<HttpEmailService> logger,
-            IOptions<HttpEmailOptions> settings)
+        public HttpEmailService(HttpClient client, ILogger<HttpEmailService> logger, IOptions<HttpEmailOptions> settings)
         {
             _client = client;
             _logger = logger;

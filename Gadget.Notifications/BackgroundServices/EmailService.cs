@@ -14,10 +14,7 @@ namespace Gadget.Notifications.BackgroundServices
         private readonly IEmailService _emailService;
         private readonly ChannelReader<EmailMessage> _channel;
 
-        public EmailService(
-            ILogger<EmailService> logger, 
-            Channel<EmailMessage> channel,
-            IEmailService emailService)
+        public EmailService(ILogger<EmailService> logger, Channel<EmailMessage> channel, IEmailService emailService)
         {
             _logger = logger;
             _channel = channel.Reader;
