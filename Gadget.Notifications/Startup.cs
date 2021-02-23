@@ -31,7 +31,7 @@ namespace Gadget.Notifications
         {
             services.AddLogging(cfg => cfg.AddSeq());
             services.AddTransient<INotificationsService, NotificationsService>();
-            services.AddEmailNotifications();
+            services.AddEmailNotifications(Configuration);
             services.AddWebhooksNotifications();
             services.AddDbContext<NotificationsContext>(builder => builder.UseSqlite("Data Source=notifications.db"));
             services.AddSignalR();

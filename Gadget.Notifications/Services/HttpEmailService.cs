@@ -1,8 +1,8 @@
 ﻿using Gadget.Notifications.Domain.ValueObjects;
+using Gadget.Notifications.Options;
 using Gadget.Notifications.Services.Interfaces;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using System;
+using Microsoft.Extensions.Options;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading;
@@ -14,37 +14,34 @@ namespace Gadget.Notifications.Services
     {
         private readonly HttpClient _client;
         private readonly ILogger<HttpEmailService> _logger;
-        //private readonly IConfiguration _configuration;
+        private  HttpEmailOptions _settings;
 
-        public HttpEmailService(HttpClient client, ILogger<HttpEmailService> logger)
+        public HttpEmailService(
+            HttpClient client, 
+            ILogger<HttpEmailService> logger,
+            IOptions<HttpEmailOptions> settings)
         {
             _client = client;
             _logger = logger;
+            _settings = settings.Value;
         }
 
         public async Task SendEmailMessage(EmailMessage message, CancellationToken cancellationToken)
         {
-            var sendEmailUrl = "https://newsletter.polskieradio.pl/api"; // new Uri(_configuration.GetValue<string>(""));
-
-            var login = "gadget";
-            var password = "";
-            var loginResponse = await _client.PostAsJsonAsync(sendEmailUrl + "/login", new { login = login, password = password });
-
+            
+            var loginResponse = await _client.PostAsJsonAsync(_settings.LoginUrl, new { login = _settings.Login, _settings.Password });
             var token = await loginResponse.Content.ReadAsStringAsync();
             _logger.LogInformation(token);
 
-            var sendResponse = await _client.PostAsJsonAsync(sendEmailUrl + "/sendmail", new
+            await _client.PostAsJsonAsync(_settings.SendUrl, new
             {
                 mailTo = message.Receiver,
                 sendWithTemplate= false,
                 subject = "Monitor Usług powiadomienie",
                 mainMessage = message.Body,
                 accessToken = token,
-                userName = login
+                userName = _settings.Login
             });
-
-
-            _logger.LogInformation(sendResponse.StatusCode.ToString());
         }
     }
 }
