@@ -1,6 +1,7 @@
 ﻿using System.Threading.Channels;
 using Gadget.Notifications.BackgroundServices;
 using Gadget.Notifications.Domain.ValueObjects;
+using Gadget.Notifications.Services;
 using Gadget.Notifications.Services.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using WebhooksService = Gadget.Notifications.Services.WebhooksService;
@@ -13,6 +14,7 @@ namespace Gadget.Notifications.Extensions
         {
             services.AddSingleton(_ => Channel.CreateUnbounded<EmailMessage>());
             services.AddHostedService<EmailService>();
+            services.AddHttpClient<IEmailService, HttpEmailService>();
             return services;
         }
 
