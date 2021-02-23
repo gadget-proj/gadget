@@ -17,7 +17,7 @@ namespace Gadget.Notifications.Extensions
             services.AddSingleton(_ => Channel.CreateUnbounded<EmailMessage>());
             services.AddHostedService<EmailService>();
             services.AddHttpClient<IEmailService, HttpEmailService>();
-            services.Configure<HttpEmailOptions>(o=> configuration.GetSection("HttpEmail").Bind(o)));
+            services.Configure<HttpEmailOptions>(o=> configuration.GetSection("HttpEmail").Bind(o));
             return services;
         }
 
