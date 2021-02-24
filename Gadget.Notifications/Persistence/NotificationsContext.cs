@@ -23,8 +23,6 @@ namespace Gadget.Notifications.Persistence
                 w.Property(wh => wh.Receiver);
                 w.Property(wh => wh.CreatedAt);
                 w.Property(wh => wh.NotifierType);
-                w.Property(wh => wh.AgentName);
-                w.Property(wh => wh.ServiceName);
                 w.HasKey("Id");
             }));
         }

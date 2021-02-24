@@ -19,13 +19,6 @@ namespace Gadget.Notifications.Controllers
             _notificationsService = notificationsService;
         }
 
-        [HttpPost("{agentName}/{serviceName}")]
-        public async Task<IActionResult> CreateNotification(string agentName, string serviceName,
-            CancellationToken cancellationToken)
-        {
-            await _notificationsService.RegisterNotification(agentName, serviceName, cancellationToken);
-            return Created("", "");
-        }
 
         [HttpGet("types")]
         public IActionResult GetNotifierTypes()
