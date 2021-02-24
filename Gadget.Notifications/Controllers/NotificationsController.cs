@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Gadget.Notifications.Domain.Enums;
 using Gadget.Notifications.Requests;
@@ -27,7 +28,7 @@ namespace Gadget.Notifications.Controllers
         }
 
         [HttpGet("types")]
-        public async Task<IActionResult> GetNotifierTypes()
+        public IActionResult GetNotifierTypes()
         {
             var types = _notificationsService.GetNotifierTypes();
             return Ok(types);
@@ -37,8 +38,8 @@ namespace Gadget.Notifications.Controllers
         public async Task<IActionResult> CreateWebhook(string agentName, string serviceName,
             CreateWebhook createWebhook, CancellationToken cancellationToken)
         {
-            await _notificationsService.RegisterNotifier(agentName, serviceName, createWebhook.Uri,
-                NotifierType.Discord, cancellationToken);
+            await _notificationsService.RegisterNotifier(agentName, serviceName, createWebhook.Receiver,
+                ParseNotifierType(createWebhook.NotifierType), cancellationToken);
             return Created("", "");
         }
 
@@ -48,6 +49,18 @@ namespace Gadget.Notifications.Controllers
         {
             var webhooks = await _notificationsService.GetWebhooks(agentName, serviceName, cancellationToken);
             return Ok(webhooks);
+        }
+
+        private NotifierType ParseNotifierType(string notifierTypeName)
+        {
+            object test = null;
+            
+            if (Enum.TryParse(typeof(NotifierType), notifierTypeName, out test))
+            {
+                return (NotifierType)test;
+            }
+
+            return NotifierType.None;
         }
     }
 }

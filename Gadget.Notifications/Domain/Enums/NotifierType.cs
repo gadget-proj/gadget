@@ -1,8 +1,8 @@
 ﻿namespace Gadget.Notifications.Domain.Enums
 {
     public enum NotifierType
-    {
-        Discord,
-        Email
+    {   None=0,
+        Discord =1,
+        Email = 2,
     }
 }

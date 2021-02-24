@@ -21,7 +21,7 @@ namespace Gadget.Notifications.Services.Interfaces
         Task RegisterNotifier(string agentName, string serviceName, string receiver, NotifierType notifierType,
             CancellationToken cancellationToken);
 
-        Task<IEnumerable<NotificationDto>> GetWebhooks(string agentName, string serviceName,
+        Task<NotificationDto> GetWebhooks(string agentName, string serviceName,
             CancellationToken cancellationToken);
 
         IEnumerable<string> GetNotifierTypes();
@@ -46,36 +46,78 @@ namespace Gadget.Notifications.Services.Interfaces
             await _notificationsContext.SaveChangesAsync(cancellationToken);
         }
 
+        public async Task DeleteNotifier(string agentName, string serviceName, string receiver,
+            CancellationToken cancellationToken)
+        {
+
+            var notification = await _notificationsContext.Notifications
+                .Include(x => x.Notifiers)
+                .FirstOrDefaultAsync(x =>
+                        x.Agent == agentName &&
+                        x.Service == serviceName);
+            if (notification is null)
+            {
+                return;
+            }
+            var toDelete = notification.Notifiers.FirstOrDefault(x => x.Receiver == receiver);
+            if (toDelete is not null)
+            {
+               
+            }
+            await _notificationsContext.SaveChangesAsync(cancellationToken);
+        }
+
         public async Task RegisterNotifier(string agentName, string serviceName, string receiver,
             NotifierType notifierType,
             CancellationToken cancellationToken)
         {
-            var notification = new Notification(agentName, serviceName);
-            var notifier = new Notifier(agentName, serviceName, receiver, NotifierType.Discord);
-            notification.AddNotifier(notifier);
-            await _notificationsContext.Notifications.AddAsync(notification, cancellationToken);
-            await _notificationsContext.SaveChangesAsync(cancellationToken);
+            var notification = await _notificationsContext.Notifications
+                .Include(x=>x.Notifiers)
+                .FirstOrDefaultAsync(x => 
+                        x.Agent == agentName &&
+                        x.Service == serviceName);
+
+            var newNotifier = new Notifier(agentName, serviceName, receiver, notifierType);
+
+            if (notification is null)
+            {
+                notification = new Notification(agentName, serviceName);
+                notification.AddNotifier(newNotifier);
+                await _notificationsContext.Notifications.AddAsync(notification, cancellationToken);
+                await _notificationsContext.SaveChangesAsync(cancellationToken);
+                return;
+            }
+
+            var notifier = notification.Notifiers.FirstOrDefault(x => 
+                                x.Receiver == receiver && 
+                                x.NotifierType == notifierType);
+
+            if (newNotifier is null)
+            {
+                notification.AddNotifier(newNotifier);
+                await _notificationsContext.SaveChangesAsync(cancellationToken);
+            }
         }
 
-        public async Task<IEnumerable<NotificationDto>> GetWebhooks(string agentName, string serviceName,
+        public async Task<NotificationDto> GetWebhooks(string agentName, string serviceName,
             CancellationToken cancellationToken)
         {
-            var notifications = await _notificationsContext.Notifications
+            var notification = await _notificationsContext.Notifications
                 .Where(n => n.Agent == agentName && n.Service == serviceName)
                 .Include(n => n.Notifiers)
-                .ToListAsync(cancellationToken);
-            return notifications.Select(n => new NotificationDto
+                .FirstOrDefaultAsync(cancellationToken);
+            return new NotificationDto
             {
-                Agent = n.Agent,
-                Id = n.Id,
-                Notifiers = n.Notifiers.Select(nn=> new NotifierDto
+                Agent = notification.Agent,
+                Id = notification.Id,
+                Notifiers = notification.Notifiers.Select(nn => new NotifierDto
                 {
                     Receiver = nn.Receiver,
                     CreatedAt = nn.CreatedAt,
                     Type = nn.NotifierType.ToString(),
                 }),
-                Service = n.Service
-            });
+                Service = notification.Service
+            };
         }
 
         public IEnumerable<string> GetNotifierTypes()
