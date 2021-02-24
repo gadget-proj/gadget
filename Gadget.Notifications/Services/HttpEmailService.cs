@@ -34,7 +34,7 @@ namespace Gadget.Notifications.Services
             {
                 mailTo = message.Receiver,
                 sendWithTemplate= false,
-                subject = "Monitor Usług powiadomienie",
+                subject = "Monitor Usług powiadomieni",
                 mainMessage = message.Body,
                 accessToken = token,
                 userName = _settings.Login
