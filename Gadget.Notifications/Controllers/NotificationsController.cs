@@ -28,7 +28,7 @@ namespace Gadget.Notifications.Controllers
         }
 
         [HttpPost("{agentName}/{serviceName}/webhooks")]
-        public async Task<IActionResult> CreateWebhook(string agentName, string serviceName,
+        public async Task<IActionResult> CreateNotifier(string agentName, string serviceName,
             CreateWebhook createWebhook, CancellationToken cancellationToken)
         {
             await _notificationsService.RegisterNotifier(agentName, serviceName, createWebhook.Receiver,
