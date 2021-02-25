@@ -53,6 +53,7 @@ namespace Gadget.Notifications.Services.Interfaces
             var toDelete = notification.Notifiers.FirstOrDefault(x => x.Receiver == receiver);
             if (toDelete is null)
             {
+                _logger.LogInformation($"Trying to delete nonexistent Notifier. Agent:{agentName}, Service:{serviceName}");
                 return;
             }
             _notificationsContext.Notifiers.Remove(toDelete);
