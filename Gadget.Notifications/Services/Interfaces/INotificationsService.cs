@@ -59,7 +59,7 @@ namespace Gadget.Notifications.Services.Interfaces
                 _logger.LogInformation($"Trying to delete nonexistent Notifier. Agent:{agentName}, Service:{serviceName}");
                 return;
             }
-            _notificationsContext.Notifier.Remove(toDelete);
+            notification.DeleteNotifier(toDelete);
             await _notificationsContext.SaveChangesAsync(cancellationToken);
         }
 
