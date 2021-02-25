@@ -251,6 +251,7 @@ ServiceFabricBackup/
 *.ndf
 *.db-shm
 *db-wal
+*.db
 
 # Business Intelligence projects
 *.rdl.data
