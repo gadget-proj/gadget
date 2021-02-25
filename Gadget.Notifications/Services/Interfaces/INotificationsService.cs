@@ -22,7 +22,7 @@ namespace Gadget.Notifications.Services.Interfaces
         Task<NotificationDto> GetWebhooks(string agentName, string serviceName,
             CancellationToken cancellationToken);
 
-        IEnumerable<string> GetNotifierTypes();
+        IEnumerable<object> GetNotifierTypes();
     }
 
     public class NotificationsService : INotificationsService
@@ -110,9 +110,10 @@ namespace Gadget.Notifications.Services.Interfaces
             };
         }
 
-        public IEnumerable<string> GetNotifierTypes()
+        public IEnumerable<object> GetNotifierTypes()
         {
-            return Enum.GetNames(typeof(NotifierType)).ToList();
+            var names = Enum.GetNames(typeof(NotifierType)).ToList();
+            return names.Select((x, i) => new {key=i, name=x });
         }
     }
 }
