@@ -23,6 +23,9 @@ namespace Gadget.Notifications.Services.Interfaces
             CancellationToken cancellationToken);
 
         IEnumerable<object> GetNotifierTypes();
+
+        Task DeleteNotifier(string agentName, string serviceName, string receiver,
+            CancellationToken cancellationToken);
     }
 
     public class NotificationsService : INotificationsService
@@ -56,7 +59,7 @@ namespace Gadget.Notifications.Services.Interfaces
                 _logger.LogInformation($"Trying to delete nonexistent Notifier. Agent:{agentName}, Service:{serviceName}");
                 return;
             }
-            _notificationsContext.Notifiers.Remove(toDelete);
+            _notificationsContext.Notifier.Remove(toDelete);
             await _notificationsContext.SaveChangesAsync(cancellationToken);
         }
 
@@ -85,7 +88,7 @@ namespace Gadget.Notifications.Services.Interfaces
                                 x.Receiver == receiver && 
                                 x.NotifierType == notifierType);
 
-            if (newNotifier is null)
+            if (notifier is null)
             {
                 notification.AddNotifier(newNotifier);
                 await _notificationsContext.SaveChangesAsync(cancellationToken);

@@ -36,6 +36,14 @@ namespace Gadget.Notifications.Controllers
             return Created("", "");
         }
 
+        [HttpPost("{agentName}/{serviceName}/deleteNotifier")]
+        public async Task<IActionResult> DeleteNotifier(string agentName, string serviceName,
+            DeleteWebhook deleteWebhook, CancellationToken cancellationToken)
+        {
+            await _notificationsService.DeleteNotifier(agentName, serviceName, deleteWebhook.Receiver, cancellationToken);
+            return Ok();
+        }
+
         [HttpGet("{agentName}/{serviceName}/webhooks")]
         public async Task<IActionResult> GetWebhooks(string agentName, string serviceName,
             CancellationToken cancellationToken)

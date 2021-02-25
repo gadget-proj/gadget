@@ -29,6 +29,6 @@ namespace Gadget.Notifications.Persistence
 
         public DbSet<Notification> Notifications { get; set; }
 
-        public DbSet<Notifier> Notifiers { get; set; }
+        public DbSet<Notifier> Notifier { get; set; }
     }
 }
