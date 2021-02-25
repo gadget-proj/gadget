@@ -16,7 +16,7 @@ namespace Gadget.Notifications.Services
         {
             _client = client;
             _settings = settings;
-            // TO DO register smtp client ins startup like this:
+            // TODO register smtp client ins startup like this:
             //client = new SmtpClient(settings.Host, settings.Port);
             //client.Credentials = new NetworkCredential(settings.Login, settings.Password);
         }
