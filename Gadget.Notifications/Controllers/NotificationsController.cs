@@ -32,7 +32,7 @@ namespace Gadget.Notifications.Controllers
             CreateWebhook createWebhook, CancellationToken cancellationToken)
         {
             await _notificationsService.RegisterNotifier(agentName, serviceName, createWebhook.Receiver,
-                (NotifierType)createWebhook.NotifierType, cancellationToken);
+                createWebhook.NotifierType, cancellationToken);
             return Created("", "");
         }
 
