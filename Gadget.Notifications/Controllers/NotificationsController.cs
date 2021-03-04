@@ -1,10 +1,9 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
-using Gadget.Notifications.Domain.Enums;
+﻿using FluentValidation;
 using Gadget.Notifications.Requests;
 using Gadget.Notifications.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Gadget.Notifications.Controllers
 {
@@ -13,9 +12,11 @@ namespace Gadget.Notifications.Controllers
     public class NotificationsController : ControllerBase
     {
         private readonly INotificationsService _notificationsService;
+        private readonly IValidator<CreateWebhook> _createWebhookValidator;
 
-        public NotificationsController(INotificationsService notificationsService)
+        public NotificationsController(INotificationsService notificationsService, IValidator<CreateWebhook> createWebhookValidator)
         {
+            _createWebhookValidator = createWebhookValidator;
             _notificationsService = notificationsService;
         }
 
@@ -31,6 +32,11 @@ namespace Gadget.Notifications.Controllers
         public async Task<IActionResult> CreateNotifier(string agentName, string serviceName,
             CreateWebhook createWebhook, CancellationToken cancellationToken)
         {
+            var result = _createWebhookValidator.Validate(createWebhook);
+            if (!result.IsValid)
+            {
+                return BadRequest(result.Errors[0].ErrorMessage);
+            }
             await _notificationsService.RegisterNotifier(agentName, serviceName, createWebhook.Receiver,
                 createWebhook.NotifierType, cancellationToken);
             return Created("", "");

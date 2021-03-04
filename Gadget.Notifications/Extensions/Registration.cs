@@ -1,7 +1,10 @@
 ﻿using System.Threading.Channels;
+using FluentValidation;
 using Gadget.Notifications.BackgroundServices;
 using Gadget.Notifications.Domain.ValueObjects;
 using Gadget.Notifications.Options;
+using Gadget.Notifications.Requests;
+using Gadget.Notifications.Requests.Validations;
 using Gadget.Notifications.Services;
 using Gadget.Notifications.Services.Interfaces;
 using Microsoft.Extensions.Configuration;
@@ -26,6 +29,12 @@ namespace Gadget.Notifications.Extensions
             services.AddHttpClient<IWebhooksService, WebhooksService>();
             services.AddHostedService<WebhooksBackgroundService>();
             services.AddSingleton(_ => Channel.CreateUnbounded<DiscordMessage>());
+            return services;
+        }
+
+        public static IServiceCollection AddValidations(this IServiceCollection services)
+        {
+            services.AddTransient<IValidator<CreateWebhook>, CreateWebhookValidator>();
             return services;
         }
     }

@@ -1,3 +1,4 @@
+using FluentValidation.AspNetCore;
 using Gadget.Notifications.Consumers;
 using Gadget.Notifications.Extensions;
 using Gadget.Notifications.Hubs;
@@ -33,6 +34,7 @@ namespace Gadget.Notifications
             services.AddTransient<INotificationsService, NotificationsService>();
             services.AddEmailNotifications(Configuration);
             services.AddWebhooksNotifications();
+            services.AddValidations();
             services.AddDbContext<NotificationsContext>(builder => builder.UseSqlite("Data Source=notifications.db"));
             services.AddSignalR();
             services.AddMassTransit(x =>
@@ -55,7 +57,8 @@ namespace Gadget.Notifications
                 });
             });
             services.AddMassTransitHostedService();
-            services.AddControllers();
+            services.AddControllers()
+                .AddFluentValidation();
             services.AddCors(options =>
             {
                 options.AddPolicy("AllowAll",
