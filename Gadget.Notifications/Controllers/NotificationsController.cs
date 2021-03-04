@@ -12,11 +12,9 @@ namespace Gadget.Notifications.Controllers
     public class NotificationsController : ControllerBase
     {
         private readonly INotificationsService _notificationsService;
-        private readonly IValidator<CreateWebhook> _createWebhookValidator;
 
-        public NotificationsController(INotificationsService notificationsService, IValidator<CreateWebhook> createWebhookValidator)
+        public NotificationsController(INotificationsService notificationsService)
         {
-            _createWebhookValidator = createWebhookValidator;
             _notificationsService = notificationsService;
         }
 
@@ -32,10 +30,9 @@ namespace Gadget.Notifications.Controllers
         public async Task<IActionResult> CreateNotifier(string agentName, string serviceName,
             CreateWebhook createWebhook, CancellationToken cancellationToken)
         {
-            var result = _createWebhookValidator.Validate(createWebhook);
-            if (!result.IsValid)
+            if (!ModelState.IsValid)
             {
-                return BadRequest(result.Errors[0].ErrorMessage);
+                return BadRequest();
             }
             await _notificationsService.RegisterNotifier(agentName, serviceName, createWebhook.Receiver,
                 createWebhook.NotifierType, cancellationToken);
