@@ -51,7 +51,7 @@ namespace Gadget.Server.HealthCheck
                         }
                         else
                         {
-                            await hub.Clients.Group("dashboard").SendAsync("AgentHealthCheck", new { Agent = a.Name, IsAlive = true });
+                            await hub.Clients.Group("dashboard").SendAsync("AgentHealthCheck", new { Agent = a.Name, IsAlive = false });
                         }
 
                         await Task.Delay(TimeSpan.FromSeconds(2), stoppingToken);

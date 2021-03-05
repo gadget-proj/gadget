@@ -1,5 +1,6 @@
 using Gadget.Messaging.Contracts.Commands;
 using Gadget.Server.Authorization;
+using Gadget.Server.Authorization.Providers;
 using Gadget.Server.Consumers;
 using Gadget.Server.HealthCheck;
 using Gadget.Server.Persistence;
@@ -86,6 +87,8 @@ namespace Gadget.Server
             services.AddControllers();
             services.AddTransient<IAgentsService, AgentsService>();
             services.AddHostedService<AgentHealthCheck>();
+            services.AddTransient<ILoginProvider, PRMockProvider>();
+            services.AddTransient<IUserService, UserService>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILogger<Startup> logger)

@@ -1,8 +1,9 @@
-﻿using Gadget.Server.Authorization.Requests;
+﻿using Gadget.Server.Authorization.Providers;
+using Gadget.Server.Authorization.Requests;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
-using System.Security.Principal;
+using System;
 using System.Threading.Tasks;
 
 namespace Gadget.Server.Authorization
@@ -12,10 +13,12 @@ namespace Gadget.Server.Authorization
     public class AuthorizationController : ControllerBase
     {
         private readonly TokenManager _tokenManager;
+        private readonly IUserService _userService;
 
-        public AuthorizationController(TokenManager tokenManager)
+        public AuthorizationController(TokenManager tokenManager, IUserService userService)
         {
             _tokenManager = tokenManager;
+            _userService = userService;
         }
 
         [Authorize]
@@ -32,9 +35,16 @@ namespace Gadget.Server.Authorization
             {
                 return Unauthorized();
             }
+
+           await _userService.AddUser(request.UserName);
+
             var token = _tokenManager.GenerateToken(request.UserName);
+            var refreshToken = _tokenManager.GenerateRefreshToken();
+            SetTokenCookie(refreshToken);
             return Ok(token);
         }
+
+        
 
         [HttpPost("logout")]
         public async Task<IActionResult> Logout(LoginRequest request)
@@ -51,6 +61,16 @@ namespace Gadget.Server.Authorization
             }
 
             return Ok(_tokenManager.GenerateToken(request.UserName));
+        }
+
+        private void SetTokenCookie(string token)
+        {
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Expires = DateTime.UtcNow.AddDays(7)
+            };
+            Response.Cookies.Append("refreshToken", token, cookieOptions);
         }
     }
 }
