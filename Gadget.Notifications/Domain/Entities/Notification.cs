@@ -24,5 +24,10 @@ namespace Gadget.Notifications.Domain.Entities
         {
             _notifiers.Add(notifier);
         }
+
+        public void DeleteNotifier(Notifier notifier)
+        {
+            _notifiers.Remove(notifier);
+        }
     }
 }
