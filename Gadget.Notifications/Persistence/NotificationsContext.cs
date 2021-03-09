@@ -20,7 +20,7 @@ namespace Gadget.Notifications.Persistence
             {
                 w.WithOwner().HasForeignKey("OwnerId");
                 w.Property<Guid>("Id");
-                w.Property(wh => wh.Receiver);
+                w.Property(wh => wh.Destination);
                 w.Property(wh => wh.CreatedAt);
                 w.Property(wh => wh.NotifierType);
                 w.HasKey("Id");

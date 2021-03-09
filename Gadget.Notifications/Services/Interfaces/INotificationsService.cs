@@ -16,7 +16,7 @@ namespace Gadget.Notifications.Services.Interfaces
 {
     public interface INotificationsService
     {
-        Task RegisterNotifier(string agentName, string serviceName, string receiver, NotifierType notifierType,
+        Task RegisterNotifier(string agentName, string serviceName, string destination, NotifierType notifierType,
             CancellationToken cancellationToken);
 
         Task<NotificationDto> GetWebhooks(string agentName, string serviceName,
@@ -24,7 +24,7 @@ namespace Gadget.Notifications.Services.Interfaces
 
         IEnumerable<object> GetNotifierTypes();
 
-        Task DeleteNotifier(string agentName, string serviceName, string receiver,
+        Task DeleteNotifier(string agentName, string serviceName, string destination,
             CancellationToken cancellationToken);
     }
 
@@ -39,41 +39,44 @@ namespace Gadget.Notifications.Services.Interfaces
             _notificationsContext = notificationsContext;
         }
 
-        public async Task DeleteNotifier(string agentName, string serviceName, string receiver,
+        public async Task DeleteNotifier(string agentName, string serviceName, string destination,
             CancellationToken cancellationToken)
         {
-
             var notification = await _notificationsContext.Notifications
                 .Include(x => x.Notifiers)
                 .FirstOrDefaultAsync(x =>
-                        x.Agent == agentName &&
-                        x.Service == serviceName);
+                    x.Agent == agentName &&
+                    x.Service == serviceName);
             if (notification is null)
             {
-                _logger.LogInformation($"Trying to delete nonexistent Notification. Agent:{agentName}, Service:{serviceName}");
+                _logger.LogInformation(
+                    $"Trying to delete nonexistent Notification. Agent:{agentName}, Service:{serviceName}");
                 return;
             }
-            var toDelete = notification.Notifiers.FirstOrDefault(x => x.Receiver == receiver);
+
+            var toDelete = notification.Notifiers.FirstOrDefault(x => x.Destination == destination);
             if (toDelete is null)
             {
-                _logger.LogInformation($"Trying to delete nonexistent Notifier. Agent:{agentName}, Service:{serviceName}");
+                _logger.LogInformation(
+                    $"Trying to delete nonexistent Notifier. Agent:{agentName}, Service:{serviceName}");
                 return;
             }
+
             notification.DeleteNotifier(toDelete);
             await _notificationsContext.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task RegisterNotifier(string agentName, string serviceName, string receiver,
+        public async Task RegisterNotifier(string agentName, string serviceName, string destination,
             NotifierType notifierType,
             CancellationToken cancellationToken)
         {
             var notification = await _notificationsContext.Notifications
-                .Include(x=>x.Notifiers)
-                .FirstOrDefaultAsync(x => 
-                        x.Agent == agentName &&
-                        x.Service == serviceName);
+                .Include(x => x.Notifiers)
+                .FirstOrDefaultAsync(x =>
+                    x.Agent == agentName &&
+                    x.Service == serviceName);
 
-            var newNotifier = new Notifier(agentName, serviceName, receiver, notifierType);
+            var newNotifier = new Receiver(agentName, serviceName, destination, notifierType);
 
             if (notification is null)
             {
@@ -84,9 +87,9 @@ namespace Gadget.Notifications.Services.Interfaces
                 return;
             }
 
-            var notifier = notification.Notifiers.FirstOrDefault(x => 
-                                x.Receiver == receiver && 
-                                x.NotifierType == notifierType);
+            var notifier = notification.Notifiers.FirstOrDefault(x =>
+                x.Destination == destination &&
+                x.NotifierType == notifierType);
 
             if (notifier is null)
             {
@@ -108,7 +111,7 @@ namespace Gadget.Notifications.Services.Interfaces
                 Id = notification.Id,
                 Notifiers = notification.Notifiers.Select(nn => new NotifierDto
                 {
-                    Receiver = nn.Receiver,
+                    Receiver = nn.Destination,
                     CreatedAt = nn.CreatedAt,
                     Type = nn.NotifierType.ToString(),
                 }),
@@ -119,7 +122,7 @@ namespace Gadget.Notifications.Services.Interfaces
         public IEnumerable<object> GetNotifierTypes()
         {
             var names = Enum.GetNames(typeof(NotifierType)).ToList();
-            return names.Select((x, i) => new {key=i, name=x });
+            return names.Select((x, i) => new {key = i, name = x});
         }
     }
 }

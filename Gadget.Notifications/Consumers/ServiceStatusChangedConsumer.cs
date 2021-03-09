@@ -74,23 +74,23 @@ namespace Gadget.Notifications.Consumers
             }, context.CancellationToken);
         }
 
-        private async Task EnqueueMessage(Notifier notifier, string status, string agent, string service)
+        private async Task EnqueueMessage(Receiver receiver, string status, string agent, string service)
         {
-            switch (notifier.NotifierType)
+            switch (receiver.NotifierType)
             {
                 case NotifierType.Discord:
-                    var discordMessage = new DiscordMessage(
-                        $"Agent : {agent} Service : {service} Status : {status}",
-                        new Uri(notifier.Receiver));
+                    var discordMessage = new DiscordMessage($"Agent : {agent} Service : {service} Status : {status}",
+                        new Uri(receiver.Destination));
                     await _discord.WriteAsync(discordMessage);
                     _logger.LogInformation("Enqueued discord message");
                     break;
                 case NotifierType.Email:
-                    var emailMessage = new EmailMessage(
-                        $"Agent : {agent} Service : {service} Status : {status}",
-                        notifier.Receiver);
+                    var emailMessage = new EmailMessage($"Agent : {agent} Service : {service} Status : {status}",
+                        receiver.Destination);
                     await _emails.WriteAsync(emailMessage);
                     _logger.LogInformation("Enqueued email message");
+                    break;
+                case NotifierType.None:
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
