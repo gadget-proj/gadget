@@ -1,6 +1,5 @@
 ﻿using System;
 using Gadget.Notifications.Domain.Entities;
-using Gadget.Notifications.Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 
 namespace Gadget.Notifications.Persistence

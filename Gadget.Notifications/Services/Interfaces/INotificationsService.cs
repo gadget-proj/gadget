@@ -26,6 +26,8 @@ namespace Gadget.Notifications.Services.Interfaces
 
         Task DeleteNotifier(string agentName, string serviceName, string destination,
             CancellationToken cancellationToken);
+
+        Task<IEnumerable<AgentDto>> GetAgentsAsync();
     }
 
     public class NotificationsService : INotificationsService
@@ -64,6 +66,15 @@ namespace Gadget.Notifications.Services.Interfaces
 
             notification.DeleteNotifier(toDelete);
             await _notificationsContext.SaveChangesAsync(cancellationToken);
+        }
+
+        public async Task<IEnumerable<AgentDto>> GetAgentsAsync()
+        {
+            return await _notificationsContext.Notifications
+                .Select(n => n.Agent)
+                .Distinct()
+                .Select(n=>new AgentDto(n))
+                .ToListAsync();
         }
 
         public async Task RegisterNotifier(string agentName, string serviceName, string destination,

@@ -15,6 +15,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Gadget.Notifications.Consumers
 {
+    // ReSharper disable once ClassNeverInstantiated.Global
     public class ServiceStatusChangedConsumer : IConsumer<IServiceStatusChanged>
     {
         private readonly ILogger<ServiceStatusChangedConsumer> _logger;
