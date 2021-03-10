@@ -31,7 +31,10 @@ namespace Gadget.Server.Domain.Entities
 
         public void AddServices(IEnumerable<Service> services)
         {
-            foreach (var service in services) AddService(service);
+            foreach (var service in services)
+            {
+                AddService(service);
+            }
         }
 
         public void ChangeServiceStatus(string serviceName, string newStatus)
