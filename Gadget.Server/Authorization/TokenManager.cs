@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -34,6 +35,16 @@ namespace Gadget.Server.Authorization
             };
             var token = handler.CreateJwtSecurityToken(descriptor);
             return handler.WriteToken(token);
+        }
+
+        public string GenerateRefreshToken()
+        {
+            var num = new byte[32];
+            using (var rng = RandomNumberGenerator.Create())
+            {
+                rng.GetBytes(num);
+                return Convert.ToBase64String(num);
+            }
         }
 
         private ClaimsPrincipal GetPrincipal(string token)

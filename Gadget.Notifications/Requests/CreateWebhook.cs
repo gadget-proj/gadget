@@ -1,4 +1,6 @@
-﻿namespace Gadget.Notifications.Requests
+﻿using Gadget.Notifications.Domain.Enums;
+
+namespace Gadget.Notifications.Requests
 {
-    public record CreateWebhook(string Uri);
+    public record CreateWebhook(string Receiver, NotifierType NotifierType);
 }

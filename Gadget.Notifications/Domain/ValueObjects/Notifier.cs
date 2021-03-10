@@ -7,8 +7,6 @@ namespace Gadget.Notifications.Domain.ValueObjects
     {
         public DateTime CreatedAt { get; }
         public NotifierType NotifierType { get; }
-        public string AgentName { get; }
-        public string ServiceName { get; }
         public string Receiver { get; }
 
         private Notifier()
@@ -17,8 +15,6 @@ namespace Gadget.Notifications.Domain.ValueObjects
         }
         public Notifier(string agentName, string serviceName, string receiver, NotifierType notifierType)
         {
-            AgentName = agentName ?? throw new ArgumentNullException(nameof(agentName));
-            ServiceName = serviceName ?? throw new ArgumentNullException(nameof(serviceName));
             Receiver = receiver ?? throw new ArgumentNullException(nameof(receiver));
             NotifierType = notifierType;
 
@@ -28,8 +24,6 @@ namespace Gadget.Notifications.Domain.ValueObjects
 
     public interface INotifier
     {
-        string AgentName { get; }
-        string ServiceName { get; }
         string Receiver { get; }
     }
 }
