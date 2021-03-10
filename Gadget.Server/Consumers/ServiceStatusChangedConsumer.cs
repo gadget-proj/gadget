@@ -1,7 +1,6 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Gadget.Messaging.Contracts.Commands.v1;
 using Gadget.Messaging.Contracts.Events.v1;
 using Gadget.Server.Domain.Entities;
 using Gadget.Server.Persistence;
@@ -28,42 +27,28 @@ namespace Gadget.Server.Consumers
             var agentName = context.Message.Agent;
             var service = context.Message.Name;
             var newStatus = context.Message.Status;
-            
-            _logger.LogInformation($"Service {service} on an agent {agentName} changed its status to {newStatus}");
+
             var agent = await _context.Agents
                 .Include(a => a.Services)
                 .ThenInclude(s => s.Events.Take(1))
                 .FirstOrDefaultAsync(a => a.Name == agentName);
-            
             if (agent == null)
             {
                 throw new ApplicationException($"Agent {agentName} is not registered");
             }
 
             var changedService = agent.Services.FirstOrDefault(s => s.Name == service);
-            if (changedService is null)
+            if (changedService != null)
             {
-                _logger.LogError($"Service {service} on agent {agentName} is not registered on this server");
-                return;
-            }
-
-            var newEvent = new ServiceEvent(newStatus);
-            changedService.Events.Add(newEvent);
-
-            if (changedService.Restart && newStatus == "Stopped")
-            {
-                //Restart
-                _logger.LogInformation($"Trying to restart service {service} on an agent {agentName}");
-                await context.Publish<IStartService>(new
-                {
-                    ServiceName = service,
-                    Agent = agentName
-                }, ctx => { ctx.SetRoutingKey(service); });
+                var newEvent = new ServiceEvent(newStatus);
+                changedService.Events.Add(newEvent);
             }
 
             agent.ChangeServiceStatus(service, newStatus);
             _context.Agents.Update(agent);
             await _context.SaveChangesAsync();
+            _logger.LogInformation(
+                $"Agent {context.Message.Agent} Svc {context.Message.Name} Status {context.Message.Status}");
         }
     }
 }
