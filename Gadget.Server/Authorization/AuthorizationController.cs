@@ -31,15 +31,14 @@ namespace Gadget.Server.Authorization
         [HttpPost("login")]
         public async Task<IActionResult> Login(LoginRequest request)
         {
-            if (request.UserName != "lucek" || request.Password != "lucek")
+            if (!await _userService.IsUservalid(request.UserName, request.Password))
             {
                 return Unauthorized();
             }
 
-           await _userService.AddUser(request.UserName);
-
             var token = _tokenManager.GenerateToken(request.UserName);
             var refreshToken = _tokenManager.GenerateRefreshToken();
+            await _userService.SaveRefreshToken(request.UserName, refreshToken);
             SetTokenCookie(refreshToken);
             return Ok(token);
         }

@@ -10,15 +10,19 @@ namespace Gadget.Server.Domain.Entities
         public DateTime ExpireDate { get;}
         public User User { get;}
         public Guid UserId { get;}
-
         public bool Used { get; set; }
         public bool Unvalidated { get; set; }
 
-        public RefreshToken(Guid userId, string token)
+        private RefreshToken()
         {
-            Id = Guid.NewGuid();
+
+        }
+
+        public RefreshToken(User user, string token)
+        {
+            //Id = Guid.NewGuid();
             Token = token;
-            UserId = userId;
+            User = user;
             CreateDate = DateTime.UtcNow;
             ExpireDate = DateTime.UtcNow.AddMinutes(10);
             Used = false;

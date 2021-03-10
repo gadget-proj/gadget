@@ -1,6 +1,5 @@
 using Gadget.Server.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
-using System;
 
 namespace Gadget.Server.Persistence
 {
@@ -41,7 +40,7 @@ namespace Gadget.Server.Persistence
 
             modelBuilder.Entity<User>(builder => builder.HasKey(u => u.Id));
             modelBuilder.Entity<User>(builder => builder.HasMany(u => u.RefreshTokens)
-                .WithOne(r => r.User).HasForeignKey("UserId"));
+               .WithOne(r => r.User).HasForeignKey("UserId")); ;
             modelBuilder.Entity<User>(builder => builder.Property(u => u.UserName));
             modelBuilder.Entity<User>(builder => builder.Property(u => u.UserProvider));
 
@@ -50,6 +49,7 @@ namespace Gadget.Server.Persistence
                                                         .HasOne(r => r.User)
                                                         .WithMany(u => u.RefreshTokens)
                                                         .HasForeignKey("UserId"));
+
             modelBuilder.Entity<RefreshToken>(builder => builder.Property(r => r.Token));
             modelBuilder.Entity<RefreshToken>(builder => builder.Property(r => r.Unvalidated));
             modelBuilder.Entity<RefreshToken>(builder => builder.Property(r => r.Used));
@@ -61,5 +61,6 @@ namespace Gadget.Server.Persistence
         public DbSet<Service> Services { get; set; }
         public DbSet<ServiceEvent> ServiceEvents { get; set; }
         public DbSet<User> Users { get; set; }
+        public DbSet<RefreshToken> RefreshToken { get; set; }
     }
 }
