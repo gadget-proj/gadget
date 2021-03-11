@@ -1,0 +1,20 @@
+﻿using Gadget.Server.Authorization.Dto;
+using Gadget.Server.Domain.Entities;
+using System.Threading.Tasks;
+
+namespace Gadget.Server.Authorization.Services.Interfaces
+{
+    public interface IUserService
+    {
+        Task<User> GetUser(string userName);
+
+        Task<bool> AddUser(string userName);
+
+        Task<bool> IsUservalid(string userName, string password);
+
+        Task<bool> SaveRefreshToken(string userName, string token, string ipAddress);
+
+        Task<RefreshTokenResult> RefreshToken(string token, string ipAddress);
+
+    }
+}
