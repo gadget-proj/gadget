@@ -1,17 +1,19 @@
-using Gadget.Messaging.Contracts.Commands.v1;
-using Gadget.Messaging.Contracts.Events.v1;
-using Gadget.Messaging.SignalR.v1;
-using MassTransit;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Management;
 using System.Net;
+using System.Net.Sockets;
 using System.ServiceProcess;
 using System.Threading;
 using System.Threading.Tasks;
+using Gadget.Messaging.Contracts.Commands.v1;
+using Gadget.Messaging.Contracts.Events.v1;
+using Gadget.Messaging.SignalR.v1;
+using MassTransit;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace Gadget.Inspector
 {
@@ -19,12 +21,11 @@ namespace Gadget.Inspector
     {
         private readonly IPublishEndpoint _publishEndpoint;
         private readonly ILogger<Inspector> _logger;
+
         private readonly IDictionary<string, ServiceControllerStatus> _services =
             new Dictionary<string, ServiceControllerStatus>();
 
-        public Inspector(IPublishEndpoint publishEndpoint, 
-            ILogger<Inspector> logger,
-            InspectorResources inspectorResources)
+        public Inspector(IPublishEndpoint publishEndpoint, ILogger<Inspector> logger)
         {
             _publishEndpoint = publishEndpoint;
             _logger = logger;
@@ -34,7 +35,7 @@ namespace Gadget.Inspector
         {
             _logger.LogInformation("Starting Inspector service");
             await RegisterAgent(stoppingToken);
-            
+
             _logger.LogInformation($"Starting watcher {DateTime.UtcNow}");
             while (!stoppingToken.IsCancellationRequested)
             {
@@ -59,10 +60,9 @@ namespace Gadget.Inspector
                         Agent = Environment.MachineName,
                         Name = serviceController.ServiceName,
                         Status = current.ToString()
-                    },  stoppingToken);
-                    
+                    }, stoppingToken);
                 }
-                
+
                 await Task.Delay(TimeSpan.FromSeconds(1), stoppingToken);
             }
         }
@@ -77,7 +77,7 @@ namespace Gadget.Inspector
                 Services = ServiceController.GetServices().Select(s => new ServiceDescriptor
                 {
                     Name = s.ServiceName,
-                    Status = s.Status.ToString(), 
+                    Status = s.Status.ToString(),
                     LogOnAs = GetServiceUser(s.ServiceName),
                     Description = GetServiceDescription(s.ServiceName)
                 })
@@ -87,7 +87,8 @@ namespace Gadget.Inspector
         private static string GetAddress()
         {
             var addresses = Dns.GetHostEntry(Dns.GetHostName()).AddressList;
-            return addresses.FirstOrDefault(x => x.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)?.ToString();
+            return addresses.FirstOrDefault(x => x.AddressFamily == AddressFamily.InterNetwork)
+                ?.ToString();
         }
 
         private static string GetServiceUser(string serviceName)
@@ -98,7 +99,7 @@ namespace Gadget.Inspector
             wmiService.Get();
             try
             {
-                output =  wmiService["startname"].ToString();
+                output = wmiService["startname"].ToString();
             }
             catch (Exception e)
             {
