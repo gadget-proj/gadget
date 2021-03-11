@@ -21,13 +21,6 @@ namespace Gadget.Inspector
         public static IHostBuilder CreateHostBuilder(string[] args)
         {
             return Host.CreateDefaultBuilder(args)
-                .ConfigureHostConfiguration(config =>
-                {
-                    if (args != null)
-                    {
-                        config.AddCommandLine(args);
-                    }
-                })
                 .ConfigureServices((host, services) =>
                 {
                     services.AddLogging(cfg => cfg.AddSeq());
@@ -62,12 +55,6 @@ namespace Gadget.Inspector
                     services.AddLogging(options => options.AddConsole());
                     services.AddScoped(_ => new PerformanceCounter("Processor", "% Processor Time", "_Total"));
                     services.AddScoped<InspectorResources>();
-                })
-                .ConfigureAppConfiguration((context, builder) =>
-                {
-                    builder.SetBasePath(AppContext.BaseDirectory)
-                        .AddJsonFile("appsettings.json", false)
-                        .AddJsonFile($"appsettings.{context.HostingEnvironment.EnvironmentName}.json", true);
                 });
         }
     }
