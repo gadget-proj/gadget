@@ -10,8 +10,8 @@ namespace Gadget.Server.Domain.Entities
         public string UserName { get;}
         public string UserProvider { get;}
 
-        private readonly ICollection<RefreshToken> _tokens = new HashSet<RefreshToken>();
-        public IEnumerable<RefreshToken> RefreshTokens => _tokens.ToImmutableList();
+        private readonly ICollection<RefreshToken> _refreshTokens = new HashSet<RefreshToken>();
+        public IEnumerable<RefreshToken> RefreshTokens => _refreshTokens.ToImmutableList();
 
         public User(string userName)
         {
@@ -21,7 +21,7 @@ namespace Gadget.Server.Domain.Entities
 
         public void AddRefreshToken(RefreshToken refreshToken)
         {
-            _tokens.Add(refreshToken);
+            _refreshTokens.Add(refreshToken);
         }
     }
 }

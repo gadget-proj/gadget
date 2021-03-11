@@ -10,7 +10,6 @@ namespace Gadget.Server.Domain.Entities
         public DateTime CreateDate { get;}
         public DateTime ExpireDate { get;}
         public User User { get;}
-        //public Guid UserId { get;}
         public bool Used { get;  private set; }
         public string IpAddress { get; }
         public bool Unvalidated { get; private set; }

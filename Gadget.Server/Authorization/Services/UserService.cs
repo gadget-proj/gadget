@@ -6,6 +6,7 @@ using Gadget.Server.Persistence;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Web;
 
 namespace Gadget.Server.Authorization.Services
 {
@@ -57,17 +58,15 @@ namespace Gadget.Server.Authorization.Services
 
         public async Task<RefreshTokenResult> RefreshToken(string token, string ipAddress)
         {
-            var users1 = _context.Users;
-            var users2 = _context.Users.ToList();
+            var decodedToken = HttpUtility.UrlDecode(token);
 
-            var user = await _context.Users.Include(x => x.RefreshTokens)
-                .FirstOrDefaultAsync(x => x.RefreshTokens.Any(y=>y.Token == token));
+            var user = await _context.Users.Include(x => x.RefreshTokens).FirstOrDefaultAsync(x => x.RefreshTokens.Any(y=>y.Token == decodedToken));
             if (user is null)
             {
                 return null;
             }
 
-            var refreshToken = user.RefreshTokens.Single(x => x.Token == token);
+            var refreshToken = user.RefreshTokens.Single(x => x.Token == decodedToken);
             if (!refreshToken.IsTokenIpValid(ipAddress) || !refreshToken.IsActive)
             {
                 return null;
@@ -76,15 +75,10 @@ namespace Gadget.Server.Authorization.Services
             refreshToken.Use();
             var newRefreshToken = _tokenManager.GenerateRefreshToken();
 
-            // validate refreshtoken
-            // unvalidate old
-            // generate new refresh token
-            // generate new jwt
-            //
            await SaveRefreshToken(user.UserName, newRefreshToken, ipAddress);
            var newJWT = _tokenManager.GenerateToken(user.UserName);
 
-            return null;
+            return new RefreshTokenResult(newJWT, newRefreshToken);
         }
     }
 }
