@@ -1,4 +1,5 @@
-﻿using Gadget.Server.Authorization.Requests;
+﻿using Gadget.Server.Authorization.Helpers;
+using Gadget.Server.Authorization.Requests;
 using Gadget.Server.Authorization.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -14,11 +15,13 @@ namespace Gadget.Server.Authorization
     {
         private readonly TokenManager _tokenManager;
         private readonly IUserService _userService;
+        private readonly AuthorizationHelper _authorizationHelper;
 
-        public AuthorizationController(TokenManager tokenManager, IUserService userService)
+        public AuthorizationController(TokenManager tokenManager, IUserService userService, AuthorizationHelper authorizationHelper)
         {
             _tokenManager = tokenManager;
             _userService = userService;
+            _authorizationHelper = authorizationHelper;
         }
 
         [Authorize]
@@ -32,15 +35,15 @@ namespace Gadget.Server.Authorization
         [HttpPost("login")]
         public async Task<IActionResult> Login(LoginRequest request)
         {
-            if (!await _userService.IsUservalid(request.UserName, request.Password))
+            if (!await _userService.IsUserValid(request.UserName, request.Password))
             {
                 return Unauthorized();
             }
 
             var token = _tokenManager.GenerateToken(request.UserName);
             var refreshToken = _tokenManager.GenerateRefreshToken();
-            await _userService.SaveRefreshToken(request.UserName, refreshToken, GetIp());
-            SetTokenCookie(refreshToken);
+            await _userService.SaveRefreshToken(request.UserName, refreshToken, _authorizationHelper.GetIp(HttpContext));
+            _authorizationHelper.SetTokenCookie(refreshToken, Response);
             return Ok(token);
         }
 
@@ -57,37 +60,16 @@ namespace Gadget.Server.Authorization
         [HttpPost("refresh")]
         public async Task<IActionResult> Refresh(RefreshRequest request)
         {
-            //var refreshToken = Request.Cookies["refreshToken"];
             var refreshToken = request.RefreshToken;
-            var newToken = await  _userService.RefreshToken(refreshToken, GetIp());
+            var newToken = await  _userService.RefreshToken(refreshToken, _authorizationHelper.GetIp(HttpContext));
 
             if (newToken is null)
             {
                 return Unauthorized(new { message = "Invalid refresh token" });
             }
 
-            SetTokenCookie(newToken.RefreshToken);
-
+            _authorizationHelper.SetTokenCookie(newToken.RefreshToken, Response);
             return Ok(newToken.JwtToken);
-        }
-
-        // TODO move to helper class
-        private void SetTokenCookie(string token)
-        {
-            var cookieOptions = new CookieOptions
-            {
-                HttpOnly = true,
-                Expires = DateTime.UtcNow.AddDays(7)
-            };
-            Response.Cookies.Append("refreshToken", token, cookieOptions);
-        }
-
-        private string GetIp()
-        {
-            if (Request.Headers.ContainsKey("X-Forwarded-For"))
-                return Request.Headers["X-Forwarded-For"];
-            else
-                return HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();
         }
     }
 }

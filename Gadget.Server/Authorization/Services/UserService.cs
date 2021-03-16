@@ -34,7 +34,7 @@ namespace Gadget.Server.Authorization.Services
             return await _context.Users.FirstOrDefaultAsync(x=>x.UserName ==userName);
         }
 
-        public async Task<bool> IsUservalid(string userName, string password)
+        public async Task<bool> IsUserValid(string userName, string password)
         {
             var user = await GetUser(userName);
             if (user is null)
@@ -76,9 +76,9 @@ namespace Gadget.Server.Authorization.Services
             var newRefreshToken = _tokenManager.GenerateRefreshToken();
 
            await SaveRefreshToken(user.UserName, newRefreshToken, ipAddress);
-           var newJWT = _tokenManager.GenerateToken(user.UserName);
+           var newToken = _tokenManager.GenerateToken(user.UserName);
 
-            return new RefreshTokenResult(newJWT, newRefreshToken);
+            return new RefreshTokenResult(newToken, newRefreshToken);
         }
     }
 }

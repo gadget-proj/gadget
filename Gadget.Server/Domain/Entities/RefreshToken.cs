@@ -10,7 +10,7 @@ namespace Gadget.Server.Domain.Entities
         public DateTime CreateDate { get;}
         public DateTime ExpireDate { get;}
         public User User { get;}
-        public bool Used { get;  private set; }
+        public bool Used { get; set; }
         public string IpAddress { get; }
         public bool Unvalidated { get; private set; }
 
@@ -33,12 +33,6 @@ namespace Gadget.Server.Domain.Entities
         {
             Used = true;
         }
-
-        public void Unvalidate()
-        {
-            Unvalidated = true;
-        }
-
 
         public bool IsExpired => DateTime.UtcNow >= ExpireDate;
 

@@ -16,7 +16,6 @@ namespace Gadget.Server.Authorization.Providers
         public bool PasswordValid(string userName, string password)
         {
             _users.TryGetValue(userName, out string  passwordHashed);
-            var hashed = HashMd5(password);
             return passwordHashed == HashMd5(password);
         }
 

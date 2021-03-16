@@ -10,7 +10,7 @@ namespace Gadget.Server.Authorization.Services.Interfaces
 
         Task<bool> AddUser(string userName);
 
-        Task<bool> IsUservalid(string userName, string password);
+        Task<bool> IsUserValid(string userName, string password);
 
         Task<bool> SaveRefreshToken(string userName, string token, string ipAddress);
 
