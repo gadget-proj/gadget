@@ -46,56 +46,5 @@ namespace Gadget.Server.Authorization
                 return Convert.ToBase64String(num);
             }
         }
-
-        private ClaimsPrincipal GetPrincipal(string token)
-        {
-            try
-            {
-                var handler = new JwtSecurityTokenHandler();
-                var jwtSecurityToken = (JwtSecurityToken) handler.ReadToken(token);
-                if (jwtSecurityToken == null)
-                {
-                    return null;
-                }
-
-                var key = Convert.FromBase64String(_secret);
-                var parameters = new TokenValidationParameters()
-                {
-                    RequireExpirationTime = true,
-                    ValidateIssuer = false,
-                    ValidateAudience = false,
-                    IssuerSigningKey = new SymmetricSecurityKey(key)
-                };
-
-                var principal = handler.ValidateToken(token, parameters, out _);
-                return principal;
-            }
-            catch (Exception)
-            {
-                return null;
-            }
-        }
-
-        public bool ValidateToken(string token, string userName)
-        {
-            var principal = GetPrincipal(token);
-            if (principal == null)
-            {
-                return false;
-            }
-
-            ClaimsIdentity identity;
-            try
-            {
-                identity = (ClaimsIdentity) principal.Identity;
-            }
-            catch (Exception)
-            {
-                return false;
-            }
-
-            var userNameClaim = identity?.FindFirst(ClaimTypes.Name);
-            return userName == userNameClaim?.Value;
-        }
     }
 }

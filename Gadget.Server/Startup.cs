@@ -1,5 +1,6 @@
 using Gadget.Messaging.Contracts.Commands;
 using Gadget.Server.Authorization;
+using Gadget.Server.Authorization.Helpers;
 using Gadget.Server.Authorization.Providers;
 using Gadget.Server.Authorization.Services;
 using Gadget.Server.Authorization.Services.Interfaces;
@@ -90,7 +91,8 @@ namespace Gadget.Server
             services.AddTransient<IAgentsService, AgentsService>();
             services.AddHostedService<AgentHealthCheck>();
             services.AddTransient<ILoginProvider, PRMockProvider>();
-            services.AddTransient<IUserService, UserService>();
+            services.AddTransient<IUsersService, UsersService>();
+            services.AddTransient<AuthorizationHelper>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILogger<Startup> logger)

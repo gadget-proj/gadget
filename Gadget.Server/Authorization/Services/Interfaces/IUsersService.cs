@@ -4,13 +4,13 @@ using System.Threading.Tasks;
 
 namespace Gadget.Server.Authorization.Services.Interfaces
 {
-    public interface IUserService
+    public interface IUsersService
     {
         Task<User> GetUser(string userName);
 
         Task<bool> AddUser(string userName);
 
-        Task<bool> IsUservalid(string userName, string password);
+        Task<bool> IsUserValid(string userName, string password);
 
         Task<bool> SaveRefreshToken(string userName, string token, string ipAddress);
 
