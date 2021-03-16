@@ -1,6 +1,8 @@
 using Gadget.Messaging.Contracts.Commands;
 using Gadget.Server.Authorization;
 using Gadget.Server.Authorization.Providers;
+using Gadget.Server.Authorization.Services;
+using Gadget.Server.Authorization.Services.Interfaces;
 using Gadget.Server.Consumers;
 using Gadget.Server.HealthCheck;
 using Gadget.Server.Persistence;

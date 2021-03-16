@@ -55,12 +55,12 @@ namespace Gadget.Server.Persistence
             modelBuilder.Entity<RefreshToken>(builder => builder.Property(r => r.Used));
             modelBuilder.Entity<RefreshToken>(builder => builder.Property(r => r.CreateDate));
             modelBuilder.Entity<RefreshToken>(builder => builder.Property(r => r.ExpireDate));
+            modelBuilder.Entity<RefreshToken>(builder => builder.Property(r => r.IpAddress));
         }
 
         public DbSet<Agent> Agents { get; set; }
         public DbSet<Service> Services { get; set; }
         public DbSet<ServiceEvent> ServiceEvents { get; set; }
         public DbSet<User> Users { get; set; }
-        public DbSet<RefreshToken> RefreshToken { get; set; }
     }
 }

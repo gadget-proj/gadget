@@ -1,5 +1,5 @@
-﻿using Gadget.Server.Authorization.Providers;
-using Gadget.Server.Authorization.Requests;
+﻿using Gadget.Server.Authorization.Requests;
+using Gadget.Server.Authorization.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -28,6 +28,7 @@ namespace Gadget.Server.Authorization
             return Ok("ja man");
         }
 
+        [AllowAnonymous]
         [HttpPost("login")]
         public async Task<IActionResult> Login(LoginRequest request)
         {
@@ -38,7 +39,7 @@ namespace Gadget.Server.Authorization
 
             var token = _tokenManager.GenerateToken(request.UserName);
             var refreshToken = _tokenManager.GenerateRefreshToken();
-            await _userService.SaveRefreshToken(request.UserName, refreshToken);
+            await _userService.SaveRefreshToken(request.UserName, refreshToken, GetIp());
             SetTokenCookie(refreshToken);
             return Ok(token);
         }
@@ -51,17 +52,26 @@ namespace Gadget.Server.Authorization
             return Ok();
         }
 
-        [HttpPost]
+
+        [AllowAnonymous]
+        [HttpPost("refresh")]
         public async Task<IActionResult> Refresh(RefreshRequest request)
         {
-            if (_tokenManager.ValidateToken(request.Token, request.UserName))
+            //var refreshToken = Request.Cookies["refreshToken"];
+            var refreshToken = request.RefreshToken;
+            var newToken = await  _userService.RefreshToken(refreshToken, GetIp());
+
+            if (newToken is null)
             {
-                return Unauthorized();
+                return Unauthorized(new { message = "Invalid refresh token" });
             }
 
-            return Ok(_tokenManager.GenerateToken(request.UserName));
+            SetTokenCookie(newToken.RefreshToken);
+
+            return Ok(newToken.JwtToken);
         }
 
+        // TODO move to helper class
         private void SetTokenCookie(string token)
         {
             var cookieOptions = new CookieOptions
@@ -70,6 +80,14 @@ namespace Gadget.Server.Authorization
                 Expires = DateTime.UtcNow.AddDays(7)
             };
             Response.Cookies.Append("refreshToken", token, cookieOptions);
+        }
+
+        private string GetIp()
+        {
+            if (Request.Headers.ContainsKey("X-Forwarded-For"))
+                return Request.Headers["X-Forwarded-For"];
+            else
+                return HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();
         }
     }
 }
