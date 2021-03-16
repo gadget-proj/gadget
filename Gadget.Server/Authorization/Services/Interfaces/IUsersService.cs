@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace Gadget.Server.Authorization.Services.Interfaces
 {
-    public interface IUserService
+    public interface IUsersService
     {
         Task<User> GetUser(string userName);
 

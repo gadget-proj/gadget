@@ -91,7 +91,7 @@ namespace Gadget.Server
             services.AddTransient<IAgentsService, AgentsService>();
             services.AddHostedService<AgentHealthCheck>();
             services.AddTransient<ILoginProvider, PRMockProvider>();
-            services.AddTransient<IUserService, UserService>();
+            services.AddTransient<IUsersService, UsersService>();
             services.AddTransient<AuthorizationHelper>();
         }
 

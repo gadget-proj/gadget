@@ -14,10 +14,10 @@ namespace Gadget.Server.Authorization
     public class AuthorizationController : ControllerBase
     {
         private readonly TokenManager _tokenManager;
-        private readonly IUserService _userService;
+        private readonly IUsersService _userService;
         private readonly AuthorizationHelper _authorizationHelper;
 
-        public AuthorizationController(TokenManager tokenManager, IUserService userService, AuthorizationHelper authorizationHelper)
+        public AuthorizationController(TokenManager tokenManager, IUsersService userService, AuthorizationHelper authorizationHelper)
         {
             _tokenManager = tokenManager;
             _userService = userService;

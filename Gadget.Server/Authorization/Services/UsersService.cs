@@ -10,13 +10,13 @@ using System.Web;
 
 namespace Gadget.Server.Authorization.Services
 {
-    public class UserService : IUserService
+    public class UsersService : IUsersService
     {
         private readonly GadgetContext _context;
         private readonly ILoginProvider _loginProvider;
         private readonly TokenManager _tokenManager;
 
-        public UserService(GadgetContext context, ILoginProvider loginProvider, TokenManager tokenManager)
+        public UsersService(GadgetContext context, ILoginProvider loginProvider, TokenManager tokenManager)
         {
             _context = context;
             _loginProvider = loginProvider;
