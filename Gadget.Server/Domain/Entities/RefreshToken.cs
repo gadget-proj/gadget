@@ -34,6 +34,11 @@ namespace Gadget.Server.Domain.Entities
             Used = true;
         }
 
+        public void Unvalidate()
+        {
+            Unvalidated = true;
+        }
+
         public bool IsExpired => DateTime.UtcNow >= ExpireDate;
 
         public bool IsActive => !Unvalidated && !IsExpired;

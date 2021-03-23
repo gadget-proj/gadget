@@ -16,5 +16,7 @@ namespace Gadget.Server.Authorization.Services.Interfaces
 
         Task<RefreshTokenResult> RefreshToken(string token, string ipAddress);
 
+        Task<bool> RefreshTokenUnvalidated(string token);
+
     }
 }
