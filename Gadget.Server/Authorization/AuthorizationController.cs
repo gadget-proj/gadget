@@ -14,13 +14,13 @@ namespace Gadget.Server.Authorization
     public class AuthorizationController : ControllerBase
     {
         private readonly TokenManager _tokenManager;
-        private readonly IUsersService _userService;
+        private readonly IUsersService _usersService;
         private readonly AuthorizationHelper _authorizationHelper;
 
-        public AuthorizationController(TokenManager tokenManager, IUsersService userService, AuthorizationHelper authorizationHelper)
+        public AuthorizationController(TokenManager tokenManager, IUsersService usersService, AuthorizationHelper authorizationHelper)
         {
             _tokenManager = tokenManager;
-            _userService = userService;
+            _usersService = usersService;
             _authorizationHelper = authorizationHelper;
         }
 
@@ -35,14 +35,14 @@ namespace Gadget.Server.Authorization
         [HttpPost("login")]
         public async Task<IActionResult> Login(LoginRequest request)
         {
-            if (!await _userService.IsUserValid(request.UserName, request.Password))
+            if (!await _usersService.IsUserValid(request.UserName, request.Password))
             {
                 return Unauthorized();
             }
 
             var token = _tokenManager.GenerateToken(request.UserName);
             var refreshToken = _tokenManager.GenerateRefreshToken();
-            await _userService.SaveRefreshToken(request.UserName, refreshToken, _authorizationHelper.GetIp(HttpContext));
+            await _usersService.SaveRefreshToken(request.UserName, refreshToken, _authorizationHelper.GetIp(HttpContext));
             _authorizationHelper.SetTokenCookie(refreshToken, Response);
             return Ok(token);
         }
@@ -50,18 +50,27 @@ namespace Gadget.Server.Authorization
         
 
         [HttpPost("logout")]
-        public async Task<IActionResult> Logout(LoginRequest request)
+        public async Task<IActionResult> Logout()
         {
-            return Ok();
+            var refreshToken = Request.Cookies["refreshToken"];
+            if (await _usersService.RefreshTokenUnvalidated(refreshToken))
+            {
+                return Ok();
+            }
+            return NotFound();
         }
 
 
         [AllowAnonymous]
         [HttpPost("refresh")]
-        public async Task<IActionResult> Refresh(RefreshRequest request)
+        public async Task<IActionResult> Refresh()
         {
-            var refreshToken = request.RefreshToken;
-            var newToken = await  _userService.RefreshToken(refreshToken, _authorizationHelper.GetIp(HttpContext));
+            var refreshToken = Request.Cookies["refreshToken"];
+            if (string.IsNullOrEmpty(refreshToken))
+            {
+                return Unauthorized("Refresh token not found");
+            }
+            var newToken = await  _usersService.RefreshToken(refreshToken, _authorizationHelper.GetIp(HttpContext));
 
             if (newToken is null)
             {

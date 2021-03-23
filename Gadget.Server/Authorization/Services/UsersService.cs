@@ -80,5 +80,22 @@ namespace Gadget.Server.Authorization.Services
 
             return new RefreshTokenResult(newToken, newRefreshToken);
         }
+
+        public async Task<bool> RefreshTokenUnvalidated(string token)
+        {
+            var decodedToken = HttpUtility.UrlDecode(token);
+
+            var user = await _context.Users.Include(x => x.RefreshTokens).FirstOrDefaultAsync(x => x.RefreshTokens.Any(y => y.Token == decodedToken));
+            if (user is null)
+            {
+                return false;
+            }
+
+            var refreshToken = user.RefreshTokens.Single(x => x.Token == decodedToken);
+            refreshToken.Unvalidate();
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
     }
 }
