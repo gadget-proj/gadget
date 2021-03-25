@@ -28,7 +28,7 @@ namespace Gadget.Server.Authorization
                 {
                     new Claim(ClaimTypes.Name, userName)
                 }),
-                Expires = DateTime.UtcNow.AddHours(1),
+                Expires = DateTime.UtcNow.AddMinutes(5),
                 SigningCredentials = new SigningCredentials(
                     new SymmetricSecurityKey(key),
                     SecurityAlgorithms.HmacSha256Signature)
