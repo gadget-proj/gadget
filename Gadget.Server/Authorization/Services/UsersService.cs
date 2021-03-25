@@ -4,6 +4,7 @@ using Gadget.Server.Authorization.Services.Interfaces;
 using Gadget.Server.Domain.Entities;
 using Gadget.Server.Persistence;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
@@ -72,13 +73,17 @@ namespace Gadget.Server.Authorization.Services
                 return null;
             }
 
-            refreshToken.Use();
-            var newRefreshToken = _tokenManager.GenerateRefreshToken();
-
+            var newToken = _tokenManager.GenerateToken(user.UserName);
+            if (refreshToken.IsActive)
+            {
+                refreshToken.Use();
+                return new RefreshTokenResult(newToken, refreshToken.Token);
+            }
+            
+            
+           var newRefreshToken = _tokenManager.GenerateRefreshToken();
            await SaveRefreshToken(user.UserName, newRefreshToken, ipAddress);
-           var newToken = _tokenManager.GenerateToken(user.UserName);
-
-            return new RefreshTokenResult(newToken, newRefreshToken);
+           return new RefreshTokenResult(newToken, newRefreshToken);
         }
 
         public async Task<bool> RefreshTokenUnvalidated(string token)
