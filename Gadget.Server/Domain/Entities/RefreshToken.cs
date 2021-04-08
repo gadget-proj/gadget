@@ -23,7 +23,7 @@ namespace Gadget.Server.Domain.Entities
             Token = token;
             User = user;
             CreateDate = DateTime.UtcNow;
-            ExpireDate = DateTime.UtcNow.AddMinutes(10);
+            ExpireDate = DateTime.UtcNow.AddDays(10);
             Used = false;
             Unvalidated = false;
             IpAddress = ipAddress;
