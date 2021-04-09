@@ -16,6 +16,5 @@ RUN dotnet publish "Gadget.Notifications.csproj" -c Release -o /app/publish
 
 
 FROM publish AS final
-WORKDIR /app
 COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "Gadget.Notifications.dll"]
