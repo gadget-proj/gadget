@@ -102,6 +102,11 @@ namespace Gadget.Notifications.Services.Interfaces
                 .Where(n => n.Agent == agentName && n.Service == serviceName)
                 .Include(n => n.Notifiers)
                 .FirstOrDefaultAsync(cancellationToken);
+
+            if (notification is null)
+            {
+                return null;
+            }
             return new NotificationDto
             {
                 Agent = notification.Agent,
