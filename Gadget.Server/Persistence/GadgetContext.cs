@@ -13,16 +13,16 @@ namespace Gadget.Server.Persistence
         {
             modelBuilder.Entity<Agent>(builder => builder.HasKey(a => a.Id));
             modelBuilder.Entity<Agent>(builder => builder.HasMany(a => a.Services)
-                .WithOne(s=>s.Agent).HasForeignKey("AgentId"));
+                .WithOne(s => s.Agent).HasForeignKey("AgentId"));
             modelBuilder.Entity<Agent>(builder => builder.Property(a => a.Name));
             modelBuilder.Entity<Agent>(builder => builder.Property(a => a.Address));
 
             modelBuilder.Entity<Service>(builder => builder.HasKey(a => a.Id));
             modelBuilder.Entity<Service>(builder => builder.Property(a => a.Name));
             modelBuilder.Entity<Service>(builder => builder
-                                                        .HasOne(a => a.Agent)
-                                                        .WithMany(x => x.Services)
-                                                        .HasForeignKey("AgentId"));
+                .HasOne(a => a.Agent)
+                .WithMany(x => x.Services)
+                .HasForeignKey("AgentId"));
 
             modelBuilder.Entity<Service>(builder => builder.Property(a => a.Status));
             modelBuilder.Entity<Service>(builder => builder.Property(a => a.LogOnAs));
@@ -35,20 +35,21 @@ namespace Gadget.Server.Persistence
             modelBuilder.Entity<ServiceEvent>(builder => builder.Property(s => s.CreatedAt));
             modelBuilder.Entity<ServiceEvent>(builder => builder.HasOne(s => s.Service)
                 .WithMany(x => x.Events)
-                .HasForeignKey( "ServiceId"));
+                .HasForeignKey("ServiceId"));
 
 
             modelBuilder.Entity<User>(builder => builder.HasKey(u => u.Id));
             modelBuilder.Entity<User>(builder => builder.HasMany(u => u.RefreshTokens)
-               .WithOne(r => r.User).HasForeignKey("UserId")); ;
+                .WithOne(r => r.User).HasForeignKey("UserId"));
+            ;
             modelBuilder.Entity<User>(builder => builder.Property(u => u.UserName));
             modelBuilder.Entity<User>(builder => builder.Property(u => u.UserProvider));
 
             modelBuilder.Entity<RefreshToken>(builder => builder.HasKey(a => a.Id));
             modelBuilder.Entity<RefreshToken>(builder => builder
-                                                        .HasOne(r => r.User)
-                                                        .WithMany(u => u.RefreshTokens)
-                                                        .HasForeignKey("UserId"));
+                .HasOne(r => r.User)
+                .WithMany(u => u.RefreshTokens)
+                .HasForeignKey("UserId"));
 
             modelBuilder.Entity<RefreshToken>(builder => builder.Property(r => r.Token));
             modelBuilder.Entity<RefreshToken>(builder => builder.Property(r => r.Unvalidated));

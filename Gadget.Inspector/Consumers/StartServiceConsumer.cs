@@ -1,11 +1,13 @@
 using System;
+using System.ComponentModel;
 using System.Linq;
 using System.ServiceProcess;
 using System.Threading.Tasks;
-using Gadget.Messaging.Contracts.Commands;
 using Gadget.Messaging.Contracts.Commands.v1;
+using Gadget.Messaging.Contracts.Events.v1;
 using MassTransit;
 using Microsoft.Extensions.Logging;
+using Polly;
 
 namespace Gadget.Inspector.Consumers
 {
@@ -18,7 +20,7 @@ namespace Gadget.Inspector.Consumers
             _logger = logger;
         }
 
-        public Task Consume(ConsumeContext<IStartService> context)
+        public async Task Consume(ConsumeContext<IStartService> context)
         {
             _logger.LogInformation($"Trying to start {context.Message.ServiceName}");
             var service = ServiceController.GetServices()
@@ -28,8 +30,33 @@ namespace Gadget.Inspector.Consumers
                 throw new ApplicationException($"Service {context.Message.ServiceName} could not be found");
             }
 
-            service.Start();
-            
+            var timeout = TimeSpan.FromSeconds(5);
+            try
+            {
+                await StartService(service, timeout);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e.Message);
+                await context.Publish<IActionFailed>(new
+                {
+                    context.CorrelationId,
+                    Agent = Environment.MachineName,
+                    Service = service.ServiceName,
+                    Action = nameof(StartServiceConsumer),
+                    Reason = e.Message,
+                    Date = DateTime.UtcNow
+                });
+            }
+        }
+
+        private static Task StartService(ServiceController serviceController, TimeSpan timeout, int retries = 3)
+        {
+            Policy.Handle<Win32Exception>().WaitAndRetry(retries, _ => timeout).Execute(() =>
+            {
+                serviceController.Start();
+                serviceController.WaitForStatus(ServiceControllerStatus.Running, timeout);
+            });
             return Task.CompletedTask;
         }
     }

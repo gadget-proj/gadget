@@ -58,6 +58,7 @@ namespace Gadget.Server
             {
                 x.AddConsumer<ServiceStatusChangedConsumer>();
                 x.AddConsumer<RegisterNewAgentConsumer>();
+                x.AddConsumer<ActionFailedConsumer>();
                 x.AddRequestClient<CheckAgentHealth>();
                 x.UsingRabbitMq((context, cfg) =>
                 {

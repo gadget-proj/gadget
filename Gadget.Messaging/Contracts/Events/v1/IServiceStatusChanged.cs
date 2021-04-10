@@ -1,3 +1,5 @@
+using System;
+
 namespace Gadget.Messaging.Contracts.Events.v1
 {
     public interface IServiceStatusChanged
@@ -5,5 +7,6 @@ namespace Gadget.Messaging.Contracts.Events.v1
         string Agent { get; }
         string Name { get; }
         string Status { get; }
+        DateTime Date { get; }
     }
 }
