@@ -2,6 +2,7 @@ using System.Diagnostics;
 using Gadget.Server;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Hosting;
 
 //Activity.DefaultIdFormat = ActivityIdFormat.W3C;
@@ -21,5 +22,6 @@ public static class Program
 
     public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
         WebHost.CreateDefaultBuilder(args)
+            // .ConfigureKestrel(options => options.ListenAnyIP(5021, o => o.Protocols = HttpProtocols.Http2))
             .UseStartup<Startup>();
 }

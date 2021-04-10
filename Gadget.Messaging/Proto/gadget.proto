@@ -1,0 +1,16 @@
+syntax = "proto3";
+option csharp_namespace = "GadgetRPC";
+
+package gadget;
+
+service Gadget {
+  rpc Test(TestRequest) returns (TestResponse);
+}
+
+message TestRequest{
+
+}
+
+message TestResponse {
+  string message = 1;
+}

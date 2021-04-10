@@ -24,6 +24,8 @@ namespace Gadget.Inspector
                 .ConfigureServices((host, services) =>
                 {
                     services.AddLogging(cfg => cfg.AddSeq());
+                    services.AddGrpcClient<GadgetRPC.Gadget.GadgetClient>(options => options.Address = new Uri("https://localhost:5001") );
+                    services.AddHostedService<RpcService>();
                     services.AddMassTransit(x =>
                     {
                         x.AddConsumer<StartServiceConsumer>();

@@ -10,34 +10,42 @@
         <ContainerBaseImage>mcr.microsoft.com/dotnet/sdk</ContainerBaseImage>
         <ContainerBaseTag>5.0</ContainerBaseTag>
     </PropertyGroup>
-    
+
     <ItemGroup>
         <ProjectReference Include="..\Gadget.Messaging\Gadget.Messaging.csproj" />
+        <Protobuf Include="..\Gadget.Messaging\Proto\gadget.proto" GrpcServices="Server" />
     </ItemGroup>
 
-    
+
     <ItemGroup>
-      <PackageReference Include="MassTransit" Version="7.0.7" />
-      <PackageReference Include="MassTransit.ActivityTracing" Version="0.1.0" />
-      <PackageReference Include="MassTransit.AspNetCore" Version="7.0.7" />
-      <PackageReference Include="MassTransit.Extensions.DependencyInjection" Version="7.0.7" />
-      <PackageReference Include="MassTransit.RabbitMQ" Version="7.0.7" />
-      <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="5.0.2" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.1" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="5.0.1">
-        <PrivateAssets>all</PrivateAssets>
-        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      </PackageReference>
-      <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="5.0.1" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="5.0.1" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.1" />
-      <PackageReference Include="Seq.Extensions.Logging" Version="6.0.0" />
-      <PackageReference Include="System.Threading.Channels" Version="5.0.0" />
+        <PackageReference Include="Google.Protobuf" Version="3.16.0-rc1" />
+        <PackageReference Include="Grpc.Core" Version="2.37.0" />
+        <PackageReference Include="Grpc.Tools" Version="2.37.0">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="Grpc.AspNetCore" Version="2.34.0" />
+        <PackageReference Include="MassTransit" Version="7.0.7" />
+        <PackageReference Include="MassTransit.ActivityTracing" Version="0.1.0" />
+        <PackageReference Include="MassTransit.AspNetCore" Version="7.0.7" />
+        <PackageReference Include="MassTransit.Extensions.DependencyInjection" Version="7.0.7" />
+        <PackageReference Include="MassTransit.RabbitMQ" Version="7.0.7" />
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="5.0.2" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.1" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="5.0.1">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="5.0.1" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="5.0.1" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.1" />
+        <PackageReference Include="Seq.Extensions.Logging" Version="6.0.0" />
+        <PackageReference Include="System.Threading.Channels" Version="5.0.0" />
     </ItemGroup>
 
-    
+
     <ItemGroup>
-      <Folder Include="wwwroot" />
+        <Folder Include="wwwroot" />
     </ItemGroup>
 
 </Project>

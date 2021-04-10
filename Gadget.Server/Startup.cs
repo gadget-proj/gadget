@@ -89,6 +89,7 @@ namespace Gadget.Server
                     });
             });
             services.AddControllers();
+            services.AddGrpc();
             services.AddTransient<IAgentsService, AgentsService>();
             services.AddHostedService<AgentHealthCheck>();
             services.AddTransient<ILoginProvider, PRMockProvider>();
@@ -119,7 +120,11 @@ namespace Gadget.Server
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
-            app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapGrpcService<GadgetService>();
+                endpoints.MapControllers();
+            });
         }
     }
 }
