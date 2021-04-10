@@ -6,6 +6,10 @@ services:
       - 5672:5672
       - 5673:5673
       - 15672:15672
+  grafana:
+    image: "grafana/grafana"
+    ports:
+      - 3000:3000
   seq:
     image: "datalust/seq:latest"
     environment:
