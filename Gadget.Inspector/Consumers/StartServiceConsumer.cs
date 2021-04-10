@@ -37,6 +37,7 @@ namespace Gadget.Inspector.Consumers
             }
             catch (Exception e)
             {
+                _logger.LogError(e.GetType().ToString());
                 _logger.LogError(e.Message);
                 await context.Publish<IActionFailed>(new
                 {
@@ -50,13 +51,20 @@ namespace Gadget.Inspector.Consumers
             }
         }
 
-        private static Task StartService(ServiceController serviceController, TimeSpan timeout, int retries = 3)
+        private Task StartService(ServiceController serviceController, TimeSpan timeout, int retries = 3)
         {
-            Policy.Handle<Win32Exception>().WaitAndRetry(retries, _ => timeout).Execute(() =>
-            {
-                serviceController.Start();
-                serviceController.WaitForStatus(ServiceControllerStatus.Running, timeout);
-            });
+            Policy
+                .Handle<Win32Exception>()
+                .Or<InvalidOperationException>()
+                .WaitAndRetry(retries, _ => timeout)
+                .Execute(
+                    () =>
+                    {
+                        _logger.LogInformation(
+                            $"Trying to execute action {nameof(StartServiceConsumer)}/{nameof(StartService)}");
+                        serviceController.Start();
+                        serviceController.WaitForStatus(ServiceControllerStatus.Running, timeout);
+                    });
             return Task.CompletedTask;
         }
     }
