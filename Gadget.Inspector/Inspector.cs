@@ -101,7 +101,7 @@ namespace Gadget.Inspector
             {
                 output = wmiService["startname"].ToString();
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 // ignored
             }
@@ -118,7 +118,7 @@ namespace Gadget.Inspector
             {
                 output = wmiService["Description"].ToString();
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 // ignored
             }

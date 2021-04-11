@@ -59,7 +59,7 @@ namespace Gadget.Inspector.Consumers
                             $"Trying to execute action {nameof(StartServiceConsumer)}/{nameof(StopService)}");
                         serviceController.Refresh();
                         serviceController.Stop();
-                        serviceController.WaitForStatus(ServiceControllerStatus.Running, timeout);
+                        serviceController.WaitForStatus(ServiceControllerStatus.Stopped, timeout);
                     });
             return Task.CompletedTask;
         }

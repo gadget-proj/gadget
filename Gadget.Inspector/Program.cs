@@ -3,7 +3,6 @@ using System.Diagnostics;
 using System.Reflection;
 using Gadget.Inspector.Consumers;
 using MassTransit;
-using MassTransit.ActivityTracing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -46,7 +45,6 @@ namespace Gadget.Inspector
                                 e.ConfigureConsumer<RestartServiceConsumer>(context);
                                 e.ConfigureConsumer<CheckAgentHealthConsumer>(context);
                             });
-                            cfg.PropagateActivityTracingContext();
                         });
                     });
                     services.AddMassTransitHostedService();
