@@ -25,10 +25,6 @@ namespace Gadget.Inspector
                     services.AddLogging(cfg => cfg.AddSeq());
                     services.AddMassTransit(x =>
                     {
-                        x.AddConsumer<StartServiceConsumer>();
-                        x.AddConsumer<CheckAgentHealthConsumer>();
-                        x.AddConsumer<StopServiceConsumer>();
-                        x.AddConsumer<RestartServiceConsumer>();
                         x.AddConsumers(Assembly.GetExecutingAssembly());
                         x.UsingRabbitMq((context, cfg) =>
                         {

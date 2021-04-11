@@ -56,7 +56,7 @@ namespace Gadget.Inspector.Consumers
                     () =>
                     {
                         _logger.LogInformation(
-                            $"Trying to execute action {nameof(StartServiceConsumer)}/{nameof(StopService)}");
+                            $"Trying to execute action {nameof(StopServiceConsumer)}/{nameof(StopService)}");
                         serviceController.Refresh();
                         serviceController.Stop();
                         serviceController.WaitForStatus(ServiceControllerStatus.Stopped, timeout);
