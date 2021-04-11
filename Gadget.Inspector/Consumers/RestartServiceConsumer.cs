@@ -3,6 +3,7 @@ using System.Linq;
 using System.ServiceProcess;
 using System.Threading.Tasks;
 using Gadget.Messaging.Contracts.Commands.v1;
+using Gadget.Messaging.Contracts.Responses;
 using MassTransit;
 using Microsoft.Extensions.Logging;
 
@@ -18,7 +19,7 @@ namespace Gadget.Inspector.Consumers
         }
 
 
-        public Task Consume(ConsumeContext<IRestartService> context)
+        public async Task Consume(ConsumeContext<IRestartService> context)
         {
             _logger.LogInformation($"Trying to start {context.Message.ServiceName}");
             var service = ServiceController.GetServices()
@@ -30,26 +31,34 @@ namespace Gadget.Inspector.Consumers
 
             try
             {
-                TimeSpan timeout = TimeSpan.FromMilliseconds(500);
-
-                if (service.Status == ServiceControllerStatus.Running)
+                var timeout = TimeSpan.FromMilliseconds(500);
+                await RestartRunningService(service, timeout);
+                await context.RespondAsync<IActionResultResponse>(new
                 {
-                    service.Stop();
-                    service.WaitForStatus(ServiceControllerStatus.Stopped, timeout);
-                    service.Start();
-                    service.WaitForStatus(ServiceControllerStatus.Running, timeout);
-                }
-                else if (service.Status == ServiceControllerStatus.Stopped)
-                {
-                    service.Start();
-                    service.WaitForStatus(ServiceControllerStatus.Running, timeout);
-                }
+                    Success = true
+                });
             }
             catch
             {
-                _logger.LogError($"Restart service error:{service.ServiceName}");
+                await context.RespondAsync<IActionResultResponse>(new
+                {
+                    Success = false
+                });
+                _logger.LogError($"Could not restart service {context.Message.Agent}{context.Message.ServiceName}");
+            }
+        }
+
+
+        private static Task RestartRunningService(ServiceController service, TimeSpan timeout)
+        {
+            if (service.Status == ServiceControllerStatus.Running)
+            {
+                service.Stop();
+                service.WaitForStatus(ServiceControllerStatus.Stopped, timeout);
             }
 
+            service.Start();
+            service.WaitForStatus(ServiceControllerStatus.Running, timeout);
             return Task.CompletedTask;
         }
     }
