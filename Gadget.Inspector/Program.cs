@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Reflection;
 using Gadget.Inspector.Consumers;
+using Gadget.Inspector.Extensions;
 using MassTransit;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -22,6 +23,8 @@ namespace Gadget.Inspector
             return Host.CreateDefaultBuilder(args)
                 .ConfigureServices((host, services) =>
                 {
+                    services.AddServices(host.Configuration);
+                    services.Configure<RequestedServices>(host.Configuration.GetSection("RequestedServices"));
                     services.AddLogging(cfg => cfg.AddSeq());
                     services.AddMassTransit(x =>
                     {

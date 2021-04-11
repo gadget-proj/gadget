@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.ServiceProcess;
@@ -15,19 +16,19 @@ namespace Gadget.Inspector.Consumers
     public class StopServiceConsumer : IConsumer<IStopService>
     {
         private readonly ILogger<StopServiceConsumer> _logger;
+        private readonly ICollection<Service> _services;
 
-        public StopServiceConsumer(ILogger<StopServiceConsumer> logger)
+        public StopServiceConsumer(ILogger<StopServiceConsumer> logger, ICollection<Service> services)
         {
             _logger = logger;
+            _services = services;
         }
 
 
         public async Task Consume(ConsumeContext<IStopService> context)
         {
             _logger.LogInformation($"Trying to stop {context.Message.ServiceName}");
-            var service = ServiceController
-                .GetServices()
-                .FirstOrDefault(s => s.ServiceName == context.Message.ServiceName);
+            var service = _services.FirstOrDefault(s => s.Name == context.Message.ServiceName);
 
             if (service is null)
             {
@@ -46,7 +47,7 @@ namespace Gadget.Inspector.Consumers
             }
         }
 
-        private Task StopService(ServiceController serviceController, TimeSpan timeout, int retries = 3)
+        private Task StopService(Service service, TimeSpan timeout, int retries = 3)
         {
             Policy
                 .Handle<Win32Exception>()
@@ -57,9 +58,7 @@ namespace Gadget.Inspector.Consumers
                     {
                         _logger.LogInformation(
                             $"Trying to execute action {nameof(StopServiceConsumer)}/{nameof(StopService)}");
-                        serviceController.Refresh();
-                        serviceController.Stop();
-                        serviceController.WaitForStatus(ServiceControllerStatus.Stopped, timeout);
+                        service.Stop(timeout);
                     });
             return Task.CompletedTask;
         }

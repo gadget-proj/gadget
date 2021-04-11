@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Management;
 using System.Net;
+using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.ServiceProcess;
 using System.Threading;
@@ -14,6 +15,7 @@ using MassTransit;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace Gadget.Inspector
 {
@@ -26,10 +28,14 @@ namespace Gadget.Inspector
         private readonly IDictionary<string, ServiceControllerStatus> _services =
             new Dictionary<string, ServiceControllerStatus>();
 
-        public Inspector(IPublishEndpoint publishEndpoint, ILogger<Inspector> logger, IConfiguration configuration)
+        private readonly ICollection<Service> _svc;
+
+        public Inspector(IPublishEndpoint publishEndpoint, ILogger<Inspector> logger, IConfiguration configuration,
+            ICollection<Service> svc)
         {
             _publishEndpoint = publishEndpoint;
             _logger = logger;
+            _svc = svc;
             _loopInterval = int.TryParse(configuration["MainLoopInterval"], out var interval) ? interval : 1;
         }
 
@@ -38,18 +44,18 @@ namespace Gadget.Inspector
             _logger.LogInformation($"Starting watcher {DateTime.UtcNow}");
             await RegisterAgent(stoppingToken);
 
-            while (!stoppingToken.IsCancellationRequested)
-            {
-                foreach (var serviceController in ServiceController.GetServices())
-                {
-                    await WatchForServiceChanges(stoppingToken, serviceController);
-                }
-
-                await Task.Delay(TimeSpan.FromSeconds(_loopInterval), stoppingToken);
-            }
+            // while (!stoppingToken.IsCancellationRequested)
+            // {
+            //     foreach (var serviceController in ServiceController.GetServices())
+            //     {
+            //         await WatchForServiceChanges(serviceController, stoppingToken);
+            //     }
+            //
+            //     await Task.Delay(TimeSpan.FromSeconds(_loopInterval), stoppingToken);
+            // }
         }
 
-        private async Task WatchForServiceChanges(CancellationToken stoppingToken, ServiceController serviceController)
+        private async Task WatchForServiceChanges(ServiceController serviceController, CancellationToken stoppingToken)
         {
             serviceController.Refresh();
             var current = serviceController.Status;
@@ -76,16 +82,20 @@ namespace Gadget.Inspector
         private async Task RegisterAgent(CancellationToken stoppingToken)
         {
             _logger.LogInformation($"Registering new agent {Environment.MachineName}");
+            foreach (var service in _svc)
+            {
+                _ = service.Watch(stoppingToken);
+            }
+
             await _publishEndpoint.Publish<IRegisterNewAgent>(new
             {
                 Agent = Environment.MachineName,
                 Address = GetAddress(),
-                Services = ServiceController.GetServices().Select(s => new ServiceDescriptor
+                Services = _svc.Select(s => new ServiceDescriptor
                 {
-                    Name = s.ServiceName,
+                    Agent = Environment.MachineName,
+                    Name = s.Name,
                     Status = s.Status.ToString(),
-                    LogOnAs = GetServiceUser(s.ServiceName),
-                    Description = GetServiceDescription(s.ServiceName)
                 })
             }, stoppingToken);
         }

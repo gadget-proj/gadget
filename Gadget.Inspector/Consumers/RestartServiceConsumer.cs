@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.ServiceProcess;
 using System.Threading.Tasks;
@@ -12,19 +13,20 @@ namespace Gadget.Inspector.Consumers
     public class RestartServiceConsumer : IConsumer<IRestartService>
     {
         private readonly ILogger<RestartServiceConsumer> _logger;
+        private readonly ICollection<Service> _services;
 
-        public RestartServiceConsumer(ILogger<RestartServiceConsumer> logger)
+        public RestartServiceConsumer(ILogger<RestartServiceConsumer> logger, ICollection<Service> services)
         {
             _logger = logger;
+            _services = services;
         }
 
 
         public async Task Consume(ConsumeContext<IRestartService> context)
         {
             _logger.LogInformation($"Trying to start {context.Message.ServiceName}");
-            var service = ServiceController.GetServices()
-                .FirstOrDefault(s => s.ServiceName == context.Message.ServiceName);
-            if (service == null)
+            var service = _services.FirstOrDefault(s => s.Name == context.Message.ServiceName);
+            if (service is null)
             {
                 throw new ApplicationException($"Service {context.Message.ServiceName} could not be found");
             }
@@ -49,16 +51,14 @@ namespace Gadget.Inspector.Consumers
         }
 
 
-        private static Task RestartRunningService(ServiceController service, TimeSpan timeout)
+        private static Task RestartRunningService(Service service, TimeSpan timeout)
         {
             if (service.Status == ServiceControllerStatus.Running)
             {
-                service.Stop();
-                service.WaitForStatus(ServiceControllerStatus.Stopped, timeout);
+                service.Stop(timeout);
             }
 
-            service.Start();
-            service.WaitForStatus(ServiceControllerStatus.Running, timeout);
+            service.Start(timeout);
             return Task.CompletedTask;
         }
     }

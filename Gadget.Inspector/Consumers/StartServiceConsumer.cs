@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.ServiceProcess;
@@ -15,18 +16,18 @@ namespace Gadget.Inspector.Consumers
     public class StartServiceConsumer : IConsumer<IStartService>
     {
         private readonly ILogger<StartServiceConsumer> _logger;
+        private readonly ICollection<Service> _services;
 
-        public StartServiceConsumer(ILogger<StartServiceConsumer> logger)
+        public StartServiceConsumer(ILogger<StartServiceConsumer> logger, ICollection<Service> services)
         {
             _logger = logger;
+            _services = services;
         }
 
         public async Task Consume(ConsumeContext<IStartService> context)
         {
             _logger.LogInformation($"Trying to start {context.Message.ServiceName}");
-            var service = ServiceController
-                .GetServices()
-                .FirstOrDefault(s => s.ServiceName == context.Message.ServiceName);
+            var service = _services.FirstOrDefault(s => s.Name == context.Message.ServiceName);
             if (service is null)
             {
                 throw new ApplicationException($"Service {context.Message.ServiceName} could not be found");
@@ -49,7 +50,7 @@ namespace Gadget.Inspector.Consumers
                 {
                     context.CorrelationId,
                     Agent = Environment.MachineName,
-                    Service = service.ServiceName,
+                    Service = service.Name,
                     Action = nameof(StartServiceConsumer),
                     Reason = e.Message,
                     Date = DateTime.UtcNow
@@ -58,7 +59,7 @@ namespace Gadget.Inspector.Consumers
                 {
                     context.CorrelationId,
                     Agent = Environment.MachineName,
-                    Service = service.ServiceName,
+                    Service = service.Name,
                     Action = nameof(StartServiceConsumer),
                     Reason = e.Message,
                     Date = DateTime.UtcNow
@@ -66,7 +67,7 @@ namespace Gadget.Inspector.Consumers
             }
         }
 
-        private Task StartService(ServiceController serviceController, TimeSpan timeout, int retries = 3)
+        private Task StartService(Service service, TimeSpan timeout, int retries = 3)
         {
             Policy
                 .Handle<Win32Exception>()
@@ -77,8 +78,7 @@ namespace Gadget.Inspector.Consumers
                     {
                         _logger.LogInformation(
                             $"Trying to execute action {nameof(StartServiceConsumer)}/{nameof(StartService)}");
-                        serviceController.Start();
-                        serviceController.WaitForStatus(ServiceControllerStatus.Running, timeout);
+                        service.Start(timeout);
                     });
             return Task.CompletedTask;
         }
