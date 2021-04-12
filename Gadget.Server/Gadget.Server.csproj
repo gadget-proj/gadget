@@ -39,4 +39,9 @@
       <Folder Include="wwwroot" />
     </ItemGroup>
 
+    
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="wwwroot\assets\logo.png" />
+    </ItemGroup>
+
 </Project>
