@@ -43,7 +43,7 @@ namespace Gadget.Server.Authorization
             var token = _tokenManager.GenerateToken(request.UserName);
             var refreshToken = _tokenManager.GenerateRefreshToken();
             await _usersService.SaveRefreshToken(request.UserName, refreshToken, _authorizationHelper.GetIp(HttpContext));
-            _authorizationHelper.SetTokenCookie(refreshToken, Response);
+            AuthorizationHelper.SetTokenCookie(refreshToken, Response);
             return Ok(token);
         }
 
@@ -77,7 +77,7 @@ namespace Gadget.Server.Authorization
                 return Unauthorized(new { message = "Invalid refresh token" });
             }
 
-            _authorizationHelper.SetTokenCookie(newToken.RefreshToken, Response);
+            AuthorizationHelper.SetTokenCookie(newToken.RefreshToken, Response);
             return Ok(newToken.JwtToken);
         }
     }
