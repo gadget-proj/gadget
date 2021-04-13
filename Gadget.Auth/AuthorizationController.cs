@@ -1,14 +1,13 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Threading.Tasks;
-using Gadget.Auth;
+﻿using System.Threading.Tasks;
+using Gadget.Auth.Domain;
 using Gadget.Auth.Helpers;
+using Gadget.Auth.Persistence;
 using Gadget.Auth.Requests;
 using Gadget.Auth.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
-namespace Gadget.Server.Authorization
+namespace Gadget.Auth
 {
     [ApiController]
     [Route("auth")]
@@ -17,12 +16,15 @@ namespace Gadget.Server.Authorization
         private readonly TokenManager _tokenManager;
         private readonly IUsersService _usersService;
         private readonly AuthorizationHelper _authorizationHelper;
+        private readonly AuthContext _context;
 
-        public AuthorizationController(TokenManager tokenManager, IUsersService usersService, AuthorizationHelper authorizationHelper)
+        public AuthorizationController(TokenManager tokenManager, IUsersService usersService,
+            AuthorizationHelper authorizationHelper, AuthContext context)
         {
             _tokenManager = tokenManager;
             _usersService = usersService;
             _authorizationHelper = authorizationHelper;
+            _context = context;
         }
 
         [Authorize]
@@ -30,6 +32,15 @@ namespace Gadget.Server.Authorization
         public IActionResult Test()
         {
             return Ok("ja man");
+        }
+
+        [AllowAnonymous]
+        [HttpPost("newnewnew")]
+        public async Task<IActionResult> CreateNewUser()
+        {
+            await _context.AddAsync(new User("lucek"));
+            await _context.SaveChangesAsync();
+            return Ok();
         }
 
         [AllowAnonymous]
@@ -43,12 +54,12 @@ namespace Gadget.Server.Authorization
 
             var token = _tokenManager.GenerateToken(request.UserName);
             var refreshToken = TokenManager.GenerateRefreshToken();
-            await _usersService.SaveRefreshToken(request.UserName, refreshToken, _authorizationHelper.GetIp(HttpContext));
+            await _usersService.SaveRefreshToken(request.UserName, refreshToken,
+                _authorizationHelper.GetIp(HttpContext));
             _authorizationHelper.SetTokenCookie(refreshToken, Response);
             return Ok(token);
         }
 
-        
 
         [HttpPost("logout")]
         public async Task<IActionResult> Logout()
@@ -58,6 +69,7 @@ namespace Gadget.Server.Authorization
             {
                 return Ok();
             }
+
             return NotFound();
         }
 
@@ -71,11 +83,12 @@ namespace Gadget.Server.Authorization
             {
                 return Unauthorized("Refresh token not found");
             }
-            var newToken = await  _usersService.RefreshToken(refreshToken, _authorizationHelper.GetIp(HttpContext));
+
+            var newToken = await _usersService.RefreshToken(refreshToken, _authorizationHelper.GetIp(HttpContext));
 
             if (newToken is null)
             {
-                return Unauthorized(new { message = "Invalid refresh token" });
+                return Unauthorized(new {message = "Invalid refresh token"});
             }
 
             _authorizationHelper.SetTokenCookie(newToken.RefreshToken, Response);
