@@ -17,6 +17,7 @@ namespace Gadget.ConsoleApp.Debug
             await connection.StartAsync();
 
             Console.WriteLine(connection.State);
+            
             Console.ReadKey();
         }
     }
