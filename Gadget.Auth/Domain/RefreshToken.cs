@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Net;
 
-namespace Gadget.Server.Domain.Entities
+namespace Gadget.Auth.Domain
 {
     public class RefreshToken
     {

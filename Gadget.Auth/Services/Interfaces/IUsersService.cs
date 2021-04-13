@@ -1,8 +1,8 @@
-﻿using Gadget.Server.Authorization.Dto;
-using Gadget.Server.Domain.Entities;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using Gadget.Auth.Domain;
+using Gadget.Auth.Dto;
 
-namespace Gadget.Server.Authorization.Services.Interfaces
+namespace Gadget.Auth.Services.Interfaces
 {
     public interface IUsersService
     {

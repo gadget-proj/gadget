@@ -1,9 +1,5 @@
+using System.Text;
 using Gadget.Messaging.Contracts.Commands;
-using Gadget.Server.Authorization;
-using Gadget.Server.Authorization.Helpers;
-using Gadget.Server.Authorization.Providers;
-using Gadget.Server.Authorization.Services;
-using Gadget.Server.Authorization.Services.Interfaces;
 using Gadget.Server.Consumers;
 using Gadget.Server.HealthCheck;
 using Gadget.Server.Persistence;
@@ -18,7 +14,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
-using System.Text;
 
 namespace Gadget.Server
 {
@@ -33,7 +28,7 @@ namespace Gadget.Server
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddSingleton<TokenManager>();
+            
             services.AddAuthentication(x =>
             {
                 x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -91,9 +86,7 @@ namespace Gadget.Server
             services.AddControllers();
             services.AddTransient<IAgentsService, AgentsService>();
             services.AddHostedService<AgentHealthCheck>();
-            services.AddTransient<ILoginProvider, PRMockProvider>();
-            services.AddTransient<IUsersService, UsersService>();
-            services.AddTransient<AuthorizationHelper>();
+            
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILogger<Startup> logger)

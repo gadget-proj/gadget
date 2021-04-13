@@ -36,6 +36,7 @@
 
     
     <ItemGroup>
+      <Folder Include="Authorization" />
       <Folder Include="wwwroot" />
     </ItemGroup>
 

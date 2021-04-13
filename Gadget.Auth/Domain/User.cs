@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 
-namespace Gadget.Server.Domain.Entities
+namespace Gadget.Auth.Domain
 {
     public class User
     {

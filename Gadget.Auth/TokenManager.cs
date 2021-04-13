@@ -6,7 +6,7 @@ using System.Text;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 
-namespace Gadget.Server.Authorization
+namespace Gadget.Auth
 {
     public class TokenManager
     {
@@ -37,14 +37,12 @@ namespace Gadget.Server.Authorization
             return handler.WriteToken(token);
         }
 
-        public string GenerateRefreshToken()
+        public static string GenerateRefreshToken()
         {
             var num = new byte[32];
-            using (var rng = RandomNumberGenerator.Create())
-            {
-                rng.GetBytes(num);
-                return Convert.ToBase64String(num);
-            }
+            using var rng = RandomNumberGenerator.Create();
+            rng.GetBytes(num);
+            return Convert.ToBase64String(num);
         }
     }
 }

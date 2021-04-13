@@ -1,13 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Text;
 
-namespace Gadget.Server.Authorization.Providers
+namespace Gadget.Auth.Providers
 {
-    public class PRMockProvider : ILoginProvider
+    public class PrMockProvider : ILoginProvider
     {
         private readonly Dictionary<string, string> _users;
 
-        public PRMockProvider()
+        public PrMockProvider()
         {
             _users = new Dictionary<string, string> { 
                 { "test", "5a105e8b9d40e1329780d62ea2265d8a" },

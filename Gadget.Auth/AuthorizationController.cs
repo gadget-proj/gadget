@@ -1,11 +1,12 @@
-﻿using Gadget.Server.Authorization.Helpers;
-using Gadget.Server.Authorization.Requests;
-using Gadget.Server.Authorization.Services.Interfaces;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
+using Gadget.Auth;
+using Gadget.Auth.Helpers;
+using Gadget.Auth.Requests;
+using Gadget.Auth.Services.Interfaces;
 
 namespace Gadget.Server.Authorization
 {
@@ -41,7 +42,7 @@ namespace Gadget.Server.Authorization
             }
 
             var token = _tokenManager.GenerateToken(request.UserName);
-            var refreshToken = _tokenManager.GenerateRefreshToken();
+            var refreshToken = TokenManager.GenerateRefreshToken();
             await _usersService.SaveRefreshToken(request.UserName, refreshToken, _authorizationHelper.GetIp(HttpContext));
             _authorizationHelper.SetTokenCookie(refreshToken, Response);
             return Ok(token);

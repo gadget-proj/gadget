@@ -1,4 +1,4 @@
-﻿namespace Gadget.Server.Authorization.Requests
+﻿namespace Gadget.Auth.Requests
 {
     public class LoginRequest
     {

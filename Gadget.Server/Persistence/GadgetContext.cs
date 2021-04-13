@@ -38,30 +38,12 @@ namespace Gadget.Server.Persistence
                 .HasForeignKey("ServiceId"));
 
 
-            modelBuilder.Entity<User>(builder => builder.HasKey(u => u.Id));
-            modelBuilder.Entity<User>(builder => builder.HasMany(u => u.RefreshTokens)
-                .WithOne(r => r.User).HasForeignKey("UserId"));
-            ;
-            modelBuilder.Entity<User>(builder => builder.Property(u => u.UserName));
-            modelBuilder.Entity<User>(builder => builder.Property(u => u.UserProvider));
-
-            modelBuilder.Entity<RefreshToken>(builder => builder.HasKey(a => a.Id));
-            modelBuilder.Entity<RefreshToken>(builder => builder
-                .HasOne(r => r.User)
-                .WithMany(u => u.RefreshTokens)
-                .HasForeignKey("UserId"));
-
-            modelBuilder.Entity<RefreshToken>(builder => builder.Property(r => r.Token));
-            modelBuilder.Entity<RefreshToken>(builder => builder.Property(r => r.Unvalidated));
-            modelBuilder.Entity<RefreshToken>(builder => builder.Property(r => r.Used));
-            modelBuilder.Entity<RefreshToken>(builder => builder.Property(r => r.CreateDate));
-            modelBuilder.Entity<RefreshToken>(builder => builder.Property(r => r.ExpireDate));
-            modelBuilder.Entity<RefreshToken>(builder => builder.Property(r => r.IpAddress));
+            
         }
 
         public DbSet<Agent> Agents { get; set; }
         public DbSet<Service> Services { get; set; }
         public DbSet<ServiceEvent> ServiceEvents { get; set; }
-        public DbSet<User> Users { get; set; }
+       
     }
 }

@@ -1,7 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
-using System;
+﻿using System;
+using Microsoft.AspNetCore.Http;
 
-namespace Gadget.Server.Authorization.Helpers
+namespace Gadget.Auth.Helpers
 {
     public class AuthorizationHelper
     {

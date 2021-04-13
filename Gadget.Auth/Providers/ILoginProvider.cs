@@ -1,6 +1,4 @@
-﻿using System.Threading.Tasks;
-
-namespace Gadget.Server.Authorization.Providers
+﻿namespace Gadget.Auth.Providers
 {
     public interface ILoginProvider
     {

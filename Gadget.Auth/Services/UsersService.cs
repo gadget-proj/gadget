@@ -1,28 +1,28 @@
-﻿using Gadget.Server.Authorization.Dto;
-using Gadget.Server.Authorization.Providers;
-using Gadget.Server.Authorization.Services.Interfaces;
-using Gadget.Server.Domain.Entities;
-using Gadget.Server.Persistence;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
+using Gadget.Auth.Domain;
+using Gadget.Auth.Dto;
+using Gadget.Auth.Persistence;
+using Gadget.Auth.Providers;
+using Gadget.Auth.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
-namespace Gadget.Server.Authorization.Services
+namespace Gadget.Auth.Services
 {
     public class UsersService : IUsersService
     {
-        private readonly GadgetContext _context;
+        private readonly AuthContext _context;
         private readonly ILoginProvider _loginProvider;
         private readonly TokenManager _tokenManager;
 
-        public UsersService(GadgetContext context, ILoginProvider loginProvider, TokenManager tokenManager)
+        public UsersService(AuthContext context, ILoginProvider loginProvider, TokenManager tokenManager)
         {
             _context = context;
             _loginProvider = loginProvider;
             _tokenManager = tokenManager;
         }
+
         public async Task<bool> AddUser(string userName)
         {
             var user = new User(userName);
@@ -32,7 +32,7 @@ namespace Gadget.Server.Authorization.Services
 
         public async Task<User> GetUser(string userName)
         {
-            return await _context.Users.FirstOrDefaultAsync(x=>x.UserName ==userName);
+            return await _context.Users.FirstOrDefaultAsync(x => x.UserName == userName);
         }
 
         public async Task<bool> IsUserValid(string userName, string password)
@@ -42,16 +42,19 @@ namespace Gadget.Server.Authorization.Services
             {
                 return false;
             }
+
             return _loginProvider.PasswordValid(userName, password);
         }
 
         public async Task<bool> SaveRefreshToken(string userName, string token, string ipAddress)
         {
-            var user = await _context.Users.Include(x => x.RefreshTokens).FirstOrDefaultAsync(x=>x.UserName==userName);
+            var user = await _context.Users.Include(x => x.RefreshTokens)
+                .FirstOrDefaultAsync(x => x.UserName == userName);
             if (user is null)
             {
                 return false;
             }
+
             user.AddRefreshToken(new RefreshToken(user, token, ipAddress));
             _context.Users.Update(user);
             return await _context.SaveChangesAsync() > 0;
@@ -61,7 +64,8 @@ namespace Gadget.Server.Authorization.Services
         {
             var decodedToken = HttpUtility.UrlDecode(token);
 
-            var user = await _context.Users.Include(x => x.RefreshTokens).FirstOrDefaultAsync(x => x.RefreshTokens.Any(y=>y.Token == decodedToken));
+            var user = await _context.Users.Include(x => x.RefreshTokens)
+                .FirstOrDefaultAsync(x => x.RefreshTokens.Any(y => y.Token == decodedToken));
             if (user is null)
             {
                 return null;
@@ -79,18 +83,19 @@ namespace Gadget.Server.Authorization.Services
                 refreshToken.Use();
                 return new RefreshTokenResult(newToken, refreshToken.Token);
             }
-            
-            
-           var newRefreshToken = _tokenManager.GenerateRefreshToken();
-           await SaveRefreshToken(user.UserName, newRefreshToken, ipAddress);
-           return new RefreshTokenResult(newToken, newRefreshToken);
+
+
+            var newRefreshToken = TokenManager.GenerateRefreshToken();
+            await SaveRefreshToken(user.UserName, newRefreshToken, ipAddress);
+            return new RefreshTokenResult(newToken, newRefreshToken);
         }
 
         public async Task<bool> RefreshTokenUnvalidated(string token)
         {
             var decodedToken = HttpUtility.UrlDecode(token);
 
-            var user = await _context.Users.Include(x => x.RefreshTokens).FirstOrDefaultAsync(x => x.RefreshTokens.Any(y => y.Token == decodedToken));
+            var user = await _context.Users.Include(x => x.RefreshTokens)
+                .FirstOrDefaultAsync(x => x.RefreshTokens.Any(y => y.Token == decodedToken));
             if (user is null)
             {
                 return false;
