@@ -1,10 +1,10 @@
 ﻿using Gadget.Server.Authorization.Helpers;
 using Gadget.Server.Authorization.Requests;
 using Gadget.Server.Authorization.Services.Interfaces;
+using Gadget.Server.Domain.Entities;
+using Gadget.Server.Persistence;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System;
 using System.Threading.Tasks;
 
 namespace Gadget.Server.Authorization
@@ -15,20 +15,24 @@ namespace Gadget.Server.Authorization
     {
         private readonly TokenManager _tokenManager;
         private readonly IUsersService _usersService;
+        private readonly GadgetContext _context;
         private readonly AuthorizationHelper _authorizationHelper;
 
-        public AuthorizationController(TokenManager tokenManager, IUsersService usersService, AuthorizationHelper authorizationHelper)
+        public AuthorizationController(TokenManager tokenManager, IUsersService usersService, AuthorizationHelper authorizationHelper, GadgetContext context)
         {
             _tokenManager = tokenManager;
             _usersService = usersService;
+            _context = context;
             _authorizationHelper = authorizationHelper;
         }
 
-        [Authorize]
-        [HttpGet("test")]
-        public IActionResult Test()
+        [HttpPost("newnewnew")]
+        public async Task<IActionResult> CreateNewUser()
         {
-            return Ok("ja man");
+            var user = new User("lucek");
+            await _context.Users.AddAsync(user);
+            await _context.SaveChangesAsync();
+            return Ok();
         }
 
         [AllowAnonymous]
