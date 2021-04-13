@@ -26,10 +26,10 @@ services:
     project: Gadget.Notifications/Gadget.Notifications.csproj
     bindings:
       - port: 5000
-  - name: controlplane
-    project: Gadget.Server/Gadget.Server.csproj
-    bindings:
-      - port: 5001
+  # - name: controlplane
+  #   project: Gadget.Server/Gadget.Server.csproj
+  #   bindings:
+  #     - port: 5001
   - name: auth
     project: Gadget.Auth/Gadget.Auth.csproj
     bindings:

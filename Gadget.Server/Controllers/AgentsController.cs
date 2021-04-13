@@ -29,8 +29,8 @@ namespace Gadget.Server.Controllers
         }
 
         [HttpGet("{agent}/{service}/events")]
-        public async Task<IActionResult> GetServiceEvents(string agent, string service, int count, int skip,
-            DateTime from, DateTime to)
+        public async Task<IActionResult> GetServiceEvents(string agent, string service, int skip,
+            DateTime from, DateTime to, int count = 50)
         {
             return Ok(await _agentsService.GetEvents(agent, service, from, to, count, skip));
         }

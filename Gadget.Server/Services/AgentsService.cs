@@ -64,11 +64,10 @@ namespace Gadget.Server.Services
                 .OrderByDescending(x => x.CreatedAt)
                 .Include(x => x.Service)
                 .ThenInclude(x => x.Agent)
-                .Where(x =>
-                    x.Service.Name == serviceName &&
-                    x.Service.Agent.Name == agent &&
-                    x.CreatedAt > from &&
-                    x.CreatedAt < to)
+                .Where(x => x.Service.Name == serviceName
+                    // x.CreatedAt > from &&
+                    // x.CreatedAt < to)
+                )
                 .Skip(skip)
                 .Take(count)
                 .ToListAsync();
