@@ -68,6 +68,8 @@ namespace Gadget.Notifications
                             .WithOrigins("localhost:3000")
                             .WithOrigins("http://localhost:3000")
                             .WithOrigins("localhost:5000")
+                            .WithOrigins("nmv10:5003")
+                            .WithOrigins("http://nmv10:5003")
                             .WithOrigins("http://localhost:5000")
                             .WithOrigins("https://localhost:5005")
                             .WithOrigins("https://localhost:5006")
