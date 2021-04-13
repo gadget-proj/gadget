@@ -24,6 +24,7 @@ namespace Gadget.Cli
             var services = new ServiceCollection();
             services.AddTransient<HelloCommand>();
             services.AddTransient<GetAgentsCommand>();
+            services.AddTransient<GetAgentServicesCommand>();
             return services.BuildServiceProvider();
         }
 
