@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
+using Gadget.Server.Domain.Interfaces;
 
 namespace Gadget.Server.Domain.Entities
 {
-    public class Service
+    public class Service : Resource
     {
-        public Guid Id { get; }
         public string Name { get; }
         public string Status { get; private set; }
         public string LogOnAs { get; }
@@ -28,7 +28,6 @@ namespace Gadget.Server.Domain.Entities
             Agent = agent;
             LogOnAs = logOnAs;
             Description = description;
-            Id = Guid.NewGuid();
         }
 
         public void ChangeStatus(string status)

@@ -5,9 +5,8 @@ using System.Linq;
 
 namespace Gadget.Server.Domain.Entities
 {
-    public class Agent
+    public class Agent : Entity
     {
-        public Guid Id { get; }
         public string Name { get; }
         public string Address { get; }
         private readonly ICollection<Service> _services = new HashSet<Service>();
@@ -21,7 +20,6 @@ namespace Gadget.Server.Domain.Entities
         {
             Name = name ?? throw new ArgumentNullException(nameof(name));
             Address = address ?? throw new ArgumentNullException(nameof(address));
-            Id = Guid.NewGuid();
         }
 
         private void AddService(Service service)
