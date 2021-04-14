@@ -28,7 +28,7 @@ namespace Gadget.Server
 
         public void ConfigureServices(IServiceCollection services)
         {
-            
+            services.AddTransient<IGroupsService, GroupsService>();
             services.AddAuthentication(x =>
             {
                 x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -86,7 +86,6 @@ namespace Gadget.Server
             services.AddControllers();
             services.AddTransient<IAgentsService, AgentsService>();
             services.AddHostedService<AgentHealthCheck>();
-            
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILogger<Startup> logger)

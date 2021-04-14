@@ -5,8 +5,9 @@ using System.Linq;
 
 namespace Gadget.Server.Domain.Entities
 {
-    public class Agent : Entity
+    public class Agent 
     {
+        public Guid Id { get; }
         public string Name { get; }
         public string Address { get; }
         private readonly ICollection<Service> _services = new HashSet<Service>();

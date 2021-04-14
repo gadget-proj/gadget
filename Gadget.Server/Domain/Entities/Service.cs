@@ -4,8 +4,9 @@ using Gadget.Server.Domain.Interfaces;
 
 namespace Gadget.Server.Domain.Entities
 {
-    public class Service : Resource
+    public class Service 
     {
+        public Guid Id { get; }
         public string Name { get; }
         public string Status { get; private set; }
         public string LogOnAs { get; }
