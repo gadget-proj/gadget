@@ -40,11 +40,14 @@ namespace Gadget.Server.Persistence
             modelBuilder.Entity<Group>(builder => builder.HasKey(g => g.Id));
             modelBuilder.Entity<Group>(builder => builder.Property(g => g.Name));
             modelBuilder.Entity<Group>(builder => builder.HasMany(g => g.Resources));
+
+            modelBuilder.Entity<UserAction>(builder => builder.HasKey(a => a.Id));
         }
 
         public DbSet<Agent> Agents { get; set; }
         public DbSet<Service> Services { get; set; }
         public DbSet<ServiceEvent> ServiceEvents { get; set; }
         public DbSet<Group> Groups { get; set; }
+        public DbSet<UserAction> UserActions { get; set; }
     }
 }

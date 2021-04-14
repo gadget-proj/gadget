@@ -35,7 +35,7 @@ namespace Gadget.Server.Domain.Entities
 
         public void ChangeServiceStatus(string serviceName, string newStatus)
         {
-            var service = _services.FirstOrDefault(s => s.Name == serviceName);
+            var service = _services.FirstOrDefault(s => string.Equals(s.Name, serviceName, StringComparison.CurrentCultureIgnoreCase));
             if (service is null)
             {
                 throw new ApplicationException($"Service {serviceName} could not be found on agent {Name}");
