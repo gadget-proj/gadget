@@ -21,11 +21,19 @@ services:
         name: "5673"
       - port: 15672
         name: "ui"
-
   - name: notifications
     project: Gadget.Notifications/Gadget.Notifications.csproj
     bindings:
       - port: 5000
+  - name: prometheus
+    image: prom/prometheus:latest
+    bindings:
+      - port: 9090
+        name: "9090"
+      # command:
+      # - --config.file=/etc/prometheus/prometheus.yml
+      # volumes:
+      # - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
   # - name: controlplane
   #   project: Gadget.Server/Gadget.Server.csproj
   #   bindings:

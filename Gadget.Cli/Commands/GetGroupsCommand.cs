@@ -17,7 +17,8 @@ namespace Gadget.Cli.Commands
         public async ValueTask ExecuteAsync(IConsole console)
         {
             var client = new HttpClient();
-            var response = await client.GetFromJsonAsync<IEnumerable<GetGroupsRequest>>("http://localhost:5001/groups");
+            // var response = await client.GetFromJsonAsync<IEnumerable<GetGroupsRequest>>("http://localhost:5001/groups");
+            var response = await client.GetFromJsonAsync<IEnumerable<GetGroupsRequest>>("http://nmv10:5001/groups");
             if (response is null)
             {
                 await console.Output.WriteLineAsync(":(");

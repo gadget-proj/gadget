@@ -22,7 +22,8 @@ namespace Gadget.Cli.Commands
         {
             var client = new HttpClient();
             var request = new AddToGroupRequest(ResourceName);
-            var response = await client.PostAsJsonAsync($"http://localhost:5001/groups/{GroupName}", request);
+            // var response = await client.PostAsJsonAsync($"http://localhost:5001/groups/{GroupName}", request);
+            var response = await client.PostAsJsonAsync($"http://nmv10:5001/groups/{GroupName}", request);
             if (!response.IsSuccessStatusCode)
             {
                 await console.Output.WriteLineAsync(":(");
