@@ -22,10 +22,8 @@ namespace Gadget.Cli.Commands
         {
             var client = new HttpClient();
             var services =
-                // await client.GetFromJsonAsync<IEnumerable<GetServicesResponse>>(
-                //     $"http://localhost:5001/agents/{Value}");
-            await client.GetFromJsonAsync<IEnumerable<GetServicesResponse>>(
-                $"http://nmv10:5001/agents/{Value}");
+                await client.GetFromJsonAsync<IEnumerable<GetServicesResponse>>(
+                    $"http://localhost:5001/agents/{Value}");
             if (services is null)
             {
                 await console.Output.WriteLineAsync("something went wrong, response is null");

@@ -19,8 +19,7 @@ namespace Gadget.Cli.Commands
         {
             var httpClient = new HttpClient();
             var request = new CreateNewGroup(Value);
-            // var response = await httpClient.PostAsJsonAsync("http://localhost:5001/groups", request);
-            var response = await httpClient.PostAsJsonAsync("http://nmv10:5001/groups", request);
+            var response = await httpClient.PostAsJsonAsync("http://localhost:5001/groups", request);
             if (!response.IsSuccessStatusCode)
             {
                 await console.Output.WriteLineAsync(":(");

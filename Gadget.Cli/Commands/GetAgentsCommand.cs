@@ -17,8 +17,7 @@ namespace Gadget.Cli.Commands
         public async ValueTask ExecuteAsync(IConsole console)
         {
             var client = new HttpClient();
-            var agents = await client.GetFromJsonAsync<IEnumerable<AgentsResponse>>("http://nmv10:5001/agents");
-            // var agents = await client.GetFromJsonAsync<IEnumerable<AgentsResponse>>("http://localhost:5001/agents");
+            var agents = await client.GetFromJsonAsync<IEnumerable<AgentsResponse>>("http://localhost:5001/agents");
             if (agents is null)
             {
                 await console.Output.WriteLineAsync("Could not find any registered agents");
