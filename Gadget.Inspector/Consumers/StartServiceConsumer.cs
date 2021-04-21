@@ -48,30 +48,16 @@ namespace Gadget.Inspector.Consumers
                 var (success, error) = await StartService(service, timeout);
                 await context.Publish<IActionResultResponse>(new
                 {
-                    context.CorrelationId, Success = success, Error = error
+                    context.CorrelationId, Success = success, Reason = error
                 });
             }
             catch (Exception e)
             {
                 _logger.LogError(e.GetType().ToString());
                 _logger.LogError(e.Message);
-                await context.RespondAsync<IActionResultResponse>(new
+                await context.Publish<IActionResultResponse>(new
                 {
-                    context.CorrelationId,
-                    Agent = Environment.MachineName,
-                    Service = service.ServiceName,
-                    Action = nameof(StartServiceConsumer),
-                    Reason = e.Message,
-                    Date = DateTime.UtcNow
-                });
-                await context.Publish<IActionFailed>(new
-                {
-                    context.CorrelationId,
-                    Agent = Environment.MachineName,
-                    Service = service.ServiceName,
-                    Action = nameof(StartServiceConsumer),
-                    Reason = e.Message,
-                    Date = DateTime.UtcNow
+                    context.CorrelationId, Success = false, Reason = e.Message
                 });
             }
         }

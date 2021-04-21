@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Linq;
 using System.ServiceProcess;
 using System.Threading.Tasks;
@@ -6,6 +7,7 @@ using Gadget.Messaging.Contracts.Commands.v1;
 using Gadget.Messaging.Contracts.Responses;
 using MassTransit;
 using Microsoft.Extensions.Logging;
+using Polly;
 
 namespace Gadget.Inspector.Consumers
 {
@@ -17,7 +19,6 @@ namespace Gadget.Inspector.Consumers
         {
             _logger = logger;
         }
-
 
         public async Task Consume(ConsumeContext<IRestartService> context)
         {
@@ -33,34 +34,49 @@ namespace Gadget.Inspector.Consumers
             try
             {
                 var timeout = TimeSpan.FromMilliseconds(500);
-                await RestartRunningService(service, timeout);
-                await context.RespondAsync<IActionResultResponse>(new
+                var (success, error) = await RestartRunningService(service, timeout);
+                await context.Publish<IActionResultResponse>(new
                 {
-                    Success = true
+                    context.CorrelationId, Success = success, Reason = error
                 });
             }
-            catch
+            catch (Exception exception)
             {
-                await context.RespondAsync<IActionResultResponse>(new
-                {
-                    Success = false
-                });
                 _logger.LogError($"Could not restart service {context.Message.Agent}{serviceNormalizedName}");
+                await context.Publish<IActionResultResponse>(new
+                {
+                    context.CorrelationId, Success = false, Reason = exception.Message
+                });
             }
         }
 
 
-        private static Task RestartRunningService(ServiceController service, TimeSpan timeout)
+        private static Task<Result> RestartRunningService(ServiceController service, TimeSpan timeout)
         {
-            if (service.Status == ServiceControllerStatus.Running)
+            try
             {
-                service.Stop();
-                service.WaitForStatus(ServiceControllerStatus.Stopped, timeout);
-            }
+                Policy
+                    .Handle<Win32Exception>()
+                    .Or<InvalidOperationException>()
+                    .WaitAndRetry(3, _ => timeout)
+                    .Execute(
+                        () =>
+                        {
+                            if (service.Status == ServiceControllerStatus.Running)
+                            {
+                                service.Stop();
+                                service.WaitForStatus(ServiceControllerStatus.Stopped, timeout);
+                            }
 
-            service.Start();
-            service.WaitForStatus(ServiceControllerStatus.Running, timeout);
-            return Task.CompletedTask;
+                            service.Start();
+                            service.WaitForStatus(ServiceControllerStatus.Running, timeout);
+                        });
+                return Task.FromResult(new Result(true, ""));
+            }
+            catch (Exception e)
+            {
+                return Task.FromResult(new Result(false, e.Message));
+            }
         }
     }
 }
