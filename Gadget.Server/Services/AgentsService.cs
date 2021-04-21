@@ -100,45 +100,21 @@ namespace Gadget.Server.Services
             return await Task.FromResult(dto);
         }
 
-        public async Task RestartService(string agentName, string serviceName)
-        {
-            var service = $"{agentName}/{serviceName}";
-            try
-            {
-                var client = _bus.CreateRequestClient<IRestartService>(new Uri($"queue:{agentName}"));
-                var response = await client.GetResponse<IActionResultResponse>(new
-                {
-                    Agent = agentName,
-                    ServiceName = serviceName
-                });
-                if (!response.Message.Success)
-                {
-                    _logger.LogError($"could not restart service {service}");
-                    return;
-                }
-
-                _logger.LogInformation($"Successfully restarted service {service}");
-            }
-            catch (Exception e)
-            {
-                _logger.LogCritical(e.Message);
-            }
-        }
-
-        public async Task<Guid> StartService(string agentName, string serviceName)
+        public async Task<Guid> RestartService(string agent, string serviceName)
         {
             var actionId = Guid.NewGuid();
+            var service = $"{agent}/{serviceName}";
             try
             {
+                await _publishEndpoint.Publish<IActionResultResponse>(new
+                {
+                    CorrelationId = actionId,
+                    Agent = agent,
+                    ServiceName = serviceName
+                }, context => context.SetRoutingKey(serviceName));
                 var action = new UserAction(Guid.NewGuid(), actionId, DateTime.UtcNow, ActionResult.Accepted, "");
                 await _context.UserActions.AddAsync(action);
-                await _publishEndpoint.Publish<IStartService>(
-                    new
-                    {
-                        CorrelationId = actionId,
-                        Agent = agentName,
-                        ServiceName = serviceName
-                    }, context => { context.SetRoutingKey(serviceName); });
+                _logger.LogInformation($"Requested restart of service {service}", serviceName);
             }
             catch (Exception e)
             {
@@ -152,21 +128,62 @@ namespace Gadget.Server.Services
             return actionId;
         }
 
-        public async Task StopService(string agentName, string serviceName)
+        public async Task<Guid> StartService(string agentName, string serviceName)
         {
+            var actionId = Guid.NewGuid();
+            try
+            {
+                await _publishEndpoint.Publish<IStartService>(
+                    new
+                    {
+                        CorrelationId = actionId,
+                        Agent = agentName,
+                        ServiceName = serviceName
+                    }, context => { context.SetRoutingKey(serviceName); });
+                var action = new UserAction(Guid.NewGuid(), actionId, DateTime.UtcNow, ActionResult.Accepted, "");
+                await _context.UserActions.AddAsync(action);
+
+                _logger.LogInformation("Requested restart of service {service}", serviceName);
+            }
+            catch (Exception e)
+            {
+                var failedAction = new UserAction(Guid.NewGuid(), actionId, DateTime.UtcNow, ActionResult.Failed,
+                    e.Message);
+                await _context.UserActions.AddAsync(failedAction);
+                _logger.LogCritical(e.Message);
+            }
+
+            await _context.SaveChangesAsync();
+            return actionId;
+        }
+
+        public async Task<Guid> StopService(string agentName, string serviceName)
+        {
+            var actionId = Guid.NewGuid();
             try
             {
                 await _publishEndpoint.Publish<IStopService>(new
                     {
+                        CorrelationId = actionId,
                         ServiceName = serviceName,
                         Agent = agentName
                     },
                     context => { context.SetRoutingKey(serviceName); });
+
+                var action = new UserAction(Guid.NewGuid(), actionId, DateTime.UtcNow, ActionResult.Accepted, "");
+                await _context.UserActions.AddAsync(action);
+                _logger.LogInformation("Requested stop of service {service}", serviceName);
             }
             catch (Exception e)
             {
+                var failedAction = new UserAction(Guid.NewGuid(), actionId, DateTime.UtcNow, ActionResult.Failed,
+                    e.Message);
+                await _context.UserActions.AddAsync(failedAction);
                 _logger.LogCritical(e.Message);
             }
+
+            await _context.SaveChangesAsync();
+            return actionId;
         }
     }
 }

@@ -10,9 +10,9 @@ namespace Gadget.Server.Services
         Task<IEnumerable<AgentDto>> GetAgents();
         Task<IEnumerable<ServiceDto>> GetServices(string agentName);
         Task<Guid> StartService(string agentName, string serviceName);
-        Task StopService(string agentName, string serviceName);
+        Task<Guid> StopService(string agentName, string serviceName);
 
-        Task RestartService(string agentName, string serviceName);
+        Task<Guid> RestartService(string agent, string serviceName);
 
         //TODO we could modify GetEvents method and merge them together
         Task<IEnumerable<EventDto>> GetLatestEvents(int count);
