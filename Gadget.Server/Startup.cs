@@ -88,6 +88,7 @@ namespace Gadget.Server
             services.AddControllers();
             services.AddTransient<IAgentsService, AgentsService>();
             services.AddTransient<ISelectorService, SelectorService>();
+            services.AddTransient<IActionsService, ActionsService>();
             services.AddHostedService<AgentHealthCheck>();
         }
 
