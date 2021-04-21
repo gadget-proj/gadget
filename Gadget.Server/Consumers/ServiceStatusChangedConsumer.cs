@@ -27,7 +27,8 @@ namespace Gadget.Server.Consumers
             var agentName = context.Message.Agent;
             var service = context.Message.Name;
             var newStatus = context.Message.Status;
-
+            var id = context.CorrelationId;
+            
             var agent = await _context.Agents
                 .Include(a => a.Services)
                 .ThenInclude(s => s.Events.Take(1))
@@ -38,10 +39,17 @@ namespace Gadget.Server.Consumers
             }
 
             var changedService = agent.Services.FirstOrDefault(s => s.Name == service);
-            if (changedService != null)
+            if (changedService is null)
             {
-                var newEvent = new ServiceEvent(newStatus);
-                changedService.Events.Add(newEvent);
+                return;
+            }
+
+            var newEvent = new ServiceEvent(newStatus);
+            changedService.Events.Add(newEvent);
+            
+            if (changedService.Config.Restart)
+            {
+                _logger.LogCritical("restart!");
             }
 
             agent.ChangeServiceStatus(service, newStatus);

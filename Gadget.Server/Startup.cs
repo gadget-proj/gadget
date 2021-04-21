@@ -47,6 +47,7 @@ namespace Gadget.Server
                     ValidateAudience = false
                 };
             });
+
             services.AddLogging(cfg => cfg.AddSeq());
             services.AddDbContext<GadgetContext>(builder => builder.UseSqlite("Data Source=gadget.db"));
             services.AddMassTransit(x =>
@@ -54,6 +55,7 @@ namespace Gadget.Server
                 x.AddConsumer<ServiceStatusChangedConsumer>();
                 x.AddConsumer<RegisterNewAgentConsumer>();
                 x.AddConsumer<ActionFailedConsumer>();
+                x.AddConsumer<ActionResultConsumer>();
                 x.AddRequestClient<CheckAgentHealth>();
                 x.UsingRabbitMq((context, cfg) =>
                 {
@@ -85,6 +87,7 @@ namespace Gadget.Server
             });
             services.AddControllers();
             services.AddTransient<IAgentsService, AgentsService>();
+            services.AddTransient<ISelectorService, SelectorService>();
             services.AddHostedService<AgentHealthCheck>();
         }
 

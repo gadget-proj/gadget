@@ -21,12 +21,13 @@ namespace Gadget.Inspector.Consumers
 
         public async Task Consume(ConsumeContext<IRestartService> context)
         {
-            _logger.LogInformation($"Trying to start {context.Message.ServiceName}");
+            var serviceNormalizedName = context.Message.ServiceName.Trim().ToLower();
+            _logger.LogInformation($"Trying to start {serviceNormalizedName}");
             var service = ServiceController.GetServices()
-                .FirstOrDefault(s => s.ServiceName == context.Message.ServiceName);
+                .FirstOrDefault(s => s.ServiceName == serviceNormalizedName);
             if (service == null)
             {
-                throw new ApplicationException($"Service {context.Message.ServiceName} could not be found");
+                throw new ApplicationException($"Service {serviceNormalizedName} could not be found");
             }
 
             try
@@ -44,7 +45,7 @@ namespace Gadget.Inspector.Consumers
                 {
                     Success = false
                 });
-                _logger.LogError($"Could not restart service {context.Message.Agent}{context.Message.ServiceName}");
+                _logger.LogError($"Could not restart service {context.Message.Agent}{serviceNormalizedName}");
             }
         }
 

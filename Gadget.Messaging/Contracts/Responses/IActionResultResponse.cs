@@ -1,7 +1,11 @@
-﻿namespace Gadget.Messaging.Contracts.Responses
+﻿using System;
+using MassTransit;
+
+namespace Gadget.Messaging.Contracts.Responses
 {
-    public interface IActionResultResponse
+    public interface IActionResultResponse : CorrelatedBy<Guid>
     {
+        string Reason { get; }
         bool Success { get; }
     }
 }

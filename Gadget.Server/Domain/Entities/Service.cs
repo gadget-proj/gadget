@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Gadget.Server.Domain.Entities
 {
-    public class Service 
+    public class Service
     {
         public Guid Id { get; }
         public string Name { get; }
@@ -11,7 +11,7 @@ namespace Gadget.Server.Domain.Entities
         public string LogOnAs { get; }
         public string Description { get; }
         public Agent Agent { get; }
-
+        public Config Config { get; private set; }
         public readonly ICollection<ServiceEvent> Events = new List<ServiceEvent>();
         public static IEqualityComparer<Service> NameComparer { get; } = new NameEqualityComparer();
 

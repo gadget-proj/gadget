@@ -44,8 +44,8 @@ namespace Gadget.Server.Controllers
         [HttpPost("{agent}/{service}/start")]
         public async Task<IActionResult> StartService(string agent, string service)
         {
-            await _agentsService.StartService(agent, service);
-            return Accepted();
+            var id = await _agentsService.StartService(agent, service);
+            return Accepted(id);
         }
 
         [HttpPost("{agent}/{service}/stop")]

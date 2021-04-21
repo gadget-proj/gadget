@@ -82,7 +82,7 @@ namespace Gadget.Inspector
                 Address = GetAddress(),
                 Services = ServiceController.GetServices().Select(s => new ServiceDescriptor
                 {
-                    Name = s.ServiceName,
+                    Name = s.ServiceName.Trim().ToLower(),
                     Status = s.Status.ToString(),
                     LogOnAs = GetServiceUser(s.ServiceName),
                     Description = GetServiceDescription(s.ServiceName)

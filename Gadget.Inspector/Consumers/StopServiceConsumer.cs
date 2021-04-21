@@ -24,17 +24,18 @@ namespace Gadget.Inspector.Consumers
 
         public async Task Consume(ConsumeContext<IStopService> context)
         {
-            _logger.LogInformation($"Trying to stop {context.Message.ServiceName}");
+            var serviceNormalizedName = context.Message.ServiceName.Trim().ToLower();
+            _logger.LogInformation($"Trying to stop {serviceNormalizedName}");
             var service = ServiceController
                 .GetServices()
-                .FirstOrDefault(s => s.ServiceName == context.Message.ServiceName);
+                .FirstOrDefault(s => s.ServiceName.ToLower().Trim() == serviceNormalizedName);
 
             if (service is null)
             {
-                throw new ApplicationException($"Service {context.Message.ServiceName} could not be found");
+                throw new ApplicationException($"Service {serviceNormalizedName} could not be found");
             }
 
-            var serviceId = $"{context.Message.Agent}/{context.Message.ServiceName}";
+            var serviceId = $"{context.Message.Agent}/{serviceNormalizedName}";
             try
             {
                 var timeout = TimeSpan.FromSeconds(3);

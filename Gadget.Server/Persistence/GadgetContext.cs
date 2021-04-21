@@ -29,6 +29,7 @@ namespace Gadget.Server.Persistence
             modelBuilder.Entity<Service>(builder => builder.Property(a => a.Description));
             modelBuilder.Entity<Service>(builder => builder.HasMany(s => s.Events));
             modelBuilder.Entity<Service>(builder => builder.HasOne(s => s.Agent));
+            modelBuilder.Entity<Service>(builder => builder.OwnsOne(s => s.Config));
 
             modelBuilder.Entity<ServiceEvent>(builder => builder.HasKey(s => s.Id));
             modelBuilder.Entity<ServiceEvent>(builder => builder.Property(s => s.Status));
@@ -40,7 +41,6 @@ namespace Gadget.Server.Persistence
             modelBuilder.Entity<Group>(builder => builder.HasKey(g => g.Id));
             modelBuilder.Entity<Group>(builder => builder.Property(g => g.Name));
             modelBuilder.Entity<Group>(builder => builder.HasMany(g => g.Resources));
-
             modelBuilder.Entity<UserAction>(builder => builder.HasKey(a => a.Id));
         }
 

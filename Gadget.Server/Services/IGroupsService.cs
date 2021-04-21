@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using Gadget.Server.Domain.Entities;
 using Gadget.Server.Dto.V1;
 using Gadget.Server.Persistence;
+using MassTransit;
+using MassTransit.Initializers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
@@ -15,18 +17,22 @@ namespace Gadget.Server.Services
         Task<Guid> CreateGroup(string name);
         Task AddResource(Guid groupId, string resource);
         Task AddResource(string groupName, string resource);
-        Task<IEnumerable<GroupDto>> GetGroups();
+        Task<IEnumerable<GroupPartialDto>> GetGroups();
+        Task<GroupDto> GetGroup(string groupName);
+        Task StopResourcesAsync(string groupName);
     }
 
     public class GroupsService : IGroupsService
     {
         private readonly ILogger<GroupsService> _logger;
         private readonly GadgetContext _context;
+        private readonly IAgentsService _agentsService;
 
-        public GroupsService(ILogger<GroupsService> logger, GadgetContext context)
+        public GroupsService(ILogger<GroupsService> logger, GadgetContext context, IAgentsService agentsService)
         {
             _logger = logger;
             _context = context;
+            _agentsService = agentsService;
         }
 
         public async Task<Guid> CreateGroup(string name)
@@ -80,9 +86,37 @@ namespace Gadget.Server.Services
             _logger.LogInformation("Added resource to group");
         }
 
-        public async Task<IEnumerable<GroupDto>> GetGroups()
+        public async Task<IEnumerable<GroupPartialDto>> GetGroups()
         {
-            return await _context.Groups.Select(g => new GroupDto(g.Id, g.Name)).ToListAsync();
+            return await _context.Groups.Select(g => new GroupPartialDto(g.Id, g.Name)).ToListAsync();
+        }
+
+        public async Task<GroupDto> GetGroup(string groupName)
+        {
+            var group = await _context.Groups
+                .Include(g => g.Resources)
+                .FirstOrDefaultAsync(g => g.Name == groupName)
+                .Select(g => new GroupDto(g.Id, g.Name,
+                    g.Resources.Select(s => new ServiceDto(s.Name, s.Status, s.LogOnAs, s.Description))));
+            return group;
+        }
+
+        public async Task StopResourcesAsync(string groupName)
+        {
+            try
+            {
+                var normalizedName = groupName.Trim().ToLower();
+                var resources = await _context.Groups
+                    .Include(g => g.Resources)
+                    .ThenInclude(r => r.Agent)
+                    .FirstOrDefaultAsync(r => r.Name == groupName);
+                var stopRequests = resources.Resources.Select(r => _agentsService.StopService(r.Agent.Name, r.Name));
+                await Task.WhenAll(stopRequests);
+            }
+            catch (Exception e)
+            {
+                _logger.LogCritical(e.Message);
+            }
         }
     }
 }

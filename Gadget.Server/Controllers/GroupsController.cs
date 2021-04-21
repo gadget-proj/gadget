@@ -11,6 +11,7 @@ namespace Gadget.Server.Controllers
     public class GroupsController : ControllerBase
     {
         private readonly IGroupsService _groupsService;
+        
 
         public GroupsController(IGroupsService groupsService)
         {
@@ -24,17 +25,31 @@ namespace Gadget.Server.Controllers
             return Ok(id);
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetGroups()
-        {
-            var groups = await _groupsService.GetGroups();
-            return Ok(groups);
-        }
-
         [HttpPost("{groupName}")]
         public async Task<IActionResult> AddToGroup(string groupName, AddToGroupRequest request)
         {
             await _groupsService.AddResource(groupName, request.ResourceName);
+            return Ok();
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetGroups()
+        {
+            var group = await _groupsService.GetGroups();
+            return Ok(group);
+        }
+
+        [HttpGet("{groupName}")]
+        public async Task<IActionResult> GetGroup(string groupName)
+        {
+            var group = await _groupsService.GetGroup(groupName);
+            return Ok(group);
+        }
+
+        [HttpPost("{groupName}/stop")]
+        public async Task<IActionResult> StopGroupResources(string groupName)
+        {
+            await _groupsService.StopResourcesAsync(groupName);
             return Ok();
         }
     }

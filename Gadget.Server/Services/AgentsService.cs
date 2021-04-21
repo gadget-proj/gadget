@@ -125,43 +125,31 @@ namespace Gadget.Server.Services
             }
         }
 
-        public async Task StartService(string agentName, string serviceName)
+        public async Task<Guid> StartService(string agentName, string serviceName)
         {
-            var service = $"{agentName}/{serviceName}";
             var actionId = Guid.NewGuid();
             try
             {
-                var client = _bus.CreateRequestClient<IStartService>(new Uri($"queue:{agentName}"));
-                var response = await client.GetResponse<IActionResultResponse>(new
-                {
-                    CorrelationId = actionId,
-                    Agent = agentName,
-                    ServiceName = serviceName
-                });
-                var action = new UserAction(Guid.NewGuid(), actionId, DateTime.UtcNow, ActionResult.Accepted);
+                var action = new UserAction(Guid.NewGuid(), actionId, DateTime.UtcNow, ActionResult.Accepted, "");
                 await _context.UserActions.AddAsync(action);
-                if (!response.Message.Success)
-                {
-                    var failedAction = new UserAction(Guid.NewGuid(), actionId, DateTime.UtcNow, ActionResult.Failed);
-                    await _context.UserActions.AddAsync(failedAction);
-                    _logger.LogError($"could not start service {service}");
-                    return;
-                }
-
-                var successAction =
-                    new UserAction(Guid.NewGuid(), actionId, DateTime.UtcNow, ActionResult.Succeeded);
-                await _context.UserActions.AddAsync(successAction);
-
-                _logger.LogInformation($"Successfully started service {service}");
+                await _publishEndpoint.Publish<IStartService>(
+                    new
+                    {
+                        CorrelationId = actionId,
+                        Agent = agentName,
+                        ServiceName = serviceName
+                    }, context => { context.SetRoutingKey(serviceName); });
             }
             catch (Exception e)
             {
-                var failedAction = new UserAction(Guid.NewGuid(), actionId, DateTime.UtcNow, ActionResult.Failed);
+                var failedAction = new UserAction(Guid.NewGuid(), actionId, DateTime.UtcNow, ActionResult.Failed,
+                    e.Message);
                 await _context.UserActions.AddAsync(failedAction);
                 _logger.LogCritical(e.Message);
             }
 
             await _context.SaveChangesAsync();
+            return actionId;
         }
 
         public async Task StopService(string agentName, string serviceName)
