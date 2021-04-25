@@ -3,10 +3,12 @@ using Gadget.Server.Dto.V1;
 using Gadget.Server.Dto.V1.Requests;
 using Gadget.Server.Services;
 using Gadget.Server.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Gadget.Server.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("[controller]")]
     public class GroupsController : ControllerBase

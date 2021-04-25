@@ -20,15 +20,60 @@ namespace Gadget.Cli
             var ctl = cconfiguration.GetConnectionString("Ctl");
 
             var services = new ServiceCollection();
-            services.AddHttpClient<GetAgentsCommand>(client => { client.BaseAddress = new Uri(ctl); });
-            services.AddHttpClient<GetGroupsCommand>(client => { client.BaseAddress = new Uri(ctl); });
-            services.AddHttpClient<GetAgentServicesCommand>(client => { client.BaseAddress = new Uri(ctl); });
-            services.AddHttpClient<LoginCommand>(client => { client.BaseAddress = new Uri(auth); });
-            services.AddHttpClient<CreateUserCommand>(client => { client.BaseAddress = new Uri(auth); });
-            services.AddHttpClient<StopServiceCommand>(client => { client.BaseAddress = new Uri(ctl); });
-            services.AddHttpClient<AddToGroupCommand>(client => { client.BaseAddress = new Uri(ctl); });
-            services.AddHttpClient<CreateNewGroupCommand>(client => { client.BaseAddress = new Uri(ctl); });
-            services.AddHttpClient<StopGroupCommand>(client => { client.BaseAddress = new Uri(ctl); });
+            services.AddHttpClient<GetAgentsCommand>(client =>
+            {
+                client.DefaultRequestHeaders.Add("Authorize",
+                    $"Bearer {Environment.GetEnvironmentVariable("GADGET_TOKEN")}");
+                client.BaseAddress = new Uri(ctl);
+            });
+            services.AddHttpClient<GetGroupsCommand>(client =>
+            {
+                client.DefaultRequestHeaders.Add("Authorize",
+                    $"Bearer {Environment.GetEnvironmentVariable("GADGET_TOKEN")}");
+                client.BaseAddress = new Uri(ctl);
+            });
+            services.AddHttpClient<GetAgentServicesCommand>(client =>
+            {
+                client.DefaultRequestHeaders.Add("Authorize",
+                    $"Bearer {Environment.GetEnvironmentVariable("GADGET_TOKEN")}");
+                client.BaseAddress = new Uri(ctl);
+            });
+            services.AddHttpClient<LoginCommand>(client =>
+            {
+                client.DefaultRequestHeaders.Add("Authorize",
+                    $"Bearer {Environment.GetEnvironmentVariable("GADGET_TOKEN")}");
+                client.BaseAddress = new Uri(auth);
+            });
+            services.AddHttpClient<CreateUserCommand>(client =>
+            {
+                client.DefaultRequestHeaders.Add("Authorize",
+                    $"Bearer {Environment.GetEnvironmentVariable("GADGET_TOKEN")}");
+                client.BaseAddress = new Uri(auth);
+            });
+            services.AddHttpClient<StopServiceCommand>(client =>
+            {
+                client.DefaultRequestHeaders.Add("Authorize",
+                    $"Bearer {Environment.GetEnvironmentVariable("GADGET_TOKEN")}");
+                client.BaseAddress = new Uri(ctl);
+            });
+            services.AddHttpClient<AddToGroupCommand>(client =>
+            {
+                client.DefaultRequestHeaders.Add("Authorize",
+                    $"Bearer {Environment.GetEnvironmentVariable("GADGET_TOKEN")}");
+                client.BaseAddress = new Uri(ctl);
+            });
+            services.AddHttpClient<CreateNewGroupCommand>(client =>
+            {
+                client.DefaultRequestHeaders.Add("Authorize",
+                    $"Bearer {Environment.GetEnvironmentVariable("GADGET_TOKEN")}");
+                client.BaseAddress = new Uri(ctl);
+            });
+            services.AddHttpClient<StopGroupCommand>(client =>
+            {
+                client.DefaultRequestHeaders.Add("Authorize",
+                    $"Bearer {Environment.GetEnvironmentVariable("GADGET_TOKEN")}");
+                client.BaseAddress = new Uri(ctl);
+            });
             return services.BuildServiceProvider();
         }
 

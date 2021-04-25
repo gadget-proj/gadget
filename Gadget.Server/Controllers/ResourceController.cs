@@ -1,10 +1,12 @@
 ﻿using System.Threading.Tasks;
 using Gadget.Server.Services;
 using Gadget.Server.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Gadget.Server.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("[controller]")]
     public class ResourceController : ControllerBase
