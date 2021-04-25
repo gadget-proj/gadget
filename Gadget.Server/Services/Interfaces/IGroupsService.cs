@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Gadget.Server.Dto.V1;
-using MassTransit;
 
-namespace Gadget.Server.Services
+namespace Gadget.Server.Services.Interfaces
 {
     public interface IGroupsService
     {

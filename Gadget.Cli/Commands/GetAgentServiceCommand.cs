@@ -11,7 +11,7 @@ using CliFx.Infrastructure;
 namespace Gadget.Cli.Commands
 {
     [Command("services list", Description = "lists all services registered on an agent")]
-    public class GetAgentServicesCommand : ICommand
+    public class GetAgentServicesCommand : Command, ICommand
     {
         [CommandParameter(0, Description = "ok")]
         public string Value { get; set; }
@@ -20,10 +20,8 @@ namespace Gadget.Cli.Commands
 
         public async ValueTask ExecuteAsync(IConsole console)
         {
-            var client = new HttpClient();
-            var services =
-                await client.GetFromJsonAsync<IEnumerable<GetServicesResponse>>(
-                    $"http://localhost:5001/agents/{Value}");
+            var services = await HttpClient.GetFromJsonAsync<IEnumerable<GetServicesResponse>>(
+                $"http://localhost:5001/agents/{Value}");
             if (services is null)
             {
                 await console.Output.WriteLineAsync("something went wrong, response is null");
@@ -53,6 +51,10 @@ namespace Gadget.Cli.Commands
                     : ConsoleColor.Green);
                 await console.Output.WriteLineAsync($" {getServicesResponse.Status}");
             }
+        }
+
+        public GetAgentServicesCommand(HttpClient httpClient) : base(httpClient)
+        {
         }
     }
 }

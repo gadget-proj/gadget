@@ -7,8 +7,8 @@ using CliFx.Infrastructure;
 
 namespace Gadget.Cli.Commands
 {
-    [Command("groups add")]
-    public class AddToGroupCommand : ICommand
+    [Command("groups add", Description = "add selected services to a group")]
+    public class AddToGroupCommand : Command, ICommand
     {
         [CommandParameter(0, Description = "group to add to")]
         public string GroupName { get; set; }
@@ -20,9 +20,8 @@ namespace Gadget.Cli.Commands
 
         public async ValueTask ExecuteAsync(IConsole console)
         {
-            var client = new HttpClient();
             var request = new AddToGroupRequest(ResourceName);
-            var response = await client.PostAsJsonAsync($"http://localhost:5001/groups/{GroupName}", request);
+            var response = await HttpClient.PostAsJsonAsync($"http://localhost:5001/groups/{GroupName}", request);
             if (!response.IsSuccessStatusCode)
             {
                 await console.Output.WriteLineAsync(":(");
@@ -30,6 +29,10 @@ namespace Gadget.Cli.Commands
             }
 
             await console.Output.WriteLineAsync(":)");
+        }
+
+        public AddToGroupCommand(HttpClient httpClient) : base(httpClient)
+        {
         }
     }
 }

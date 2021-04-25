@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 using Gadget.Auth.Domain;
@@ -7,6 +8,7 @@ using Gadget.Auth.Persistence;
 using Gadget.Auth.Providers;
 using Gadget.Auth.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace Gadget.Auth.Services
 {
@@ -15,12 +17,15 @@ namespace Gadget.Auth.Services
         private readonly AuthContext _context;
         private readonly ILoginProvider _loginProvider;
         private readonly TokenManager _tokenManager;
+        private readonly ILogger<UsersService> _logger;
 
-        public UsersService(AuthContext context, ILoginProvider loginProvider, TokenManager tokenManager)
+        public UsersService(AuthContext context, ILoginProvider loginProvider, TokenManager tokenManager,
+            ILogger<UsersService> logger)
         {
             _context = context;
             _loginProvider = loginProvider;
             _tokenManager = tokenManager;
+            _logger = logger;
         }
 
         public async Task<bool> AddUser(string userName)
@@ -106,6 +111,21 @@ namespace Gadget.Auth.Services
             await _context.SaveChangesAsync();
 
             return true;
+        }
+
+        public async Task CreateUser(string username, string password)
+        {
+            var hash = BCrypt.Net.BCrypt.HashPassword(password);
+            var user = new User(username, hash);
+            try
+            {
+                await _context.Users.AddAsync(user);
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e.Message);
+            }
         }
     }
 }

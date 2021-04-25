@@ -6,9 +6,10 @@ namespace Gadget.Auth.Domain
 {
     public class User
     {
-        public Guid Id { get;}
-        public string UserName { get;}
-        public string UserProvider { get;}
+        public Guid Id { get; }
+        public string UserName { get; }
+        public string Password { get; }
+        public string UserProvider { get; }
 
         private readonly ICollection<RefreshToken> _refreshTokens = new HashSet<RefreshToken>();
         public IEnumerable<RefreshToken> RefreshTokens => _refreshTokens.ToImmutableList();
@@ -17,6 +18,13 @@ namespace Gadget.Auth.Domain
         {
             Id = Guid.NewGuid();
             UserName = userName;
+        }
+
+        public User(string userName, string password)
+        {
+            Id = Guid.NewGuid();
+            UserName = userName;
+            Password = password;
         }
 
         public void AddRefreshToken(RefreshToken refreshToken)

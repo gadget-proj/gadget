@@ -1,12 +1,16 @@
-﻿using System.Threading.Tasks;
+﻿using System.Net.Http;
+using System.Net.Http.Json;
+using System.Threading.Tasks;
 using CliFx;
 using CliFx.Attributes;
 using CliFx.Infrastructure;
 
 namespace Gadget.Cli.Commands
 {
-    [Command("login")]
-    public class LoginCommand : ICommand
+    public record LoginRequest(string Username, string Password);
+
+    [Command("account login", Description = "lets you login to your cluster")]
+    public class LoginCommand : Command, ICommand
     {
         [CommandParameter(0, Description = "username")]
         public string Username { get; set; }
@@ -16,7 +20,20 @@ namespace Gadget.Cli.Commands
 
         public async ValueTask ExecuteAsync(IConsole console)
         {
-            await console.Output.WriteLineAsync($"{Username} {Password}");
+            var client = new HttpClient();
+            var request = new LoginRequest(Username, Password);
+            var response = await HttpClient.PostAsJsonAsync("http://localhost:5002/auth/login", request);
+            if (!response.IsSuccessStatusCode)
+            {
+                await console.Output.WriteLineAsync(response.ReasonPhrase);
+                return;
+            }
+
+            await console.Output.WriteLineAsync("Logged in");
+        }
+
+        public LoginCommand(HttpClient httpClient) : base(httpClient)
+        {
         }
     }
 }

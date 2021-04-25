@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Gadget.Server.Services;
+using Gadget.Server.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Gadget.Server.Controllers

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Gadget.Server.Dto.V1;
 using Gadget.Server.Persistence;
+using Gadget.Server.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace Gadget.Server.Services

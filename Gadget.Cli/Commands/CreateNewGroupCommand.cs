@@ -8,7 +8,7 @@ using CliFx.Infrastructure;
 namespace Gadget.Cli.Commands
 {
     [Command("groups create", Description = "creates new group")]
-    public class CreateNewGroupCommand : ICommand
+    public class CreateNewGroupCommand :Command, ICommand
     {
         public record CreateNewGroup(string Name);
 
@@ -17,9 +17,8 @@ namespace Gadget.Cli.Commands
 
         public async ValueTask ExecuteAsync(IConsole console)
         {
-            var httpClient = new HttpClient();
             var request = new CreateNewGroup(Value);
-            var response = await httpClient.PostAsJsonAsync("http://localhost:5001/groups", request);
+            var response = await HttpClient.PostAsJsonAsync("http://localhost:5001/groups", request);
             if (!response.IsSuccessStatusCode)
             {
                 await console.Output.WriteLineAsync(":(");
@@ -27,6 +26,10 @@ namespace Gadget.Cli.Commands
             }
 
             await console.Output.WriteLineAsync(":)");
+        }
+
+        public CreateNewGroupCommand(HttpClient httpClient) : base(httpClient)
+        {
         }
     }
 }

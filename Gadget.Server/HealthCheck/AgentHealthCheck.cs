@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Gadget.Messaging.Contracts.Commands;
 using Gadget.Server.Hubs;
 using Gadget.Server.Services;
+using Gadget.Server.Services.Interfaces;
 using MassTransit;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.DependencyInjection;

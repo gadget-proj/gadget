@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Gadget.Server.Domain.Entities;
 using Gadget.Server.Dto.V1;
 using Gadget.Server.Persistence;
+using Gadget.Server.Services.Interfaces;
 using MassTransit.Initializers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;

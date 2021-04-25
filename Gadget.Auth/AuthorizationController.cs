@@ -60,6 +60,12 @@ namespace Gadget.Auth
             return Ok(token);
         }
 
+        [HttpPost("new")]
+        public async Task<IActionResult> CreateAccount(CreateAccountRequest request)
+        {
+            await _usersService.CreateUser(request.Username, request.Password);
+            return Ok();
+        }
 
         [HttpPost("logout")]
         public async Task<IActionResult> Logout()

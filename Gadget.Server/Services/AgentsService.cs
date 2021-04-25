@@ -8,6 +8,7 @@ using Gadget.Server.Domain.Entities;
 using Gadget.Server.Domain.Enums;
 using Gadget.Server.Dto.V1;
 using Gadget.Server.Persistence;
+using Gadget.Server.Services.Interfaces;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;

@@ -10,14 +10,14 @@ using CliFx.Infrastructure;
 namespace Gadget.Cli.Commands
 {
     [Command("groups list", Description = "lists all groups")]
-    public class GetGroupsCommand : ICommand
+    public class GetGroupsCommand : Command, ICommand
     {
         public record GetGroupsRequest(Guid Id, string Name);
 
         public async ValueTask ExecuteAsync(IConsole console)
         {
-            var client = new HttpClient();
-            var response = await client.GetFromJsonAsync<IEnumerable<GetGroupsRequest>>("http://localhost:5001/groups");
+            var response =
+                await HttpClient.GetFromJsonAsync<IEnumerable<GetGroupsRequest>>("http://localhost:5001/groups");
             if (response is null)
             {
                 await console.Output.WriteLineAsync(":(");
@@ -28,6 +28,10 @@ namespace Gadget.Cli.Commands
             {
                 await console.Output.WriteLineAsync($"Id : {guid} Name : {name}");
             }
+        }
+
+        public GetGroupsCommand(HttpClient httpClient) : base(httpClient)
+        {
         }
     }
 }

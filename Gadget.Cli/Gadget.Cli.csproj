@@ -9,5 +9,6 @@
     <ItemGroup>
         <PackageReference Include="CliFx" Version="2.0.3" />
         <PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Http" Version="6.0.0-preview.3.21201.4" />
     </ItemGroup>
 </Project>

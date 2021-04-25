@@ -7,7 +7,7 @@ using CliFx.Infrastructure;
 namespace Gadget.Cli.Commands
 {
     [Command("services stop", Description = "Attempts to stop requested service")]
-    public class StopServiceCommand : ICommand
+    public class StopServiceCommand : Command, ICommand
     {
         [CommandParameter(0, Description = "agent name")]
         public string Agent { get; set; }
@@ -17,8 +17,7 @@ namespace Gadget.Cli.Commands
 
         public async ValueTask ExecuteAsync(IConsole console)
         {
-            var client = new HttpClient();
-            var response = await client.PostAsync($"http://localhost:5001/agents/{Agent}/{Service}/stop", null!);
+            var response = await HttpClient.PostAsync($"http://localhost:5001/agents/{Agent}/{Service}/stop", null!);
             if (!response.IsSuccessStatusCode)
             {
                 await console.Output.WriteLineAsync("bad");
@@ -26,6 +25,10 @@ namespace Gadget.Cli.Commands
             }
 
             await console.Output.WriteLineAsync("good");
+        }
+
+        public StopServiceCommand(HttpClient httpClient) : base(httpClient)
+        {
         }
     }
 }

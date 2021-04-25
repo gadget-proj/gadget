@@ -5,13 +5,15 @@ using System.Linq;
 
 namespace Gadget.Server.Domain.Entities
 {
-    public class Agent 
+    public class Agent
     {
         public Guid Id { get; }
         public string Name { get; }
         public string Address { get; }
         private readonly ICollection<Service> _services = new HashSet<Service>();
         public IEnumerable<Service> Services => _services.ToImmutableList();
+        public bool Alive { get; private set; }
+        public DateTime LastAlive { get; set; }
 
         private Agent()
         {
@@ -35,13 +37,20 @@ namespace Gadget.Server.Domain.Entities
 
         public void ChangeServiceStatus(string serviceName, string newStatus)
         {
-            var service = _services.FirstOrDefault(s => string.Equals(s.Name, serviceName, StringComparison.CurrentCultureIgnoreCase));
+            var service = _services.FirstOrDefault(s =>
+                string.Equals(s.Name, serviceName, StringComparison.CurrentCultureIgnoreCase));
             if (service is null)
             {
                 throw new ApplicationException($"Service {serviceName} could not be found on agent {Name}");
             }
 
             service.ChangeStatus(newStatus);
+        }
+
+        public void MarkNotAvailable()
+        {
+            Alive = false;
+            LastAlive = DateTime.UtcNow;
         }
     }
 }
