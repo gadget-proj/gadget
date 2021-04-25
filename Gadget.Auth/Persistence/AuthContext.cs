@@ -16,7 +16,7 @@ namespace Gadget.Auth.Persistence
             modelBuilder.Entity<User>(builder => builder.HasKey(u => u.Id));
             modelBuilder.Entity<User>(builder => builder.HasMany(u => u.RefreshTokens)
                 .WithOne(r => r.User).HasForeignKey("UserId"));
-
+            modelBuilder.Entity<User>(builder => builder.Property(u => u.Password));
             modelBuilder.Entity<User>(builder => builder.Property(u => u.UserName));
             modelBuilder.Entity<User>(builder => builder.Property(u => u.UserProvider));
 

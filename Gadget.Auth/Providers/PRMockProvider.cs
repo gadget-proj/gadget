@@ -1,28 +1,35 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
+using System.Net.NetworkInformation;
 using System.Text;
+using System.Threading.Tasks;
+using Gadget.Auth.Persistence;
+using Microsoft.EntityFrameworkCore;
 
 namespace Gadget.Auth.Providers
 {
     public class PrMockProvider : ILoginProvider
     {
-        private readonly Dictionary<string, string> _users;
+        private readonly AuthContext _context;
 
-        public PrMockProvider()
+        public PrMockProvider(AuthContext context)
         {
-            _users = new Dictionary<string, string> { 
-                { "test", "5a105e8b9d40e1329780d62ea2265d8a" },
-                {"lucek", "ff29a82b9ea498210089965fb5216806" } };
+            _context = context;
         }
-        public bool PasswordValid(string userName, string password)
+
+        public async Task<bool> PasswordValid(string userName, string password)
         {
-            _users.TryGetValue(userName, out string  passwordHashed);
-            return passwordHashed == HashMd5(password);
+            var user = await _context.Users.SingleAsync(u => u.UserName == userName);
+
+            var matches = BCrypt.Net.BCrypt.Verify(password, user.Password);
+            return matches;
         }
 
 
         private string HashMd5(string value)
         {
-            System.Security.Cryptography.MD5CryptoServiceProvider x = new System.Security.Cryptography.MD5CryptoServiceProvider();
+            System.Security.Cryptography.MD5CryptoServiceProvider x =
+                new System.Security.Cryptography.MD5CryptoServiceProvider();
             byte[] data = System.Text.Encoding.ASCII.GetBytes(value);
             data = x.ComputeHash(data);
 
@@ -32,6 +39,7 @@ namespace Gadget.Auth.Providers
             {
                 sBuilder.Append(data[i].ToString("x2"));
             }
+
             return sBuilder.ToString();
         }
     }

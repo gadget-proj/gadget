@@ -48,7 +48,7 @@ namespace Gadget.Auth.Services
                 return false;
             }
 
-            return _loginProvider.PasswordValid(userName, password);
+            return await _loginProvider.PasswordValid(userName, password);
         }
 
         public async Task<bool> SaveRefreshToken(string userName, string token, string ipAddress)
