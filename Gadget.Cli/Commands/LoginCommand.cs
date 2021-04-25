@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
@@ -22,7 +23,7 @@ namespace Gadget.Cli.Commands
         public async ValueTask ExecuteAsync(IConsole console)
         {
             var request = new LoginRequest(Username, Password);
-            var response = await HttpClient.PostAsJsonAsync("http://localhost:5002/auth/login", request);
+            var response = await HttpClient.PostAsJsonAsync("/auth/login", request);
             if (!response.IsSuccessStatusCode)
             {
                 await console.Output.WriteLineAsync(response.ReasonPhrase);
@@ -30,7 +31,8 @@ namespace Gadget.Cli.Commands
             }
 
             var token = await response.Content.ReadAsStringAsync();
-            Environment.SetEnvironmentVariable("GADGET_TOKEN", token);
+            await File.WriteAllTextAsync("config.gd", token);
+            await console.Output.WriteLineAsync(token);
             await console.Output.WriteLineAsync("Logged in");
         }
 

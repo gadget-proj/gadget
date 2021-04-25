@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Threading.Tasks;
 using CliFx;
 using Gadget.Cli.Commands;
@@ -22,56 +23,57 @@ namespace Gadget.Cli
             var services = new ServiceCollection();
             services.AddHttpClient<GetAgentsCommand>(client =>
             {
-                client.DefaultRequestHeaders.Add("Authorize",
-                    $"Bearer {Environment.GetEnvironmentVariable("GADGET_TOKEN")}");
+                client.DefaultRequestHeaders.Add("Authorization",
+                    $"Bearer {File.ReadAllText("config.gd")}");
                 client.BaseAddress = new Uri(ctl);
             });
             services.AddHttpClient<GetGroupsCommand>(client =>
             {
-                client.DefaultRequestHeaders.Add("Authorize",
-                    $"Bearer {Environment.GetEnvironmentVariable("GADGET_TOKEN")}");
+                client.DefaultRequestHeaders.Add("Authorization",
+                    $"Bearer {File.ReadAllText("config.gd")}");
                 client.BaseAddress = new Uri(ctl);
             });
             services.AddHttpClient<GetAgentServicesCommand>(client =>
             {
-                client.DefaultRequestHeaders.Add("Authorize",
-                    $"Bearer {Environment.GetEnvironmentVariable("GADGET_TOKEN")}");
+                client.DefaultRequestHeaders.Add("Authorization",
+                    $"Bearer {File.ReadAllText("config.gd")}");
                 client.BaseAddress = new Uri(ctl);
             });
-            services.AddHttpClient<LoginCommand>(client =>
-            {
-                client.DefaultRequestHeaders.Add("Authorize",
-                    $"Bearer {Environment.GetEnvironmentVariable("GADGET_TOKEN")}");
-                client.BaseAddress = new Uri(auth);
-            });
+            services.AddHttpClient<LoginCommand>(client => { client.BaseAddress = new Uri(auth); });
             services.AddHttpClient<CreateUserCommand>(client =>
             {
-                client.DefaultRequestHeaders.Add("Authorize",
-                    $"Bearer {Environment.GetEnvironmentVariable("GADGET_TOKEN")}");
+                client.DefaultRequestHeaders.Add("Authorization",
+                    $"Bearer {File.ReadAllText("config.gd")}");
                 client.BaseAddress = new Uri(auth);
             });
             services.AddHttpClient<StopServiceCommand>(client =>
             {
-                client.DefaultRequestHeaders.Add("Authorize",
-                    $"Bearer {Environment.GetEnvironmentVariable("GADGET_TOKEN")}");
+                client.DefaultRequestHeaders.Add("Authorization",
+                    $"Bearer {File.ReadAllText("config.gd")}");
                 client.BaseAddress = new Uri(ctl);
             });
             services.AddHttpClient<AddToGroupCommand>(client =>
             {
-                client.DefaultRequestHeaders.Add("Authorize",
-                    $"Bearer {Environment.GetEnvironmentVariable("GADGET_TOKEN")}");
+                client.DefaultRequestHeaders.Add("Authorization",
+                    $"Bearer {File.ReadAllText("config.gd")}");
                 client.BaseAddress = new Uri(ctl);
             });
             services.AddHttpClient<CreateNewGroupCommand>(client =>
             {
-                client.DefaultRequestHeaders.Add("Authorize",
-                    $"Bearer {Environment.GetEnvironmentVariable("GADGET_TOKEN")}");
+                client.DefaultRequestHeaders.Add("Authorization",
+                    $"Bearer {File.ReadAllText("config.gd")}");
                 client.BaseAddress = new Uri(ctl);
             });
             services.AddHttpClient<StopGroupCommand>(client =>
             {
-                client.DefaultRequestHeaders.Add("Authorize",
-                    $"Bearer {Environment.GetEnvironmentVariable("GADGET_TOKEN")}");
+                client.DefaultRequestHeaders.Add("Authorization",
+                    $"Bearer {File.ReadAllText("config.gd")}");
+                client.BaseAddress = new Uri(ctl);
+            });
+            services.AddHttpClient<ApplyConfigCommand>(client =>
+            {
+                client.DefaultRequestHeaders.Add("Authorization",
+                    $"Bearer {File.ReadAllText("config.gd")}");
                 client.BaseAddress = new Uri(ctl);
             });
             return services.BuildServiceProvider();
