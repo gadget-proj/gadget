@@ -1,5 +1,10 @@
+using System.Collections.Generic;
+using System.Text.Json;
 using Gadget.Server.Domain.Entities;
+using Gadget.Server.Domain.Enums;
+using Gadget.Server.Dto.V1.Requests;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 
 namespace Gadget.Server.Persistence
 {
@@ -29,7 +34,11 @@ namespace Gadget.Server.Persistence
             modelBuilder.Entity<Service>(builder => builder.Property(a => a.Description));
             modelBuilder.Entity<Service>(builder => builder.HasMany(s => s.Events));
             modelBuilder.Entity<Service>(builder => builder.HasOne(s => s.Agent));
-            modelBuilder.Entity<Service>(builder => builder.OwnsOne(s => s.Config));
+            // modelBuilder.Entity<Service>(builder => builder.OwnsOne(s => s.Config));
+            modelBuilder.Entity<Config>(builder => builder.HasKey(a => a.Id));
+            modelBuilder.Entity<Config>(builder => builder.HasMany(c => c.Actions));
+
+            modelBuilder.Entity<ActionRequest>().HasKey(a=>a.Id);
 
             modelBuilder.Entity<ServiceEvent>(builder => builder.HasKey(s => s.Id));
             modelBuilder.Entity<ServiceEvent>(builder => builder.Property(s => s.Status));

@@ -45,22 +45,7 @@ namespace Gadget.Server.Domain.Entities
 
         public Action Act(Event @event)
         {
-            if (Config is null)
-            {
-                return Action.Pass;
-            }
-
-            return @event.ServiceStatus switch
-            {
-                ServiceStatus.Stopped => Action.Start,
-                ServiceStatus.StartPending => Action.Pass,
-                ServiceStatus.StopPending => Action.Pass,
-                ServiceStatus.Running => Action.Stop,
-                ServiceStatus.ContinuePending => Action.Pass,
-                ServiceStatus.PausePending => Action.Pass,
-                ServiceStatus.Paused => Action.Pass,
-                _ => throw new ArgumentOutOfRangeException()
-            };
+            return Config?.Action(@event.ServiceStatus) ?? Action.Pass;
         }
 
         private sealed class NameEqualityComparer : IEqualityComparer<Service>

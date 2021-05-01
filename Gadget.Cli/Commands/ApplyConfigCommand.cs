@@ -26,7 +26,6 @@ namespace Gadget.Cli.Commands
 
         public async ValueTask ExecuteAsync(IConsole console)
         {
-            
             var exists = File.Exists(Config);
             if (!exists)
             {

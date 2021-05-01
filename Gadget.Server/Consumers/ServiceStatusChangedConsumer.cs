@@ -39,24 +39,20 @@ namespace Gadget.Server.Consumers
             var newStatus = Enum.Parse<ServiceStatus>(context.Message.Status);
             var id = context.CorrelationId;
             var @event = ParseEvent(context.Message);
-            var agent = await _context.Agents
-                .Include(a => a.Services)
-                .ThenInclude(s => s.Events.Take(1))
-                .FirstOrDefaultAsync(a => a.Name == agentName);
-            if (agent == null)
-            {
-                throw new ApplicationException($"Agent {agentName} is not registered");
-            }
+            var svc2 = await _context.Services
+                .Include(s => s.Config)
+                .ThenInclude(c=>c.Actions)
+                .Include(s => s.Events)
+                .FirstOrDefaultAsync(s => s.Name.ToLower() == service.ToLower());
 
             await _events.WriteAsync(context.Message);
-            var changedService = agent.Services.FirstOrDefault(s => s.Name.ToLower() == service.ToLower());
-            if (changedService is null)
+
+            if (svc2 is null)
             {
                 return;
             }
 
-
-            var action = changedService.Act(@event);
+            var action = svc2.Act(@event);
             switch (action)
             {
                 case Action.Stop:
@@ -75,13 +71,8 @@ namespace Gadget.Server.Consumers
             }
 
             var newEvent = new ServiceEvent(newStatus);
-            changedService.Events.Add(newEvent);
-
-            if (changedService.Config.Restart)
-            {
-                _logger.LogCritical("restart!");
-            }
-
+            svc2.Events.Add(newEvent);
+            var agent = await _context.Agents.FirstOrDefaultAsync(a => a.Name.ToLower() == agentName.ToLower());
             agent.ChangeServiceStatus(service, newStatus);
             _context.Agents.Update(agent);
             await _context.SaveChangesAsync();
