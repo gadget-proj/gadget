@@ -47,7 +47,7 @@ namespace Gadget.Server.Services
                 .ToListAsync();
 
             return await Task.FromResult(events.Select(e =>
-                new EventDto(e.Service.Agent.Name, e.Service.Name, e.CreatedAt, e.Status)));
+                new EventDto(e.Service.Agent.Name, e.Service.Name, e.CreatedAt, e.Status.ToString())));
         }
 
         public async Task<IEnumerable<EventDto>> GetEvents(string agent, string serviceName, DateTime from, DateTime to,
@@ -76,7 +76,7 @@ namespace Gadget.Server.Services
                 .ToListAsync();
 
             return await Task.FromResult(events.Select(e =>
-                new EventDto(e.Service.Agent.Name, e.Service.Name, e.CreatedAt, e.Status)));
+                new EventDto(e.Service.Agent.Name, e.Service.Name, e.CreatedAt, e.Status.ToString())));
         }
 
         public async Task<IEnumerable<EventDto>> GetEvents(string agent, string service)
@@ -87,7 +87,8 @@ namespace Gadget.Server.Services
                 .FirstOrDefaultAsync(a => a.Name == agent);
 
             var svc = ag.Services.FirstOrDefault(s => s.Name == service);
-            return svc?.Events.Select(e => new EventDto(e.Service.Agent.Name, e.Service.Name, e.CreatedAt, e.Status));
+            return svc?.Events.Select(e =>
+                new EventDto(e.Service.Agent.Name, e.Service.Name, e.CreatedAt, e.Status.ToString()));
         }
 
         public async Task<IEnumerable<ServiceDto>> GetServices(string agentName)
@@ -97,7 +98,7 @@ namespace Gadget.Server.Services
                 .ThenInclude(s => s.Events.Take(20))
                 .FirstOrDefault(x => x.Name == agentName);
             var services = machine?.Services;
-            var dto = services?.Select(s => new ServiceDto(s.Name, s.Status, s.LogOnAs, s.Description));
+            var dto = services?.Select(s => new ServiceDto(s.Name, s.Status.ToString(), s.LogOnAs, s.Description));
             return await Task.FromResult(dto);
         }
 

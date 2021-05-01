@@ -1,8 +1,10 @@
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Gadget.Messaging.Contracts.Commands.v1;
 using Gadget.Messaging.SignalR.v1;
 using Gadget.Server.Domain.Entities;
+using Gadget.Server.Domain.Enums;
 using Gadget.Server.Persistence;
 using MassTransit;
 using Microsoft.Extensions.Logging;
@@ -40,12 +42,15 @@ namespace Gadget.Server.Consumers
             {
                 //I dont like this, TODO check MassTransit serialization constraints
                 var service = JsonConvert.DeserializeObject<ServiceDescriptor>(s.ToString());
-                return new Service(service?.Name.ToLower().Trim(), service?.Status, agent, service?.LogOnAs,
+                return new Service(service?.Name.ToLower().Trim(),
+                    Enum.Parse<ServiceStatus>(service?.Status ?? "Stopped"), agent,
+                    service?.LogOnAs,
                     service?.Description);
             }));
 
             await _context.Agents.AddAsync(agent);
             await _context.SaveChangesAsync();
+            _logger.LogInformation($"Agent {agent} successfully registered");
         }
     }
 }

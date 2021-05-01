@@ -76,6 +76,12 @@ namespace Gadget.Cli
                     $"Bearer {File.ReadAllText("config.gd")}");
                 client.BaseAddress = new Uri(ctl);
             });
+            services.AddHttpClient<StartServiceCommand>(client =>
+            {
+                client.DefaultRequestHeaders.Add("Authorization",
+                    $"Bearer {File.ReadAllText("config.gd")}");
+                client.BaseAddress = new Uri(ctl);
+            });
             return services.BuildServiceProvider();
         }
 

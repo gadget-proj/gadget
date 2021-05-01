@@ -87,7 +87,8 @@ namespace Gadget.Server.Services
                 .Include(g => g.Resources)
                 .FirstOrDefaultAsync(g => g.Name == groupName)
                 .Select(g => new GroupDto(g.Id, g.Name,
-                    Enumerable.Select<Service, ServiceDto>(g.Resources, s => new ServiceDto(s.Name, s.Status, s.LogOnAs, s.Description))));
+                    Enumerable.Select<Service, ServiceDto>(g.Resources,
+                        s => new ServiceDto(s.Name, s.Status.ToString(), s.LogOnAs, s.Description))));
             return group;
         }
 

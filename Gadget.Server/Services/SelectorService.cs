@@ -35,7 +35,10 @@ namespace Gadget.Server.Services
                 var resource = await _gadgetContext.Services.FirstOrDefaultAsync(s => s.Name == query);
                 if (resource is not null)
                     return new[]
-                        {new ServiceDto(resource.Name, resource.Status, resource.LogOnAs, resource.Description)};
+                    {
+                        new ServiceDto(resource.Name, resource.Status.ToString(), resource.LogOnAs,
+                            resource.Description)
+                    };
                 _logger.LogInformation("could not find resource for {query}", query);
                 return null;
             }
@@ -45,7 +48,7 @@ namespace Gadget.Server.Services
             var resources = await _gadgetContext.Services
                 .Include(s => s.Agent)
                 .Where(a => a.Name == service && a.Agent.Name == agent)
-                .Select(s => new ServiceDto(s.Name, s.Status, s.LogOnAs, s.Description))
+                .Select(s => new ServiceDto(s.Name, s.Status.ToString(), s.LogOnAs, s.Description))
                 .ToListAsync();
             return resources;
         }

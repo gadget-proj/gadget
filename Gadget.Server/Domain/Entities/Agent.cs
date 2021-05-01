@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using Gadget.Server.Domain.Enums;
 
 namespace Gadget.Server.Domain.Entities
 {
@@ -35,7 +36,7 @@ namespace Gadget.Server.Domain.Entities
             foreach (var service in services) AddService(service);
         }
 
-        public void ChangeServiceStatus(string serviceName, string newStatus)
+        public void ChangeServiceStatus(string serviceName, ServiceStatus newStatus)
         {
             var service = _services.FirstOrDefault(s =>
                 string.Equals(s.Name, serviceName, StringComparison.CurrentCultureIgnoreCase));
@@ -45,12 +46,6 @@ namespace Gadget.Server.Domain.Entities
             }
 
             service.ChangeStatus(newStatus);
-        }
-
-        public void MarkNotAvailable()
-        {
-            Alive = false;
-            LastAlive = DateTime.UtcNow;
         }
     }
 }
