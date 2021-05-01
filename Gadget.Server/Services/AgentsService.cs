@@ -7,11 +7,13 @@ using Gadget.Messaging.Contracts.Responses;
 using Gadget.Server.Domain.Entities;
 using Gadget.Server.Domain.Enums;
 using Gadget.Server.Dto.V1;
+using Gadget.Server.Dto.V1.Requests;
 using Gadget.Server.Persistence;
 using Gadget.Server.Services.Interfaces;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Action = Gadget.Server.Domain.Enums.Action;
 
 namespace Gadget.Server.Services
 {
@@ -19,16 +21,13 @@ namespace Gadget.Server.Services
     {
         private readonly GadgetContext _context;
         private readonly IPublishEndpoint _publishEndpoint;
-        private readonly IBus _bus;
         private readonly ILogger<AgentsService> _logger;
 
-        public AgentsService(GadgetContext context, IPublishEndpoint publishEndpoint, ILogger<AgentsService> logger,
-            IBus bus)
+        public AgentsService(GadgetContext context, IPublishEndpoint publishEndpoint, ILogger<AgentsService> logger)
         {
             _context = context;
             _publishEndpoint = publishEndpoint;
             _logger = logger;
-            _bus = bus;
         }
 
         public async Task<IEnumerable<AgentDto>> GetAgents()
@@ -77,6 +76,45 @@ namespace Gadget.Server.Services
 
             return await Task.FromResult(events.Select(e =>
                 new EventDto(e.Service.Agent.Name, e.Service.Name, e.CreatedAt, e.Status.ToString())));
+        }
+
+        public async Task ApplyConfig(IEnumerable<ConfigRequest> requestRules)
+        {
+            foreach (var (selector, actionRequests) in requestRules)
+            {
+                var svc = await _context
+                    .Services
+                    .Include(s => s.Config)
+                    .Include(s => s.Agent)
+                    .FirstOrDefaultAsync(s => s.Name == selector.ToLower().Trim());
+                if (svc is null)
+                {
+                    continue;
+                }
+
+                var config = new Config(actionRequests);
+                svc.ApplyConfig(config);
+                var requiredAction = svc.RequiredAction();
+                if (requiredAction != Action.Pass)
+                {
+                    switch (requiredAction)
+                    {
+                        case Action.Stop:
+                            await StopService(svc.Agent.Name, svc.Name);
+                            break;
+                        case Action.Start:
+                            await StartService(svc.Agent.Name, svc.Name);
+                            break;
+                        // ReSharper disable once UnreachableSwitchCaseDueToIntegerAnalysis
+                        case Action.Pass:
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException();
+                    }
+                }
+
+                await _context.SaveChangesAsync();
+            }
         }
 
         public async Task<IEnumerable<EventDto>> GetEvents(string agent, string service)

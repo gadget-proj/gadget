@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Gadget.Server.Dto.V1;
+using Gadget.Server.Dto.V1.Requests;
 
 namespace Gadget.Server.Services.Interfaces
 {
@@ -19,5 +20,7 @@ namespace Gadget.Server.Services.Interfaces
 
         Task<IEnumerable<EventDto>> GetEvents(string agent, string serviceName, DateTime from, DateTime to,
             int count = int.MaxValue, int skip = 0);
+
+        Task ApplyConfig(IEnumerable<ConfigRequest> requestRules);
     }
 }

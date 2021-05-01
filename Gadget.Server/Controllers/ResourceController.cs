@@ -44,25 +44,8 @@ namespace Gadget.Server.Controllers
         public async Task<IActionResult> ApplyConfig(ApplyConfigRequest request)
         {
             var entry = Enum.Parse<ServiceStatus>(request.Rules.FirstOrDefault()?.Actions.FirstOrDefault()?.Event!);
-            foreach (var configRequest in request.Rules)
-            {
-                var selector = configRequest.Selector;
-                var svc = await _gadgetContext
-                    .Services
-                    .Include(s => s.Config)
-                    .FirstOrDefaultAsync(s => s.Name == selector.ToLower().Trim());
-                if (svc is null)
-                {
-                    continue;
-                }
-
-                var config = new Config(configRequest.Actions);
-                svc.ApplyConfig(config);
-                await _gadgetContext.SaveChangesAsync();
-                _logger.LogInformation((false).ToString());
-            }
-
-
+            await _agentsService.ApplyConfig(request.Rules);
+            
             return Ok();
         }
     }

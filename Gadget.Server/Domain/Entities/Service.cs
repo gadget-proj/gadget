@@ -48,6 +48,11 @@ namespace Gadget.Server.Domain.Entities
             return Config?.Action(@event.ServiceStatus) ?? Action.Pass;
         }
 
+        public Action RequiredAction()
+        {
+            return Config?.Action(Status) ?? Action.Pass; 
+        }
+        
         private sealed class NameEqualityComparer : IEqualityComparer<Service>
         {
             public bool Equals(Service x, Service y)
