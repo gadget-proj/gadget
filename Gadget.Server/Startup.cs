@@ -2,7 +2,6 @@ using System.Text;
 using System.Threading.Channels;
 using Gadget.Messaging.Contracts.Commands;
 using Gadget.Messaging.Contracts.Events.v1;
-using Gadget.Server.BackgroundServices;
 using Gadget.Server.Consumers;
 using Gadget.Server.HealthCheck;
 using Gadget.Server.Persistence;
@@ -28,7 +27,7 @@ namespace Gadget.Server
             Configuration = configuration;
         }
 
-        public IConfiguration Configuration { get; private set; }
+        public IConfiguration Configuration { get; }
 
         public void ConfigureServices(IServiceCollection services)
         {
@@ -55,7 +54,6 @@ namespace Gadget.Server
             services.AddLogging(cfg => cfg.AddSeq());
             services.AddDbContext<GadgetContext>(builder =>
                 builder.UseSqlServer(Configuration.GetConnectionString("MsSql")));
-            // services.AddDbContext<GadgetContext>(builder => builder.UseSqlite("Data Source=gadget.db"));
             services.AddMassTransit(x =>
             {
                 x.AddConsumer<ServiceStatusChangedConsumer>();
@@ -98,7 +96,6 @@ namespace Gadget.Server
             services.AddTransient<ISelectorService, SelectorService>();
             services.AddTransient<IActionsService, ActionsService>();
             services.AddHostedService<AgentHealthCheck>();
-            services.AddHostedService<CommanderBackgroundService>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILogger<Startup> logger)
@@ -109,7 +106,6 @@ namespace Gadget.Server
             {
                 using (var context = serviceScope.ServiceProvider.GetService<GadgetContext>())
                 {
-                    logger.LogCritical("ensurecreated");
                     context?.Database.EnsureCreated();
                 }
             }
