@@ -21,7 +21,7 @@ namespace Gadget.Cli.Commands
         public async ValueTask ExecuteAsync(IConsole console)
         {
             var services = await HttpClient.GetFromJsonAsync<IEnumerable<GetServicesResponse>>(
-                $"http://localhost:5001/agents/{Value}");
+                $"agents/{Value}");
             if (services is null)
             {
                 await console.Output.WriteLineAsync("something went wrong, response is null");

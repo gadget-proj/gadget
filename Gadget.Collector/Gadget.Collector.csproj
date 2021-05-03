@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <TargetFramework>net5.0</TargetFramework>
+        <UserSecretsId>aspnet-Gadget.Collector-EE46CCC9-5827-4958-A086-C16FE0E1A38D</UserSecretsId>
+        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="5.6.3" />
+        <PackageReference Include="MassTransit" Version="7.0.7"/>
+        <PackageReference Include="MassTransit.AspNetCore" Version="7.0.7"/>
+        <PackageReference Include="MassTransit.Extensions.DependencyInjection" Version="7.0.7"/>
+        <PackageReference Include="MassTransit.RabbitMQ" Version="7.0.7"/>
+    </ItemGroup>
+
+</Project>

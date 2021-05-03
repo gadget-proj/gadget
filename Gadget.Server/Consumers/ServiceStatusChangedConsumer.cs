@@ -70,8 +70,6 @@ namespace Gadget.Server.Consumers
                     throw new ArgumentOutOfRangeException();
             }
 
-            var newEvent = new ServiceEvent(newStatus);
-            svc2.Events.Add(newEvent);
             var agent = await _context.Agents.FirstOrDefaultAsync(a => a.Name.ToLower() == agentName.ToLower());
             agent.ChangeServiceStatus(service, newStatus);
             _context.Agents.Update(agent);
