@@ -8,10 +8,22 @@
 
     <ItemGroup>
         <PackageReference Include="Swashbuckle.AspNetCore" Version="5.6.3" />
-        <PackageReference Include="MassTransit" Version="7.0.7"/>
-        <PackageReference Include="MassTransit.AspNetCore" Version="7.0.7"/>
-        <PackageReference Include="MassTransit.Extensions.DependencyInjection" Version="7.0.7"/>
-        <PackageReference Include="MassTransit.RabbitMQ" Version="7.0.7"/>
+        <PackageReference Include="MassTransit" Version="7.0.7" />
+        <PackageReference Include="MassTransit.AspNetCore" Version="7.0.7" />
+        <PackageReference Include="MassTransit.Extensions.DependencyInjection" Version="7.0.7" />
+        <PackageReference Include="MassTransit.RabbitMQ" Version="7.0.7" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.1" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="5.0.1">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="5.0.1" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="5.0.1" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.1" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Gadget.Messaging\Gadget.Messaging.csproj" />
     </ItemGroup>
 
 </Project>
