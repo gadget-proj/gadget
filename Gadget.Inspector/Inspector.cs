@@ -69,7 +69,8 @@ namespace Gadget.Inspector
             {
                 Agent = Environment.MachineName,
                 Name = serviceController.ServiceName,
-                Status = current.ToString()
+                Status = current.ToString(),
+                Date = DateTime.UtcNow
             }, stoppingToken);
         }
 

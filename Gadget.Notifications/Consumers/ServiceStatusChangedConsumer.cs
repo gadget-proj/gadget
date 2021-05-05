@@ -8,6 +8,7 @@ using Gadget.Notifications.Domain.Enums;
 using Gadget.Notifications.Domain.ValueObjects;
 using Gadget.Notifications.Hubs;
 using Gadget.Notifications.Persistence;
+using Gadget.Notifications.Services.Interfaces;
 using MassTransit;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
@@ -22,15 +23,18 @@ namespace Gadget.Notifications.Consumers
         private readonly ChannelWriter<DiscordMessage> _discord;
         private readonly ChannelWriter<EmailMessage> _emails;
         private readonly NotificationsContext _notificationsContext;
+        private readonly ISubscriptionsManager _subscriptionsManager;
 
         public ServiceStatusChangedConsumer(ILogger<ServiceStatusChangedConsumer> logger,
             IHubContext<NotificationsHub> hub, Channel<DiscordMessage> channel,
-            NotificationsContext notificationsContext, Channel<EmailMessage> emails)
+            NotificationsContext notificationsContext, Channel<EmailMessage> emails,
+            ISubscriptionsManager subscriptionsManager)
         {
             _logger = logger;
             _hub = hub;
             _notificationsContext = notificationsContext;
             _emails = emails;
+            _subscriptionsManager = subscriptionsManager;
             _discord = channel.Writer;
         }
 
@@ -66,12 +70,16 @@ namespace Gadget.Notifications.Consumers
 
         private async Task SendSignalRNotification(ConsumeContext<IServiceStatusChanged> context)
         {
-            await _hub.Clients.Group("dashboard").SendAsync("ServiceStatusChanged", new ServiceDescriptor
+            _logger.LogInformation("Sending signalr notifications");
+            await foreach (var group in _subscriptionsManager.Match($"{context.Message.Agent}/{context.Message.Name}"))
             {
-                Agent = context.Message.Agent,
-                Name = context.Message.Name,
-                Status = context.Message.Status
-            }, context.CancellationToken);
+                await _hub.Clients.Group(group).SendAsync("ServiceStatusChanged", new ServiceDescriptor
+                {
+                    Agent = context.Message.Agent,
+                    Name = context.Message.Name,
+                    Status = context.Message.Status
+                }, context.CancellationToken);
+            }
         }
 
         private async Task EnqueueMessage(Notifier notifier, string status, string agent, string service)
@@ -91,6 +99,8 @@ namespace Gadget.Notifications.Consumers
                         notifier.Receiver);
                     await _emails.WriteAsync(emailMessage);
                     _logger.LogInformation("Enqueued email message");
+                    break;
+                case NotifierType.None:
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();

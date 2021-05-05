@@ -35,6 +35,7 @@ namespace Gadget.Collector
             services.AddMassTransit(x =>
             {
                 x.AddConsumer<MetricsDataConsumer>();
+                x.AddConsumer<ServiceStatusChangedConsumer>();
                 x.UsingRabbitMq((context, cfg) =>
                 {
                     cfg.Host(Configuration.GetConnectionString("RabbitMq"),

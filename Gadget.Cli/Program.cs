@@ -88,6 +88,7 @@ namespace Gadget.Cli
                     $"Bearer {File.ReadAllText("config.gd")}");
                 client.BaseAddress = new Uri(ctl);
             });
+            services.AddSingleton<WatchServiceCommand>();
             return services.BuildServiceProvider();
         }
 

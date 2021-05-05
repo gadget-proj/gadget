@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using FluentValidation.AspNetCore;
 using Gadget.Notifications.Consumers;
 using Gadget.Notifications.Extensions;
@@ -35,6 +36,9 @@ namespace Gadget.Notifications
             services.AddEmailNotifications(Configuration);
             services.AddWebhooksNotifications();
             services.AddValidations();
+            // services.AddTransient<IList<ServiceDescriptor>>(_ => new List<ServiceDescriptor>());
+            services.AddSingleton<IList<string>>(_ => new List<string>());
+            services.AddTransient<ISubscriptionsManager, SubscriptionsManager>();
             services.AddDbContext<NotificationsContext>(builder => builder.UseSqlite("Data Source=notifications.db"));
             services.AddSignalR();
             services.AddMassTransit(x =>
