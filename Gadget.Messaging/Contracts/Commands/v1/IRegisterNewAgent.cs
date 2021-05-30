@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using MassTransit;
 
 namespace Gadget.Messaging.Contracts.Commands.v1
 {
-    public interface IRegisterNewAgent
+    public interface IRegisterNewAgent : CorrelatedBy<Guid>
     {
         string Agent { get; }
         string Address { get; }

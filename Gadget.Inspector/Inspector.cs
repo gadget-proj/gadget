@@ -21,50 +21,57 @@ namespace Gadget.Inspector
     {
         private readonly IPublishEndpoint _publishEndpoint;
         private readonly ILogger<Inspector> _logger;
+        private readonly int _loopInterval;
 
         private readonly IDictionary<string, ServiceControllerStatus> _services =
             new Dictionary<string, ServiceControllerStatus>();
 
-        public Inspector(IPublishEndpoint publishEndpoint, ILogger<Inspector> logger)
+        public Inspector(IPublishEndpoint publishEndpoint, ILogger<Inspector> logger, IConfiguration configuration)
         {
             _publishEndpoint = publishEndpoint;
             _logger = logger;
+            _loopInterval = int.TryParse(configuration["MainLoopInterval"], out var interval) ? interval : 1;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            _logger.LogInformation("Starting Inspector service");
+            _logger.LogInformation($"Starting watcher {DateTime.UtcNow}");
             await RegisterAgent(stoppingToken);
 
-            _logger.LogInformation($"Starting watcher {DateTime.UtcNow}");
             while (!stoppingToken.IsCancellationRequested)
             {
                 foreach (var serviceController in ServiceController.GetServices())
                 {
-                    serviceController.Refresh();
-                    var current = serviceController.Status;
-                    if (!_services.TryGetValue(serviceController.ServiceName, out var previous))
-                    {
-                        _services[serviceController.ServiceName] = current;
-                        continue;
-                    }
-
-                    if (current == previous)
-                    {
-                        continue;
-                    }
-
-                    _services[serviceController.ServiceName] = current;
-                    await _publishEndpoint.Publish<IServiceStatusChanged>(new
-                    {
-                        Agent = Environment.MachineName,
-                        Name = serviceController.ServiceName,
-                        Status = current.ToString()
-                    }, stoppingToken);
+                    await WatchForServiceChanges(stoppingToken, serviceController);
                 }
 
-                await Task.Delay(TimeSpan.FromSeconds(1), stoppingToken);
+                await Task.Delay(TimeSpan.FromSeconds(_loopInterval), stoppingToken);
             }
+        }
+
+        private async Task WatchForServiceChanges(CancellationToken stoppingToken, ServiceController serviceController)
+        {
+            serviceController.Refresh();
+            var current = serviceController.Status;
+            if (!_services.TryGetValue(serviceController.ServiceName, out var previous))
+            {
+                _services[serviceController.ServiceName] = current;
+                return;
+            }
+
+            if (current == previous)
+            {
+                return;
+            }
+
+            _services[serviceController.ServiceName] = current;
+            await _publishEndpoint.Publish<IServiceStatusChanged>(new
+            {
+                Agent = Environment.MachineName,
+                Name = serviceController.ServiceName,
+                Status = current.ToString(),
+                Date = DateTime.UtcNow
+            }, stoppingToken);
         }
 
         private async Task RegisterAgent(CancellationToken stoppingToken)
@@ -76,7 +83,7 @@ namespace Gadget.Inspector
                 Address = GetAddress(),
                 Services = ServiceController.GetServices().Select(s => new ServiceDescriptor
                 {
-                    Name = s.ServiceName,
+                    Name = s.ServiceName.Trim().ToLower(),
                     Status = s.Status.ToString(),
                     LogOnAs = GetServiceUser(s.ServiceName),
                     Description = GetServiceDescription(s.ServiceName)
@@ -101,7 +108,7 @@ namespace Gadget.Inspector
             {
                 output = wmiService["startname"].ToString();
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 // ignored
             }
@@ -118,7 +125,7 @@ namespace Gadget.Inspector
             {
                 output = wmiService["Description"].ToString();
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 // ignored
             }

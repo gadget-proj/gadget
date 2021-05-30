@@ -1,4 +1,5 @@
 ﻿using System;
+using Gadget.Server.Domain.Enums;
 
 namespace Gadget.Server.Domain.Entities
 {
@@ -8,13 +9,13 @@ namespace Gadget.Server.Domain.Entities
         {
         }
 
-        public ServiceEvent(string status)
+        public ServiceEvent(ServiceStatus status)
         {
-            Status = status ?? throw new ArgumentNullException(nameof(status));
+            Status = status;
             CreatedAt = DateTime.UtcNow;
         }
         public Guid Id { get; }
-        public string Status { get; }
+        public ServiceStatus Status { get; }
         public DateTime CreatedAt { get; }
         public Service Service { get; }
     }

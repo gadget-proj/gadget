@@ -18,12 +18,9 @@ namespace Gadget.Notifications.Services.Interfaces
     {
         Task RegisterNotifier(string agentName, string serviceName, string receiver, NotifierType notifierType,
             CancellationToken cancellationToken);
-
         Task<NotificationDto> GetWebhooks(string agentName, string serviceName,
             CancellationToken cancellationToken);
-
         IEnumerable<object> GetNotifierTypes();
-
         Task DeleteNotifier(string agentName, string serviceName, string receiver,
             CancellationToken cancellationToken);
     }
@@ -47,7 +44,7 @@ namespace Gadget.Notifications.Services.Interfaces
                 .Include(x => x.Notifiers)
                 .FirstOrDefaultAsync(x =>
                         x.Agent == agentName &&
-                        x.Service == serviceName);
+                        x.Service == serviceName, cancellationToken: cancellationToken);
             if (notification is null)
             {
                 _logger.LogInformation($"Trying to delete nonexistent Notification. Agent:{agentName}, Service:{serviceName}");
@@ -71,7 +68,7 @@ namespace Gadget.Notifications.Services.Interfaces
                 .Include(x=>x.Notifiers)
                 .FirstOrDefaultAsync(x => 
                         x.Agent == agentName &&
-                        x.Service == serviceName);
+                        x.Service == serviceName, cancellationToken: cancellationToken);
 
             var newNotifier = new Notifier(agentName, serviceName, receiver, notifierType);
 
@@ -107,6 +104,7 @@ namespace Gadget.Notifications.Services.Interfaces
             {
                 return null;
             }
+            
             return new NotificationDto
             {
                 Agent = notification.Agent,

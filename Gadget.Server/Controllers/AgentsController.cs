@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Gadget.Server.Services;
+using Gadget.Server.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Gadget.Server.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("[controller]")]
     public class AgentsController : ControllerBase
@@ -29,7 +32,8 @@ namespace Gadget.Server.Controllers
         }
 
         [HttpGet("{agent}/{service}/events")]
-        public async Task<IActionResult> GetServiceEvents(string agent, string service, int count, int skip, DateTime from, DateTime to)
+        public async Task<IActionResult> GetServiceEvents(string agent, string service, int skip,
+            DateTime from, DateTime to, int count = 50)
         {
             return Ok(await _agentsService.GetEvents(agent, service, from, to, count, skip));
         }
@@ -43,8 +47,8 @@ namespace Gadget.Server.Controllers
         [HttpPost("{agent}/{service}/start")]
         public async Task<IActionResult> StartService(string agent, string service)
         {
-            await _agentsService.StartService(agent, service);
-            return Accepted();
+            var id = await _agentsService.StartService(agent, service);
+            return Accepted(id);
         }
 
         [HttpPost("{agent}/{service}/stop")]

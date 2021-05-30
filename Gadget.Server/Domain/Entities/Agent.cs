@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using Gadget.Server.Domain.Enums;
 
 namespace Gadget.Server.Domain.Entities
 {
@@ -12,6 +13,8 @@ namespace Gadget.Server.Domain.Entities
         public string Address { get; }
         private readonly ICollection<Service> _services = new HashSet<Service>();
         public IEnumerable<Service> Services => _services.ToImmutableList();
+        public bool Alive { get; private set; }
+        public DateTime LastAlive { get; set; }
 
         private Agent()
         {
@@ -21,7 +24,6 @@ namespace Gadget.Server.Domain.Entities
         {
             Name = name ?? throw new ArgumentNullException(nameof(name));
             Address = address ?? throw new ArgumentNullException(nameof(address));
-            Id = Guid.NewGuid();
         }
 
         private void AddService(Service service)
@@ -34,9 +36,10 @@ namespace Gadget.Server.Domain.Entities
             foreach (var service in services) AddService(service);
         }
 
-        public void ChangeServiceStatus(string serviceName, string newStatus)
+        public void ChangeServiceStatus(string serviceName, ServiceStatus newStatus)
         {
-            var service = _services.FirstOrDefault(s => s.Name == serviceName);
+            var service = _services.FirstOrDefault(s =>
+                string.Equals(s.Name, serviceName, StringComparison.CurrentCultureIgnoreCase));
             if (service is null)
             {
                 throw new ApplicationException($"Service {serviceName} could not be found on agent {Name}");

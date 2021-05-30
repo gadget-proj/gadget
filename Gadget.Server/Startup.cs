@@ -1,13 +1,12 @@
+using System.Text;
+using System.Threading.Channels;
 using Gadget.Messaging.Contracts.Commands;
-using Gadget.Server.Authorization;
-using Gadget.Server.Authorization.Helpers;
-using Gadget.Server.Authorization.Providers;
-using Gadget.Server.Authorization.Services;
-using Gadget.Server.Authorization.Services.Interfaces;
+using Gadget.Messaging.Contracts.Events.v1;
 using Gadget.Server.Consumers;
 using Gadget.Server.HealthCheck;
 using Gadget.Server.Persistence;
 using Gadget.Server.Services;
+using Gadget.Server.Services.Interfaces;
 using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -18,7 +17,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
-using System.Text;
+using Microsoft.OpenApi.Models;
 
 namespace Gadget.Server
 {
@@ -29,11 +28,11 @@ namespace Gadget.Server
             Configuration = configuration;
         }
 
-        public IConfiguration Configuration { get; private set; }
+        public IConfiguration Configuration { get; }
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddSingleton<TokenManager>();
+            
             services.AddAuthentication(x =>
             {
                 x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -52,13 +51,16 @@ namespace Gadget.Server
                     ValidateAudience = false
                 };
             });
+
             services.AddLogging(cfg => cfg.AddSeq());
-            services.AddDbContext<GadgetContext>(builder => builder.UseSqlite("Data Source=gadget.db"));
+            services.AddDbContext<GadgetContext>(builder =>
+                builder.UseSqlServer(Configuration.GetConnectionString("MsSql")));
             services.AddMassTransit(x =>
             {
                 x.AddConsumer<ServiceStatusChangedConsumer>();
                 x.AddConsumer<RegisterNewAgentConsumer>();
                 x.AddConsumer<ActionFailedConsumer>();
+                x.AddConsumer<ActionResultConsumer>();
                 x.AddRequestClient<CheckAgentHealth>();
                 x.UsingRabbitMq((context, cfg) =>
                 {
@@ -89,11 +91,16 @@ namespace Gadget.Server
                     });
             });
             services.AddControllers();
+            services.AddSingleton(Channel.CreateUnbounded<IServiceStatusChanged>());
             services.AddTransient<IAgentsService, AgentsService>();
+            services.AddTransient<IGroupsService, GroupsService>();
+            services.AddTransient<ISelectorService, SelectorService>();
+            services.AddTransient<IActionsService, ActionsService>();
             services.AddHostedService<AgentHealthCheck>();
-            services.AddTransient<ILoginProvider, PRMockProvider>();
-            services.AddTransient<IUsersService, UsersService>();
-            services.AddTransient<AuthorizationHelper>();
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo {Title = "Gadget", Version = "v1"});
+            });
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILogger<Startup> logger)
@@ -104,7 +111,6 @@ namespace Gadget.Server
             {
                 using (var context = serviceScope.ServiceProvider.GetService<GadgetContext>())
                 {
-                    logger.LogCritical("ensurecreated");
                     context?.Database.EnsureCreated();
                 }
             }
@@ -112,6 +118,8 @@ namespace Gadget.Server
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                app.UseSwagger();
+                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "WebApplication5 v1"));
             }
 
             app.UseCors("AllowAll");

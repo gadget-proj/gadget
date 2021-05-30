@@ -1,8 +1,5 @@
-using System.Diagnostics;
-using Gadget.Server;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Hosting;
 
 //Activity.DefaultIdFormat = ActivityIdFormat.W3C;
 
@@ -12,14 +9,18 @@ using Microsoft.Extensions.Hosting;
 //        // webBuilder.UseUrls("http://+:5001");
 //        webBuilder.UseStartup<Startup>();
 //    }).Build().Run();
-public static class Program
+namespace Gadget.Server
 {
-    public static void Main(string[] args)
+    public static class Program
     {
-        CreateWebHostBuilder(args).Build().Run();
-    }
+        public static void Main(string[] args)
+        {
+            CreateWebHostBuilder(args).Build().Run();
+        }
 
-    public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
-        WebHost.CreateDefaultBuilder(args)
-            .UseStartup<Startup>();
+        public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
+            WebHost.CreateDefaultBuilder(args)
+                .UseUrls("http://+:5001")
+                .UseStartup<Startup>();
+    }
 }
