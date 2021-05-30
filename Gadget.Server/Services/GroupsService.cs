@@ -42,15 +42,6 @@ namespace Gadget.Server.Services
             return group.Id;
         }
 
-        public async Task AddResource(Guid groupId, string resource)
-        {
-            var group = await _context.Groups.FirstOrDefaultAsync(g => g.Id == groupId);
-            if (group is null)
-            {
-                _logger.LogWarning($"Could not find group with id {groupId}");
-                return;
-            }
-        }
 
         public async Task AddResource(string groupName, string resource)
         {
@@ -76,6 +67,17 @@ namespace Gadget.Server.Services
             _logger.LogInformation("Added resource to group");
         }
 
+        public async Task RemoveResource(string groupName, string resource)
+        {
+            var group = await _context.Groups.FirstOrDefaultAsync(g => g.Name.ToLower() == groupName.ToLower());
+            if (group is null)
+            {
+                throw new Exception("Could not find requested resource group");
+            }
+            _logger.LogInformation($"Trying to remove {resource} from resource group {group.Name}");
+            group.RemoveResource(resource);
+        }
+        
         public async Task<IEnumerable<GroupPartialDto>> GetGroups()
         {
             return await _context.Groups.Select(g => new GroupPartialDto(g.Id, g.Name)).ToListAsync();
@@ -93,6 +95,24 @@ namespace Gadget.Server.Services
         }
 
         public async Task StopResourcesAsync(string groupName)
+        {
+            try
+            {
+                var normalizedName = groupName.Trim().ToLower();
+                var resources = await _context.Groups
+                    .Include(g => g.Resources)
+                    .ThenInclude(r => r.Agent)
+                    .FirstOrDefaultAsync(r => r.Name == groupName);
+                var stopRequests = resources.Resources.Select(r => _agentsService.StopService(r.Agent.Name, r.Name));
+                await Task.WhenAll(stopRequests);
+            }
+            catch (Exception e)
+            {
+                _logger.LogCritical(e.Message);
+            }
+        }
+        
+        public async Task StartResourcesAsync(string groupName)
         {
             try
             {

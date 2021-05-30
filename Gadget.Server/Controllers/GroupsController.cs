@@ -14,7 +14,7 @@ namespace Gadget.Server.Controllers
     public class GroupsController : ControllerBase
     {
         private readonly IGroupsService _groupsService;
-        
+
 
         public GroupsController(IGroupsService groupsService)
         {
@@ -53,6 +53,13 @@ namespace Gadget.Server.Controllers
         public async Task<IActionResult> StopGroupResources(string groupName)
         {
             await _groupsService.StopResourcesAsync(groupName);
+            return Ok();
+        }
+
+        [HttpPost("{groupName}/start")]
+        public async Task<IActionResult> StartGroupResources(string groupName)
+        {
+            await _groupsService.StartResourcesAsync(groupName);
             return Ok();
         }
     }

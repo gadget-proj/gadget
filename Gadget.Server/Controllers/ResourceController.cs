@@ -43,9 +43,7 @@ namespace Gadget.Server.Controllers
         [HttpPost("config/apply")]
         public async Task<IActionResult> ApplyConfig(ApplyConfigRequest request)
         {
-            var entry = Enum.Parse<ServiceStatus>(request.Rules.FirstOrDefault()?.Actions.FirstOrDefault()?.Event!);
             await _agentsService.ApplyConfig(request.Rules);
-            
             return Ok();
         }
     }
