@@ -20,11 +20,11 @@ namespace Gadget.Cli.Commands
             var response = await HttpClient.PostAsync($"agents/{Agent}/{Service}/start", null!);
             if (!response.IsSuccessStatusCode)
             {
-                await console.Output.WriteLineAsync("bad");
+                await console.Output.WriteLineAsync("could not execute this command successfully");
                 return;
             }
 
-            await console.Output.WriteLineAsync("good");
+            await console.Output.WriteLineAsync("command executed successfully");
         }
 
         public StartServiceCommand(HttpClient httpClient) : base(httpClient)

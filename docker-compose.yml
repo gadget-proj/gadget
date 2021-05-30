@@ -24,15 +24,19 @@ services:
       ACCEPT_EULA: "Y"
     ports: 
       - 1433:1433
-  # controlplane:
-  #   build:
-  #     context: .
-  #     dockerfile: Dockerfile.server
-  #   ports:
-  #     - 5001:5001
-  # notifications:
-  #   build:
-  #     context: .
-  #     dockerfile: Dockerfile.notifications
-  #   ports:
-  #     - 5000:5000
+  controlplane:
+    build:
+      context: .
+      dockerfile: Dockerfile.server
+    ports:
+      - 5001:5001
+  notifications:
+    build:
+      context: .
+      dockerfile: Dockerfile.notifications
+    ports:
+      - 5000:5000
+  collector:
+    build:
+      context: .
+      dockerfile: Dockerfile.collector

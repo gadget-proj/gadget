@@ -115,6 +115,23 @@ namespace Gadget.Auth.Services
 
         public async Task CreateUser(string username, string password)
         {
+            if (string.IsNullOrEmpty(username))
+            {
+                throw new Exception("Username already exists");
+            }
+
+            if (string.IsNullOrEmpty(password))
+            {
+                throw new Exception("Password already exists");
+            }
+
+            var exists = _context.Users.Any(u => u.UserName == username);
+            if (exists)
+            {
+                throw new Exception("User already exists");
+            }
+
+
             var hash = BCrypt.Net.BCrypt.HashPassword(password);
             var user = new User(username, hash);
             try
