@@ -39,7 +39,7 @@ namespace Gadget.Notifications
             // services.AddTransient<IList<ServiceDescriptor>>(_ => new List<ServiceDescriptor>());
             services.AddSingleton<IList<string>>(_ => new List<string>());
             services.AddTransient<ISubscriptionsManager, SubscriptionsManager>();
-            services.AddDbContext<NotificationsContext>(builder => builder.UseSqlite("Data Source=notifications.db"));
+            services.AddDbContext<NotificationsContext>(builder => builder.UseSqlServer(Configuration.GetConnectionString("MsSql")));
             services.AddSignalR();
             services.AddMassTransit(x =>
             {

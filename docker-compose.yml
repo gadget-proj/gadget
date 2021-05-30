@@ -40,3 +40,9 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.collector
+  auth:
+    build:
+      context: .
+      dockerfile: Dockerfile.auth
+    ports: 
+      - 5002:5002

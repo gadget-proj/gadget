@@ -34,7 +34,8 @@ namespace Gadget.Auth
         {
             services.AddSingleton<TokenManager>();
             services.AddControllers();
-            services.AddDbContext<AuthContext>(builder => builder.UseSqlite("Data Source=auth.db"));
+            services.AddDbContext<AuthContext>(builder =>
+                builder.UseSqlServer(Configuration.GetConnectionString("MsSql")));
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo {Title = "Gadget.Auth", Version = "v1"});
@@ -68,6 +69,16 @@ namespace Gadget.Auth
                 app.UseDeveloperExceptionPage();
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Gadget.Auth v1"));
+            }
+
+            using (var serviceScope = app.ApplicationServices
+                .GetRequiredService<IServiceScopeFactory>()
+                .CreateScope())
+            {
+                using (var context = serviceScope.ServiceProvider.GetService<AuthContext>())
+                {
+                    context?.Database.EnsureCreated();
+                }
             }
 
             app.UseHttpsRedirection();
